@@ -1,9 +1,6 @@
 #MainScript.R
-library(openxlsx)
-library(magrittr)
-library(data.table)
-source("loadWorkbook.R")
-library(R6)
+
+
 
 
 #load the exported linkit student item response files ####
