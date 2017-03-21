@@ -3,12 +3,14 @@ library(openxlsx)
 library(magrittr)
 library(data.table)
 source("loadWorkbook.R")
+library(R6)
 
 
 #load the exported linkit student item response files ####
 
 #Get the basic overview of stuff
-dataLocation = choose.dir(default = "J:/tests/2016-2017/")  #select the folder
+#dataLocation = choose.dir(default = "J:/tests/2016-2017/")  #select the folder
+dataLocation = "J:\\tests\\2016-2017\\Humanities\\H2\\week23 (2017-02-17) Cuba Africa Middle East\\exports"
 sources = list.files(dataLocation, full.names = T) #get a list of files
 TestName = read.csv(sources[1], header = F, nrows = 1, stringsAsFactors = F)[1,2] #get the name of the test
 ItemInfo = read.csv(sources[1], skip = 4, header = F, nrows = 3, stringsAsFactors = F)[,-(1:5)]  #get the basic item info
@@ -28,6 +30,11 @@ for (i in 1:length(sources)){  #for each source/section
   results[[i]] = x #put the response info in the list
   names(results)[i] = SectionName #set the element name in the list to be the name of the section
 }
+
+
+
+
+
 
 #Combine and analyze the item response data ####
 allresults = rbindlist(results) #make a single data.table with all of the item responses from all of the section
@@ -128,6 +135,17 @@ for(i in 1:nrow(ItemInfo)){ItemInfo$Correlation[i] = cor(DropScores$TotalPoints,
 UploadTab = allresults[,c("StudentID")]
 UploadTab$StudentName = paste0(allresults$LastName, ", ",allresults$FirstName)
 UploadTab$Percentage = allresults$score
+
+
+
+
+
+#Needed per class
+
+
+
+#Needed overall
+
 
 
 
