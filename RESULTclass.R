@@ -14,6 +14,20 @@ RESULT = R6Class(
   
   public = list(
     initialize = function(){}
+    setItemResponses = function(x){private$ItemResponses= x},
+    setSectionName = function(x){private$SectionName= x},
+    setItemScores = function(x){private$ItemScores= x},
+    setSummary = function(x){private$Summary= x},
+    setTopicScores = function(x){private$TopicScores= x},
+    setTopicSummary = function(x){private$TopicSummary= x},
+    setDropScores = function(x){private$DropScores= x},
+    getItemResponses = function(){return(private$ItemResponses)},
+    getSectionName = function(){return(private$SectionName)},
+    getItemScores = function(){return(private$ItemScores)},
+    getSummary = function(){return(private$Summary)},
+    getTopicScores = function(){return(private$TopicScores)},
+    getTopicSummary = function(){return(private$TopicSummary)},
+    getDropScores = function(){return(private$DropScores)}
   )
   
 )
