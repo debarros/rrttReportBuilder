@@ -12,6 +12,8 @@ source("loadWorkbook.R")
 
 
 #Classes ####
-source("REPORTclass.R")
-source("RESULTclass.R")
-source("COMPARISONclass.R")
+source(paste0(getwd(), "/classes/REPORTclass.R"))
+source(paste0(getwd(), "/classes/RESULTclass.R"))
+source(paste0(getwd(), "/classes/COMPARISONclass.R"))
+
+

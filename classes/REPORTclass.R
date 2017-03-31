@@ -15,7 +15,7 @@ REPORT = R6Class(
     TestName = NULL, #atomic character with the name of the test
     ItemInfo = NULL, #data.frame with info about the items, will be used to build the breakdown tab
     UploadTab = NULL, #data.frame that holds the stuff that goes in the upload tab
-    Results = list(), #list of objects of class RESULT
+    Results = NULL, #list of objects of class RESULT
     TopicAlignments = NULL, #data.frame holding the topic alignments
     TopicSummary = NULL, #data.frame with stuff that would go on the Topic Chart Calculation tab
     Summary = NULL, #not sure of the format.  Will be the overall stats from the Scores tab
@@ -37,19 +37,13 @@ REPORT = R6Class(
   public = list(
     initialize = function(TMS = "LinkIt"){private$TMS = TMS}, #default the Testing Management System to LinkIt
     
-    setDataLocation = function(x){private$dataLocation = x},
+    setDataLocation = function(x){private$DataLocation = x},
     
     setComparisonLocation = function(x){private$ComparisonLocation = x},
     
-    
     setSources = function(){ #get a list of files
-      if(is.null(private$DataLocation)){
-        return("Need a data location first.")
-      } else {
-        private$Sources = list.files(private$DataLocation, full.names = T)  
-      }
+      source(paste0(getwd(),"/classes/REPORTclass/setSources.R"), local = T)
     }, #setSources
-    
     
     setTestName = function(){ #get the name of the test
       if(is.null(private$Sources)){
@@ -102,14 +96,14 @@ REPORT = R6Class(
         private$ItemInfo$Type = d2$type[match(private$ItemInfo$ItemName, d2$`Question #:`)] #set the type 
         private$ItemInfo$options = as.integer(d2$options[match(private$ItemInfo$ItemName, d2$`Question #:`)]) #set the number of options
       }
-    } #enhanceItemInfo
+    }, #enhanceItemInfo
     
     
     setTopicAlignments = function(d2){
       Topics = d2[,5:ncol(d2)] #set up a data.frame to hold topic info
       colnames(Topics)[1] = "ItemName" #set the name of the first column
       private$TopicAlignments = Topics
-    } #setTopicAlignments
+    }, #setTopicAlignments
     
     
     addItemScores = function(){ #add the ItemResponseScores data.frame to each result and add item average scores to the ItemInfo
@@ -124,17 +118,17 @@ REPORT = R6Class(
         ItemResponseScores = vector(mode = "list", length = length(private$Results))
         #calculate the item response scores for each section and load them in the list
         for(i in 1:length(private$Results)){
-          private$Results[i]$setResponseScores(private$ItemInfo)
-          ItemResponseScores[i] = private$Results[i]$getItemScores()
+          private$Results[[i]]$setItemResponseScores(private$ItemInfo)
+          ItemResponseScores[[i]] = private$Results[[i]]$getItemResponseScores()
         }
         ItemResponseScores = rbindlist(ItemResponseScores) #make a single data.table with all of the item response scores from all of the sections
         #Calculate the average score for each question
         for(i in 1:nrow(private$ItemInfo)){
-          private$ItemInfo$AverageScore[i] = mean(ItemResponseScores[,private$ItemInfo$ItemName[i]])/private$ItemInfo$Value[i]*100
+          private$ItemInfo$AverageScore[i] = mean(ItemResponseScores[[private$ItemInfo$ItemName[i]]])/private$ItemInfo$Value[i]*100
         }
         private$ItemScores = private$ItemInfo$AverageScore
       }
-    } #addItemScores
+    }, #addItemScores
     
     
     setUploadTab = function(){
@@ -143,7 +137,7 @@ REPORT = R6Class(
       UploadTab$StudentName = paste0(ItemResponses$LastName, ", ",ItemResponses$FirstName)
       UploadTab$Percentage = ItemResponses$score
       private$UploadTab = UploadTab
-    },
+    }, #setUploadTab
     
     
     setResults = function(){
@@ -158,7 +152,8 @@ REPORT = R6Class(
           thisResult$setItemResponses(private$Sources[i], private$ItemInfo$ItemName, private$ItemInfo$Value)
           results[[i]] = thisResult #put the response info in the list
           names(results)[i] = SectionName #set the element name in the list to be the name of the section
-        }  
+        }
+        private$Results = results
       }
     }, #setResults
     
@@ -244,7 +239,7 @@ REPORT = R6Class(
         #calculate the item response scores for each section and load them in the list
         for(i in 1:length(private$Results)){
           private$Results[i]$setDropScores(private$ItemInfo)
-          DropScores[i] = private$Results[i]$getDropScores()
+          DropScores[[i]] = private$Results[[i]]$getDropScores()
         }
         DropScores = rbindlist(DropScores) #make a single data.table with all of the dropscores from all of the sections
         #Calculate the correlations
@@ -299,7 +294,7 @@ REPORT = R6Class(
         }
         private$ResponseSet = responseSet
       }
-    } #addResponseFrequencies
+    }, #addResponseFrequencies
     
     
     getDataLocation = function(){return(private$DataLocation)},
@@ -320,7 +315,7 @@ REPORT = R6Class(
       ItemResponses = vector(mode = "list", length = length(private$Results))
       #load the item responses for each section in the list
       for(i in 1:length(private$Results)){
-        ItemResponses[i] = private$Results[i]$getItemResponses()
+        ItemResponses[[i]] = private$Results[[i]]$getItemResponses()
       }
       ItemResponses = rbindlist(ItemResponses) #make a single data.table with all of the item responses from all of the sections
       
@@ -332,10 +327,15 @@ REPORT = R6Class(
     getTopicSummary = function(){return(private$TopicSummary)},
     getSummary = function(){return(private$Summary)},
     getItemSummary = function(){return(private$ItemSummary)},
+    getItemScores = function(){return(private$ItemScores)},
     getNarrative = function(){return(private$Narrative)},
     getComparison = function(){return(private$Comparison)},
     getHandouts = function(){return(private$Handouts)},
-    getCorrelations = function(){return(private$Correlations)}
+    getCorrelations = function(){return(private$Correlations)},
+    
+    badMessage = function(method){ #check whether a method can run right now
+      source(paste0(getwd(),"/classes/REPORTclass/badMessage.R"), local = T)
+    }#badMessage
   )
   
 )

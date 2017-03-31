@@ -10,7 +10,7 @@ RESULT = R6Class(
   private = list(
     ItemResponses = NA, #data.frame showing the response each student made on each item
     SectionName = NA_character_, #atomic character with the name of the section
-    ResponseScores = NA, #data.frame showing the points each student earned on each item
+    ItemResponseScores = NA, #data.frame showing the points each student earned on each item
     Summary = NA, #not sure.  It will be the stuff that shows up to the right on the Scores tab
     TopicScores = NA, #data.frame with one row per student and one column per topic
     TopicSummary = NA, #data.frame representing one column from the Topic Chart Calculation tab and part of one row from the Topics tab
@@ -32,21 +32,20 @@ RESULT = R6Class(
     setSectionName = function(x){private$SectionName= x},
     
     
-    setResponseScores = function(ItemInfo){
-      #create a dara.frame to hold the item scores
-      ResponseScores = setNames(as.data.frame(array(data = NA_integer_, dim = dim(private$ItemResponses))), colnames(private$ItemResponses)) 
-      ResponseScores[,1:5] = private$ItemResponses[,1:5] #pull in the student info from the results data.table
-      
+    setItemResponseScores = function(ItemInfo){
+      #create a data.frame to hold the item scores
+      ItemResponseScores = setNames(as.data.frame(array(data = NA_integer_, dim = dim(private$ItemResponses))), colnames(private$ItemResponses)) 
+      ItemResponseScores[,1:5] = private$ItemResponses[,1:5] #pull in the student info from the results data.table
       #Calculate scores for each response on each item
       for(i in 1:nrow(ItemInfo)){
         if(ItemInfo$Type[i] == "MC"){
-          ResponseScores[,ItemInfo$ItemName[i]] = ItemInfo$Value[i]*(private$ItemResponses[,ItemInfo$ItemName[i], with = F] == ItemInfo$Answer[i])
+          ItemResponseScores[,ItemInfo$ItemName[i]] = ItemInfo$Value[i]*(private$ItemResponses[,ItemInfo$ItemName[i]] == ItemInfo$Answer[i])
         } else {
-          ResponseScores[,ItemInfo$ItemName[i]] = private$ItemResponses[,ItemInfo$ItemName[i], with = F]
+          ItemResponseScores[,ItemInfo$ItemName[i]] = private$ItemResponses[,ItemInfo$ItemName[i]]
         }
       }
-      private$ResponseScores = ItemResponseScores
-    }, #setResponseScores
+      private$ItemResponseScores = ItemResponseScores
+    }, #setItemResponseScores
     
     
     setSummary = function(x){private$Summary= x},
@@ -56,7 +55,7 @@ RESULT = R6Class(
     
     setDropScores = function(ItemInfo){ 
       #Set up a dataframe to hold the scores of each students with each item dropped and then calculate those scores
-      DropScores = private$ResponseScores 
+      DropScores = private$ItemResponseScores 
       for(i in 1:nrow(DropScores)){
         for(j in ItemInfo$ItemName){
           DropScores[i,j] = DropScores$TotalPoints[i] - ItemScores[i,j]
@@ -68,7 +67,13 @@ RESULT = R6Class(
     
     getItemResponses = function(){return(private$ItemResponses)},
     getSectionName = function(){return(private$SectionName)},
-    getItemResponseScores = function(){return(private$ItemResponseScores)},
+    
+    
+    getItemResponseScores = function(){
+      return(private$ItemResponseScores)
+      },
+    
+    
     getSummary = function(){return(private$Summary)},
     getTopicScores = function(){return(private$TopicScores)},
     getTopicSummary = function(){return(private$TopicSummary)},
