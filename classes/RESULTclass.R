@@ -58,7 +58,7 @@ RESULT = R6Class(
       DropScores = private$ItemResponseScores 
       for(i in 1:nrow(DropScores)){
         for(j in ItemInfo$ItemName){
-          DropScores[i,j] = DropScores$TotalPoints[i] - ItemScores[i,j]
+          DropScores[i,j] = DropScores$TotalPoints[i] - private$ItemResponseScores[i,j]
         }
       }
       private$DropScores = DropScores

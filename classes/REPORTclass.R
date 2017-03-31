@@ -31,7 +31,9 @@ REPORT = R6Class(
     RelatedCutoffProportion = 0.2, #target proportion of items to count as highly related
     ResponseSet = NULL, #character vector hold the names of the different response frequencies columns
     Correlations = NULL, #correlations column from the ItemInfo
-    ItemScores = NULL #AverageScore column from the ItemInfo
+    ItemScores = NULL, #AverageScore column from the ItemInfo
+    ItemResponseScores = NULL, #data.table with the score for every student on every item
+    DropScores = NULL #data.table with the score for each student after dropping each item
   ),
   
   public = list(
@@ -127,6 +129,7 @@ REPORT = R6Class(
           private$ItemInfo$AverageScore[i] = mean(ItemResponseScores[[private$ItemInfo$ItemName[i]]])/private$ItemInfo$Value[i]*100
         }
         private$ItemScores = private$ItemInfo$AverageScore
+        private$ItemResponseScores = ItemResponseScores
       }
     }, #addItemScores
     
@@ -238,16 +241,18 @@ REPORT = R6Class(
         DropScores = vector(mode = "list", length = length(private$Results))
         #calculate the item response scores for each section and load them in the list
         for(i in 1:length(private$Results)){
-          private$Results[i]$setDropScores(private$ItemInfo)
+          private$Results[[i]]$setDropScores(private$ItemInfo)
           DropScores[[i]] = private$Results[[i]]$getDropScores()
         }
         DropScores = rbindlist(DropScores) #make a single data.table with all of the dropscores from all of the sections
-        #Calculate the correlations
+        #Calculate the correlations between the student scores on the item and the student total scores after dropping the item
         for(i in 1:nrow(private$ItemInfo)){
-          private$ItemInfo$Correlation[i] = cor(DropScores$TotalPoints, DropScores[private$ItemInfo$ItemName[i]])
+          thisItem = private$ItemInfo$ItemName[i]
+          private$ItemInfo$Correlation[i] = cor(private$ItemResponseScores[[thisItem]], DropScores[[thisItem]])
         }
       }
       private$Correlations = private$ItemInfo$Correlation
+      private$DropScores = DropScores
     }, #addCorrelations
     
     

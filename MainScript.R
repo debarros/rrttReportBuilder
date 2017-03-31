@@ -28,6 +28,8 @@ currentReport$addItemScores()
 currentReport$getItemInfo() #just to check
 currentReport$getItemScores() #just to check
 currentReport$addCorrelations()
+currentReport$getCorrelations() #just to check
+currentReport$getItemInfo() #just to check
 currentReport$addResponseFrequencies()
 currentReport$setUploadTab()
 
