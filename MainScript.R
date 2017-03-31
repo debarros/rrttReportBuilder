@@ -31,9 +31,10 @@ currentReport$addCorrelations()
 currentReport$getCorrelations() #just to check
 currentReport$getItemInfo() #just to check
 currentReport$addResponseFrequencies()
+currentReport$getResponseSet()
 currentReport$setUploadTab()
 
-REPORT$public_methods$addItemScores()
+
 
 
 
