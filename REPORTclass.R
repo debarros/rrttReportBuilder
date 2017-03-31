@@ -19,10 +19,19 @@ REPORT = R6Class(
     TopicAlignments = NULL, #data.frame holding the topic alignments
     TopicSummary = NULL, #data.frame with stuff that would go on the Topic Chart Calculation tab
     Summary = NULL, #not sure of the format.  Will be the overall stats from the Scores tab
-    ItemSummary = NULL, #not sure of the format.  Will be the info in the table at the top of the Item Summary tab
+    ItemSummary = NULL, #data.frame With  the info in the table at the top of the Item Summary tab.  One row per item, one column per type
     Narrative = NULL, #either atomic character or character vector.  Will be the text in cell A11 of the Item Summary tab
     Comparison = list(), #a list of objects of class COMPARISON
-    Handouts = NULL #data.frame containing the information necessary to build the Handouts tab simply
+    Handouts = NULL, #data.frame containing the information necessary to build the Handouts tab simply
+    DistractorCutoffProportion = 0.25, #cutoff percentage for determining whether an item is a distrator
+    OverThinkCutoff = 0.1, #cutoff correlation for determining whether an item is an overthinker
+    EasyCutoff = 0.9, #cutoff score for determining whether an item is easy
+    DifficultCutoffParams = list("Lower" = 0.4, "Upper" = 0.5, "Proportion" = 0.2), #lower bound, upper bound, and target proportion for the criterion for determining whether an item is difficult
+    ChaffRules = data.frame(score = c(.3, .4), correlation = c(.3, .5)), #rules for determining whether an item is Wheat From Chaff
+    RelatedCutoffProportion = 0.2, #target proportion of items to count as highly related
+    ResponseSet = NULL, #character vector hold the names of the different response frequencies columns
+    Correlations = NULL, #correlations column from the ItemInfo
+    ItemScores = NULL #AverageScore column from the ItemInfo
   ),
   
   public = list(
@@ -105,24 +114,25 @@ REPORT = R6Class(
     
     addItemScores = function(){ #add the ItemResponseScores data.frame to each result and add item average scores to the ItemInfo
       badmessage = ""
-      if(length(private$results) == 0){badmessage = paste0(badmessage, "Need Results first.  ")}
+      if(length(private$Results) == 0){badmessage = paste0(badmessage, "Need Results first.  ")}
       if(is.null(private$ComparisonLocation)){ badmessage = paste0(badmessage, "Need Comparison Location first.  ")}
       if(is.null(private$ItemInfo)){ badmessage = paste0(badmessage, "Need Item Info first.  ")}
       if(nchar(badmessage) > 0){
         return(badmessage)
       } else {
         #establish a list that will hold the Item Response Scores data.frames
-        ItemResponseScores = vector(mode = "list", length = length(private$results))
+        ItemResponseScores = vector(mode = "list", length = length(private$Results))
         #calculate the item response scores for each section and load them in the list
-        for(i in 1:length(private$results)){
-          private$results[i]$setResponseScores(private$ItemInfo)
-          ItemResponseScores[i] = private$results[i]$getItemScores()
+        for(i in 1:length(private$Results)){
+          private$Results[i]$setResponseScores(private$ItemInfo)
+          ItemResponseScores[i] = private$Results[i]$getItemScores()
         }
         ItemResponseScores = rbindlist(ItemResponseScores) #make a single data.table with all of the item response scores from all of the sections
         #Calculate the average score for each question
         for(i in 1:nrow(private$ItemInfo)){
           private$ItemInfo$AverageScore[i] = mean(ItemResponseScores[,private$ItemInfo$ItemName[i]])/private$ItemInfo$Value[i]*100
-        } 
+        }
+        private$ItemScores = private$ItemInfo$AverageScore
       }
     } #addItemScores
     
@@ -153,9 +163,69 @@ REPORT = R6Class(
     }, #setResults
     
     
-    setTopicSummary = function(x){private$TopicSummary = x},
+    setItemSummary = function(x){
+      badmessage = ""
+      if(is.null(private$DataLocation)){ badmessage = paste0(badmessage, "Need Data Location first.  ")}
+      if(length(private$Results) == 0){badmessage = paste0(badmessage, "Need Results first.  ")}
+      if(is.null(private$ComparisonLocation)){ badmessage = paste0(badmessage, "Need Comparison Location first.  ")}
+      if(is.null(private$ItemInfo)){ badmessage = paste0(badmessage, "Need Item Info first.  ")}
+      if(is.null(private$ResponseSet)){ badmessage = paste0(badmessage, "Need Response Frequencies first.  ")}
+      if(nchar(badmessage) > 0){
+        return(badmessage)
+      } else {
+        
+        # set the parameters
+        DifficultCutoff = min(
+          private$DifficultCutoffParams$Lower, 
+          max(private$DifficultCutoffParams$Upper, 
+              quantile(private$ItemInfo$AverageScore, private$DifficultCutoffParams$Proportion)))
+        RelatedCutoff = quantile(private$ItemInfo$Correlation, 1 - RelatedCutoffProportion)   # find the 1-RelatedCutoffProportion quantile of the item correlations
+        DistractorCutoffCount = nrow(private$ItemInfo) * private$DistractorCutoffProportion
+        
+        #set up the ItemSummary data.frame
+        ItemSummary = data.frame(ItemName = private$ItemInfo$ItemName) 
+        
+        #for MC items only, if at least one wrong answer was selected by at least private$DistractorCutoffProportion percent of students
+        #this should be altered to not be a loop
+        ItemSummary$PowerDistrators = FALSE
+        for(i in 1:nrow(ItemSummary)){
+          if(private$ItemInfo$Type == "MC"){
+            wrongSet = grep(pattern = private$ItemInfo$Answer[i], x = private$ResponseSet, value = T, invert = T) 
+            ItemSummary$PowerDistrators = any(private$ItemInfo[,wrongSet] > DistractorCutoffCount)
+          }
+        }
+        
+        
+        #Correlation < private$OverThinkCutoff
+        ItemSummary$OverThinking = private$ItemInfo$Correlation <  private$OverThinkCutoff
+        
+        # average score < DifficultCutoff
+        ItemSummary$Difficult = private$ItemInfo$AverageScore < DifficultCutoff
+        
+        # average score >= private$EasyCutoff
+        ItemSummary$Easy = private$ItemInfo$AverageScore >= private$EasyCutoff
+        
+        #item fits one of the ChaffRules (score < ChaffRules$score and correlation > ChaffRules$correlation)
+        #this should be altered to not be a loop
+        ItemSummary$WheatFromChaff = 0
+        for(i in 1:nrow(ChaffRules)){
+          ItemSummary$WheatFromChaff = ItemSummary$WheatFromChaff + (private$ItemInfo$AverageScore < private$ChaffRules$score[i] & private$ItemInfo$Correlation > private$ChaffRules$correllation[i])
+        }
+        ItemSummary$WheatFromChaff = as.logical(ItemSummary$WheatFromChaff)
+        
+        # correlation greater than RelatedCutoff
+        ItemSummary$HighlyRelated = private$ItemInfo$Correlation > RelatedCutoff
+        
+        #for MC items only, (score is 0) OR (item is both Difficult and Overthinking)
+        ItemSummary$CheckKey = private$ItemInfo$Type == "MC" & (private$ItemInfo$AverageScore == 0 | (ItemSummary$Difficult & ItemSummary$OverThinking))
+        
+        private$ItemSummary = ItemSummary
+      }
+    }, #setTopicSummary
+    
+    
     setSummary = function(x){private$Summary = x},
-    setItemSummary = function(x){private$ItemSummary = x},
+    setTopicSummary = function(x){private$ItemSummary = x},
     setNarrative = function(x){private$Narrative = x},
     setComparison = function(x){private$Comparison = x},
     setHandouts = function(x){private$Handouts = x},
@@ -163,18 +233,18 @@ REPORT = R6Class(
     
     addCorrelations = function(){
       badmessage = ""
-      if(length(private$results) == 0){badmessage = paste0(badmessage, "Need Results first.  ")}
+      if(length(private$Results) == 0){badmessage = paste0(badmessage, "Need Results first.  ")}
       if(is.null(private$ComparisonLocation)){ badmessage = paste0(badmessage, "Need Comparison Location first.  ")}
       if(is.null(private$ItemInfo)){ badmessage = paste0(badmessage, "Need Item Info first.  ")}
       if(nchar(badmessage) > 0){
         return(badmessage)
       } else {
         #establish a list that will hold the DropScores data.frames
-        DropScores = vector(mode = "list", length = length(private$results))
+        DropScores = vector(mode = "list", length = length(private$Results))
         #calculate the item response scores for each section and load them in the list
-        for(i in 1:length(private$results)){
-          private$results[i]$setDropScores(private$ItemInfo)
-          DropScores[i] = private$results[i]$getDropScores()
+        for(i in 1:length(private$Results)){
+          private$Results[i]$setDropScores(private$ItemInfo)
+          DropScores[i] = private$Results[i]$getDropScores()
         }
         DropScores = rbindlist(DropScores) #make a single data.table with all of the dropscores from all of the sections
         #Calculate the correlations
@@ -182,12 +252,13 @@ REPORT = R6Class(
           private$ItemInfo$Correlation[i] = cor(DropScores$TotalPoints, DropScores[private$ItemInfo$ItemName[i]])
         }
       }
+      private$Correlations = private$ItemInfo$Correlation
     }, #addCorrelations
     
     
     addResponseFrequencies = function(){
       badmessage = ""
-      if(length(private$results) == 0){badmessage = paste0(badmessage, "Need Results first.  ")}
+      if(length(private$Results) == 0){badmessage = paste0(badmessage, "Need Results first.  ")}
       if(is.null(private$ComparisonLocation)){ badmessage = paste0(badmessage, "Need Comparison Location first.  ")}
       if(is.null(private$ItemInfo)){ badmessage = paste0(badmessage, "Need Item Info first.  ")}
       if(nchar(badmessage) > 0){
@@ -226,7 +297,7 @@ REPORT = R6Class(
             }
           }
         }
-        
+        private$ResponseSet = responseSet
       }
     } #addResponseFrequencies
     
@@ -246,10 +317,10 @@ REPORT = R6Class(
     
     getResponses = function(){
       #establish a list that will hold the Item Response data.frames
-      ItemResponses = vector(mode = "list", length = length(private$results))
+      ItemResponses = vector(mode = "list", length = length(private$Results))
       #load the item responses for each section in the list
-      for(i in 1:length(private$results)){
-        ItemResponses[i] = private$results[i]$getItemResponses()
+      for(i in 1:length(private$Results)){
+        ItemResponses[i] = private$Results[i]$getItemResponses()
       }
       ItemResponses = rbindlist(ItemResponses) #make a single data.table with all of the item responses from all of the sections
       
