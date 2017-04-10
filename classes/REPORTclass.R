@@ -17,7 +17,7 @@ REPORT = R6Class(
     Results = NULL, #list of objects of class RESULT
     TopicAlignments = NULL, #data.frame holding the topic alignments
     TopicSummary = NULL, #data.frame with stuff that would go on the Topic Chart Calculation tab
-    Summary = NULL, #not sure of the format.  Will be the overall stats from the Scores tab
+    Summary = NULL, #list with the overall stats from the Scores tab
     ItemSummary = NULL, #data.frame With  the info in the table at the top of the Item Summary tab.  One row per item, one column per type
     Narrative = NULL, #either atomic character or character vector.  Will be the text in cell A11 of the Item Summary tab
     Comparison = list(), #a list of objects of class COMPARISON
@@ -33,7 +33,8 @@ REPORT = R6Class(
     ItemScores = NULL, #AverageScore column from the ItemInfo
     ItemResponseScores = NULL, #data.table with the score for every student on every item
     DropScores = NULL, #data.table with the score for each student after dropping each item
-    addr = paste0(getwd(),"/classes/REPORTclass/")
+    addr = paste0(getwd(),"/classes/REPORTclass/"),
+    PassingScore = 0.7 #passing score for the test
   ),
   
   public = list(
@@ -49,6 +50,7 @@ REPORT = R6Class(
     setUploadTab = function(){source(paste0(private$addr,"setUploadTab.R"), local = T)},
     setResults = function(){source(paste0(private$addr,"setResults.R"), local = T)},
     setItemSummary = function(x){source(paste0(private$addr,"setItemSummary.R"), local = T)},
+    setPassingScore = function(x){private$PassingScore = x},
     addCorrelations = function(){source(paste0(private$addr,"addCorrelations.R"), local = T)},
     addResponseFrequencies = function(){source(paste0(private$addr,"addResponseFrequencies.R"), local = T)}, 
     getResponses = function(){source(paste0(private$addr,"getResponses.R"), local = T)}, 
@@ -69,10 +71,24 @@ REPORT = R6Class(
     getHandouts = function(){return(private$Handouts)},
     getCorrelations = function(){return(private$Correlations)},
     getResponseSet = function(){return(private$ResponseSet)},
+    getPassingScore = function(){return(private$PassingScore)},
+    setSummary = function(){source(paste0(private$addr,"setSummary.R"), local = T)},
+    
+    
+    
+    getResponses2 = function(){
+      #establish a list that will hold the Item Response data.frames
+      ItemResponses = vector(mode = "list", length = length(private$Results))
+      #load the item responses for each section in the list
+      for(i in 1:length(private$Results)){
+        ItemResponses[[i]] = private$Results[[i]]$getItemResponses()
+      }
+      ItemResponses2 = rbindlist(ItemResponses) #make a single data.table with all of the item responses from all of the sections
+      return(ItemResponses2)
+    },
     
     #Methods still to be made ####
-    setSummary = function(x){private$Summary = x},
-    setTopicSummary = function(x){private$ItemSummary = x},
+    setTopicSummary = function(x){private$TopicSummary = x},
     setNarrative = function(x){private$Narrative = x},
     setComparison = function(x){private$Comparison = x},
     setHandouts = function(x){private$Handouts = x}
