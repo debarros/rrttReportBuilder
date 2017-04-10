@@ -30,12 +30,12 @@ RESULT = R6Class(
     getSummary = function(){return(private$Summary)},
     getTopicScores = function(){return(private$TopicScores)},
     getTopicSummary = function(){return(private$TopicSummary)},
-    getDropScores = function(){return(private$DropScores)}
+    getDropScores = function(){return(private$DropScores)},
     
     #Methods yet to be made ####
     setSummary = function(x){private$Summary= x},
     setTopicScores = function(x){private$TopicScores= x},
-    setTopicSummary = function(x){private$TopicSummary= x},
+    setTopicSummary = function(x){private$TopicSummary= x}
     
   ) #public
 )
