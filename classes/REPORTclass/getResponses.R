@@ -1,5 +1,7 @@
 #getResponses.R
 
+#getResponses method for REPORT class
+
 #establish a list that will hold the Item Response data.frames
 ItemResponses = vector(mode = "list", length = length(private$Results))
 #load the item responses for each section in the list
