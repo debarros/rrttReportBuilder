@@ -61,8 +61,23 @@ RESULT = R6Class(
     
     #Methods yet to be made ####
     setSummary = function(x){private$Summary= x},
-    setTopicScores = function(x){private$TopicScores= x},
-    setTopicSummary = function(x){private$TopicSummary= x}
-    
+    setTopicScores = function(TopicAlignments, ItemInfo){
+      TopicNames = colnames(TopicAlignments)[-1]
+      TopicAlignments$Value = ItemInfo$Value
+      TopicScores = private$ItemResponses[,1:3]
+      TopicScores[,TopicNames] = NA_real_
+      for(i in TopicNames){
+        itemset = TopicAlignments[,i]
+        totalpoints = sum(TopicAlignments$Value[itemset])
+        for(j in 1:nrow(TopicScores)){
+          TopicScores[j,i] = sum(t(private$ItemResponseScores[j,TopicAlignments$ItemName[itemset]]))/totalpoints
+        }
+      }
+      private$TopicScores = TopicScores
+      self$setTopicSummary(TopicScores)
+      },
+    setTopicSummary = function(TopicScores){
+      private$TopicSummary = apply(TopicScores[,-c(1:3)], 2, mean)
+      }
   ) #public
 )
