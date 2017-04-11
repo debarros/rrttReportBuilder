@@ -20,10 +20,37 @@ RESULT = R6Class(
   
   public = list(
     initialize = function(SectionName){private$SectionName = SectionName},
-    setItemResponses = function(sourceLocation, itemNames, itemValues){source(paste0(private$addr,"setItemResponses.R"), local = T)},
+    setItemResponses = function(sourceLocation, itemNames, itemValues){
+      ItemResponses = read.csv(sourceLocation, skip = 13, header = F, stringsAsFactors = F) #read the item response info
+      colnames(ItemResponses) = c("StudentID", "LastName","FirstName","TestDate","TotalPoints",itemNames) #set the column names 
+      ItemResponses$score = ItemResponses$TotalPoints/sum(itemValues)*100
+      private$ItemResponses = ItemResponses
+    },
     setSectionName = function(x){private$SectionName= x},
-    setItemResponseScores = function(ItemInfo){source(paste0(private$addr,"setItemResponseScores.R"), local = T)},
-    setDropScores = function(ItemInfo){source(paste0(private$addr,"setDropScores.R"), local = T)},
+    setItemResponseScores = function(ItemInfo){
+      #create a data.frame to hold the item scores
+      ItemResponseScores = setNames(as.data.frame(array(data = NA_integer_, dim = dim(private$ItemResponses))), colnames(private$ItemResponses)) 
+      ItemResponseScores[,1:5] = private$ItemResponses[,1:5] #pull in the student info from the results data.table
+      #Calculate scores for each response on each item
+      for(i in 1:nrow(ItemInfo)){
+        if(ItemInfo$Type[i] == "MC"){
+          ItemResponseScores[,ItemInfo$ItemName[i]] = ItemInfo$Value[i]*(private$ItemResponses[,ItemInfo$ItemName[i]] == ItemInfo$Answer[i])
+        } else {
+          ItemResponseScores[,ItemInfo$ItemName[i]] = private$ItemResponses[,ItemInfo$ItemName[i]]
+        }
+      }
+      private$ItemResponseScores = ItemResponseScores
+    },
+    setDropScores = function(ItemInfo){
+      #Set up a dataframe to hold the scores of each students with each item dropped and then calculate those scores
+      DropScores = private$ItemResponseScores 
+      for(i in 1:nrow(DropScores)){
+        for(j in ItemInfo$ItemName){
+          DropScores[i,j] = DropScores$TotalPoints[i] - private$ItemResponseScores[i,j]
+        }
+      }
+      private$DropScores = DropScores
+    },
     getItemResponses = function(){return(private$ItemResponses)},
     getSectionName = function(){return(private$SectionName)},
     getItemResponseScores = function(){return(private$ItemResponseScores)},
