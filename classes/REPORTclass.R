@@ -2,6 +2,9 @@
 
 #An instance of this class holds everything necessary for a score report on a single test
 
+#This file is way too long.  It should be broken up into separate files, where each one adds a method using $set()
+# See details at https://cran.r-project.org/web/packages/R6/vignettes/Introduction.html#adding-members-to-an-existing-class
+
 REPORT = R6Class(
   
   classname = "REPORT",
@@ -362,42 +365,6 @@ REPORT = R6Class(
       private$Summary = Summarize
     },
     
-    setTopicSummary = function(){
-      TopicNames = colnames(private$TopicAlignments)[-1]
-      TopicScores = vector(mode = "list", length = length(private$Results))
-      sectionNames = c("All", names(private$Results))
-      TopicSummary = set_rownames(set_colnames(
-        as.data.frame.matrix(matrix(data = NA_real_, nrow = ncol(private$TopicAlignments)-1, ncol = length(sectionNames))),
-        sectionNames),TopicNames)
-      
-      for(i in 1:length(private$Results)){
-        private$Results[[i]]$setTopicScores(private$TopicAlignments,private$ItemInfo)
-        TopicScores[[i]] = private$Results[[i]]$getTopicScores()
-        TopicSummary[,names(private$Results)[i]] = private$Results[[i]]$getTopicSummary()
-      }
-      
-      
-      TopicScores = rbindlist(TopicScores)
-      for(i in TopicNames){
-        itemset = private$TopicAlignments[,i]
-        totalpoints = sum(private$TopicAlignments$Value[itemset])
-        TopicSummary$All[rownames(TopicSummary) == i] = mean(unlist(TopicScores[,i, with = F]))
-      }
-      private$TopicSummary = TopicSummary
-    }, 
-    
-    
-    
-    #Methods still to be made ####
-    
-    setComparison = function(x){
-      private$
-        
-        
-        
-        private$Comparison = x
-      
-    },
     setItemSummary = function(){
       badmessage = ""
       if(is.null(private$DataLocation)){ badmessage = paste0(badmessage, "Need Data Location first.  ")}
@@ -463,6 +430,44 @@ REPORT = R6Class(
       }
     },
     
+    setTopicSummary = function(){
+      TopicNames = colnames(private$TopicAlignments)[-1]
+      TopicScores = vector(mode = "list", length = length(private$Results))
+      sectionNames = c("All", names(private$Results))
+      TopicSummary = set_rownames(set_colnames(
+        as.data.frame.matrix(matrix(data = NA_real_, nrow = ncol(private$TopicAlignments)-1, ncol = length(sectionNames))),
+        sectionNames),TopicNames)
+      
+      for(i in 1:length(private$Results)){
+        private$Results[[i]]$setTopicScores(private$TopicAlignments,private$ItemInfo)
+        TopicScores[[i]] = private$Results[[i]]$getTopicScores()
+        TopicSummary[,names(private$Results)[i]] = private$Results[[i]]$getTopicSummary()
+      }
+      
+      
+      TopicScores = rbindlist(TopicScores)
+      for(i in TopicNames){
+        itemset = private$TopicAlignments[,i]
+        totalpoints = sum(private$TopicAlignments$Value[itemset])
+        TopicSummary$All[rownames(TopicSummary) == i] = mean(unlist(TopicScores[,i, with = F]))
+      }
+      private$TopicSummary = TopicSummary
+    }, 
+    
+    
+    
+    #Methods still to be made ####
+    
+    setComparison = function(){
+      
+      #get general comparison info  
+        
+        
+        
+      
+    },
+    
+    
     
     
     setHandouts = function(x){private$Handouts = x},
@@ -471,14 +476,49 @@ REPORT = R6Class(
 )
 
 # ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
 # Blank space ####
 # ####
-
-
-
-
-
-
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
+# ####
 
 
 
