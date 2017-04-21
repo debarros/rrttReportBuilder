@@ -1,0 +1,8 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^sandbox\.R$
+^MainScript\.R$
+^license$
+^YearDescriptions\.csv$
+^itemResponseScores\.rds$
+^README\.md$

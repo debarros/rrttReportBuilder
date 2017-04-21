@@ -1,9 +1,5 @@
 #MainScript.R
 
-#This whole thing needs to be rebuilt as a package.
-# See more at http://r-pkgs.had.co.nz/
-
-source("functions.R")
 
 #dataLocation = choose.dir(default = "J:/tests/2016-2017/")  #select the folder
 currentReport = REPORT$new() #initiate a new report
@@ -45,4 +41,5 @@ currentReport$getItemSummary() #just to check
 
 
 currentReport
+
 

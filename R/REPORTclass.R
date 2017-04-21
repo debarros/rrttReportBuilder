@@ -67,7 +67,7 @@ REPORT = R6Class(
       } else {
         ItemInfo = read.csv(private$Sources[1], skip = 4, header = F, nrows = 3, stringsAsFactors = F)[,-(1:5)]  #get the basic item info
         #fix the iteminfo data.frame setup
-        ItemInfo =  set_rownames(setNames(as.data.frame(t(ItemInfo), stringsAsFactors = F), c("ItemName", "Value", "Answer")), NULL) 
+        ItemInfo =  magrittr::set_rownames(setNames(as.data.frame(t(ItemInfo), stringsAsFactors = F), c("ItemName", "Value", "Answer")), NULL) 
         toFix = grepl(pattern = "[^a-zA-Z\\d\\s:]", x = ItemInfo$Answer) #which items have weird values in the Answer field?
         ItemInfo$Answer[toFix] = ItemInfo$Value[toFix] #Set those answers to just be the value of the respective questions
         ItemInfo$Value = as.numeric(ItemInfo$Value) #Set the value column to be numeric
@@ -86,7 +86,7 @@ REPORT = R6Class(
       if(nchar(badmessage) > 0){
         return(badmessage)
       } else {
-        d2 = read.xlsx(xlsxFile = private$ComparisonLocation, sheet = "Topic Alignment", startRow = 2, colNames = F)
+        d2 = openxlsx::read.xlsx(xlsxFile = private$ComparisonLocation, sheet = "Topic Alignment", startRow = 2, colNames = F)
         d2 = d2[1:(which(is.na(d2[,3]))[1] - 1),3:ncol(d2)] #remove unnecessary columns and rows
         d2 = t(d2) #transpose it
         colnames(d2) = d2[1,] #use the first row as the column names
@@ -130,7 +130,7 @@ REPORT = R6Class(
           ItemResponseScores[[i]] = private$Results[[i]]$getItemResponseScores()
         }
         #make a single data.table with all of the item response scores from all of the sections
-        ItemResponseScores = rbindlist(ItemResponseScores) 
+        ItemResponseScores = data.table::rbindlist(ItemResponseScores) 
         #Calculate the average score for each question
         for(i in 1:nrow(private$ItemInfo)){
           private$ItemInfo$AverageScore[i] = mean(ItemResponseScores[[private$ItemInfo$ItemName[i]]])/private$ItemInfo$Value[i]*100
@@ -141,8 +141,8 @@ REPORT = R6Class(
     },
     
     setUploadTab = function(){
-      ItemResponses = self$getResponses()
-      UploadTab = ItemResponses[,c("StudentID")]
+      ItemResponses = as.data.frame(self$getResponses())
+      UploadTab = data.frame(StudentID = ItemResponses$StudentID)
       UploadTab$StudentName = paste0(ItemResponses$LastName, ", ",ItemResponses$FirstName)
       UploadTab$Percentage = ItemResponses$score
       private$UploadTab = UploadTab
@@ -182,7 +182,7 @@ REPORT = R6Class(
           private$Results[[i]]$setDropScores(private$ItemInfo)
           DropScores[[i]] = private$Results[[i]]$getDropScores()
         }
-        DropScores = rbindlist(DropScores) #make a single data.table with all of the dropscores from all of the sections
+        DropScores = data.table::rbindlist(DropScores) #make a single data.table with all of the dropscores from all of the sections
         #Calculate the correlations between the student scores on the item and the student total scores after dropping the item
         for(i in 1:nrow(private$ItemInfo)){
           thisItem = private$ItemInfo$ItemName[i]
@@ -245,7 +245,7 @@ REPORT = R6Class(
       for(i in 1:length(private$Results)){
         ItemResponses[[i]] = private$Results[[i]]$getItemResponses()
       }
-      ItemResponses = rbindlist(ItemResponses) #make a single data.table with all of the item responses from all of the sections
+      ItemResponses = data.table::rbindlist(ItemResponses) #make a single data.table with all of the item responses from all of the sections
       return(ItemResponses)
     }, 
     
@@ -434,7 +434,7 @@ REPORT = R6Class(
       TopicNames = colnames(private$TopicAlignments)[-1]
       TopicScores = vector(mode = "list", length = length(private$Results))
       sectionNames = c("All", names(private$Results))
-      TopicSummary = set_rownames(set_colnames(
+      TopicSummary = magrittr::set_rownames(magrittr::set_colnames(
         as.data.frame.matrix(matrix(data = NA_real_, nrow = ncol(private$TopicAlignments)-1, ncol = length(sectionNames))),
         sectionNames),TopicNames)
       
@@ -445,7 +445,7 @@ REPORT = R6Class(
       }
       
       
-      TopicScores = rbindlist(TopicScores)
+      TopicScores = data.table::rbindlist(TopicScores)
       for(i in TopicNames){
         itemset = private$TopicAlignments[,i]
         totalpoints = sum(private$TopicAlignments$Value[itemset])
@@ -474,61 +474,3 @@ REPORT = R6Class(
     setNarrative = function(x){private$Narrative = x}
   )
 )
-
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# Blank space ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-# ####
-
-
-
-
-
-
-
-
-
-
-
-
-

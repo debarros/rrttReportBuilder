@@ -1,4 +1,4 @@
-loadWorkbook <- function(file, xlsxFile = NULL, isUnzipped = FALSE){
+loadWorkbook2 <- function(file, xlsxFile = NULL, isUnzipped = FALSE){
   
   ## If this is a unzipped workbook, skip the temp dir stuff
   if(isUnzipped){
@@ -928,5 +928,4 @@ loadWorkbook <- function(file, xlsxFile = NULL, isUnzipped = FALSE){
   return(wb)
   
 }
-environment(loadWorkbook) = environment(saveWorkbook)
-
+environment(loadWorkbook2) = environment(openxlsx::saveWorkbook)
