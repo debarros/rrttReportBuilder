@@ -1,6 +1,6 @@
 loadWorkbook2 <- function(file, xlsxFile = NULL, isUnzipped = FALSE){
   
-  ## If this is a unzipped workbook, skip the temp dir stuff
+  ## If this is an unzipped workbook, skip the temp dir stuff
   if(isUnzipped){
     xmlDir = file
     xmlFiles <- list.files(path = xmlDir, full.names = T, recursive = T, all.files = T)
