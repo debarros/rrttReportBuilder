@@ -12,12 +12,12 @@ COMPARISON = R6Class(
   private = list(
     Description = "last year", #description of the relationship to the prior year test
     Summary = list(), #info in the header of the Overall Comparison tab for 1 test
-    ItemComparisons = NA, #data.frame showing the item correspondences and scores in prior year (lower part of Overall Comparison tab) and whether this year was higher or lower
-    TopicComparisons = NA, #data.frame showing the prior year scores on each of the topics and whether this year was higher or lowee
-    Growth = NA_real_, #current year average - prior year average
-    Ttest = NA_real_, #value of the t test for mean differences using the df adjustment for unequal variances
-    Pvalue = NA_real_, #p value associated with the t test stat
-    Significance = NA_character_ #description of the signficance of the t test
+    ItemComparisons = NULL, #data.frame showing the item correspondences and scores in prior year (lower part of Overall Comparison tab) and whether this year was higher or lower
+    TopicComparisons = NULL, #data.frame showing the prior year scores on each of the topics and whether this year was higher or lowee
+    Growth = NULL, #current year average - prior year average
+    Ttest = NULL, #value of the t test for mean differences using the df adjustment for unequal variances
+    Pvalue = NULL, #p value associated with the t test stat
+    Significance = NULL #description of the signficance of the t test
   ), #private
   
   public = list(
