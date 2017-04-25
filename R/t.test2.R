@@ -19,7 +19,7 @@ t.test2 <- function(m1,m2,s1,s2,n1,n2,m0=0,equal.variance=FALSE)
     df <- n1+n2-2
   }      
   t <- (m1-m2-m0)/se 
-  dat <- c(m1-m2, se, t, 2*pt(-abs(t),df))    
+  dat <- list(m1-m2, se, t, 2*pt(-abs(t),df))
   names(dat) <- c("Difference of means", "Std Error", "t", "p-value")
   return(dat) 
 }
