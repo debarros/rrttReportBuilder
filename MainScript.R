@@ -35,10 +35,11 @@ currentReport$setSummary()
 currentReport$getSummary() #just to check
 currentReport$setTopicSummary()
 currentReport$getTopicSummary() #just to check
-
 currentReport$setItemSummary()
 currentReport$getItemSummary() #just to check
 
+currentReport$setComparison()
+currentReport$getComparison() # just to check
 
 currentReport
 
