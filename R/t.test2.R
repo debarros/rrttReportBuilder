@@ -1,5 +1,6 @@
 #t.test2.R
-
+# This is based on code written by CrossValidated user Macro
+# The original can be found at https://stats.stackexchange.com/a/30450
 # m1, m2: the sample means
 # s1, s2: the sample standard deviations
 # n1, n2: the same sizes
