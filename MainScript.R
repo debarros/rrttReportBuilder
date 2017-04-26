@@ -4,7 +4,7 @@
 #dataLocation = choose.dir(default = "J:/tests/2016-2017/")  #select the folder
 currentReport = REPORT$new() #initiate a new report
 #currentReport$setDataLocation(dataLocation)
-currentReport$setDataLocation("J:\\tests\\2016-2017\\Humanities\\H2\\week23 (2017-02-17) Cuba Africa Middle East\\exports")
+currentReport$setDataLocation("J:\\tests\\2016-2017\\Humanities\\H2\\week23 (2017-02-17) Cuba Africa Middle East")
 currentReport$getDataLocation() #just to check
 currentReport$setSources() #identify all the csv's in that folder
 currentReport$getSources() #just to check
@@ -15,7 +15,7 @@ currentReport$getItemInfo() #just to check
 currentReport$setResults()  #Get the actual results
 currentReport$getResults()  #just to check
 currentReport$getResponses()  #just to check
-currentReport$setComparisonLocation("J:/tests/2016-2017/Humanities/H2/week23 (2017-02-17) Cuba Africa Middle East/comparison and topic alignment.xlsx")
+currentReport$setComparisonLocation(paste0(currentReport$.__enclos_env__$private$DataLocation, "\\", currentReport$.__enclos_env__$private$ComparisonFileName))
 currentReport$getComparisonLocation()  #just to check
 currentReport$enhanceItemInfo()
 #currentReport$setTopicAlignments() #gets run from inside enhanceItemInfo()
@@ -37,10 +37,11 @@ currentReport$setTopicSummary()
 currentReport$getTopicSummary() #just to check
 currentReport$setItemSummary()
 currentReport$getItemSummary() #just to check
-
 currentReport$setComparison()
 currentReport$getComparison() # just to check
+currentReport$setNarrative()
+currentReport$getNarrative() # just to check
+currentReport$exportNarrative()
 
-currentReport
 
 

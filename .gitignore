@@ -4,3 +4,6 @@
 .Ruserdata
 itemResponseScores.rds
 sandbox.R
+1-example.Rmd
+narrative.Rmd
+narrative.html
