@@ -11,7 +11,7 @@ REPORT = R6Class(
   
   private = list(
     TMS = NULL, #The Testing Management System
-    DataLocation = NULL, #address of the folder where the exported csv's are
+    DataLocation = NULL, #address of the folder for the test
     ComparisonLocation = NULL, #address and filename of the comparison and topic alignment
     Sources = NULL, #character vector with the locations of the csv's
     TestName = NULL, #atomic character with the name of the test
@@ -22,7 +22,7 @@ REPORT = R6Class(
     TopicSummary = NULL, #data.frame with stuff that would go on the Topic Chart Calculation tab
     Summary = NULL, #list with the overall stats from the Scores tab
     ItemSummary = NULL, #data.frame With  the info in the table at the top of the Item Summary tab.  One row per item, one column per type
-    Narrative = NULL, #either atomic character or character vector.  Will be the text in cell A11 of the Item Summary tab
+    Narrative = NULL, #Character vector.  The text in cell A11 of the Item Summary tab, but with markdown formatting
     Comparison = NULL, #a list of objects of class COMPARISON
     Handouts = NULL, #data.frame containing the information necessary to build the Handouts tab simply
     DistractorCutoffProportion = 0.25, #cutoff percentage for determining whether an item is a distrator
@@ -37,19 +37,21 @@ REPORT = R6Class(
     ItemScores = NULL, #AverageScore column from the ItemInfo
     ItemResponseScores = NULL, #data.table with the score for every student on every item
     DropScores = NULL, #data.table with the score for each student after dropping each item
-    PassingScore = 0.7 #passing score for the test
+    PassingScore = 0.7, #passing score for the test
+    ComparisonFileName = "comparison and topic alignment.xlsx" #the name of the file with the test setup info (no file path)
   ),
   
   public = list(
     initialize = function(TMS = "LinkIt"){private$TMS = TMS}, #default the Testing Management System to LinkIt
     setDataLocation = function(x){private$DataLocation = x},
+    setComparisonFileName = function(x){private$ComparisonFileName = x},
     setComparisonLocation = function(x){private$ComparisonLocation = x},
     
     setSources = function(){
       if(is.null(private$DataLocation)){
         return("Need a data location first.")
       } else {
-        private$Sources = list.files(private$DataLocation, full.names = T)  
+        private$Sources = list.files(paste0(private$DataLocation,"\\exports"), full.names = T)  
       }
     },
     
@@ -67,7 +69,12 @@ REPORT = R6Class(
       } else {
         ItemInfo = read.csv(private$Sources[1], skip = 4, header = F, nrows = 3, stringsAsFactors = F)[,-(1:5)]  #get the basic item info
         #fix the iteminfo data.frame setup
-        ItemInfo =  magrittr::set_rownames(setNames(as.data.frame(t(ItemInfo), stringsAsFactors = F), c("ItemName", "Value", "Answer")), NULL) 
+        ItemInfo =  magrittr::set_rownames(
+          setNames(
+            as.data.frame(t(ItemInfo), stringsAsFactors = F), 
+            c("ItemName", "Value", "Answer")), 
+          NULL
+        ) 
         toFix = grepl(pattern = "[^a-zA-Z\\d\\s:]", x = ItemInfo$Answer) #which items have weird values in the Answer field?
         ItemInfo$Answer[toFix] = ItemInfo$Value[toFix] #Set those answers to just be the value of the respective questions
         ItemInfo$Value = as.numeric(ItemInfo$Value) #Set the value column to be numeric
@@ -152,7 +159,7 @@ REPORT = R6Class(
       if(is.null(private$Sources)){
         return("Need sources first.")
       } else {
-        results = vector(mode = "list", length = length(private$Sources)) #set up a list to hold the response sets for the various sections
+        results = vector(mode = "list", length = length(private$Sources)) #set up list to hold the response sets for the various sections
         names(results) = paste0("a", 1:length(private$Sources)) #add names to the list so they can be set later
         for (i in 1:length(private$Sources)){  #for each source/section
           SectionName = read.csv(private$Sources[i], skip = 1, header = F, nrows = 1, stringsAsFactors = F)[1,2] #get the section name
@@ -245,7 +252,7 @@ REPORT = R6Class(
       for(i in 1:length(private$Results)){
         ItemResponses[[i]] = private$Results[[i]]$getItemResponses()
       }
-      ItemResponses = data.table::rbindlist(ItemResponses) #make a single data.table with all of the item responses from all of the sections
+      ItemResponses = data.table::rbindlist(ItemResponses) #make a data.table with all of the item responses from all of the sections
       return(ItemResponses)
     }, 
     
@@ -387,7 +394,7 @@ REPORT = R6Class(
         DistractorCutoffCount = nrow(private$ItemInfo) * private$DistractorCutoffProportion
         
         #set up the ItemSummary data.frame
-        ItemSummary = data.frame(ItemName = private$ItemInfo$ItemName) 
+        ItemSummary = data.frame(ItemName = private$ItemInfo$ItemName, stringsAsFactors = F) 
         
         #for MC items only, if at least one wrong answer was selected by at least private$DistractorCutoffProportion percent of students
         #this should be altered to not be a loop
@@ -456,21 +463,21 @@ REPORT = R6Class(
     
     setComparison = function(){
       
-      d2 = read.xlsx(xlsxFile = private$ComparisonLocation, sheet = "Overall Comparison", startRow = 2, colNames = F)
+      d2 = openxlsx::read.xlsx(xlsxFile = private$ComparisonLocation, sheet = "Overall Comparison", startRow = 2, colNames = F)
       CompHeader = d2[1:8,-1]
       row.names(CompHeader) = CompHeader[,1]
       CompHeader = CompHeader[,2*(1:(ncol(CompHeader)/2))]
       CompHeader = CompHeader[1:nrow(CompHeader),apply(X = !is.na(CompHeader), MARGIN = 2, FUN = any), drop = FALSE]
       Comparisons = vector(mode = "list", length = ncol(CompHeader))
       
-      d3 = read.xlsx(xlsxFile = private$ComparisonLocation, sheet = "Topic Comparison", startRow = 4, colNames = T)
+      d3 = openxlsx::read.xlsx(xlsxFile = private$ComparisonLocation, sheet = "Topic Comparison", startRow = 4, colNames = T)
       i = 1
       for(i in 1:ncol(CompHeader)){
         
         Comparisons[[i]] = COMPARISON$new()
         Comparisons[[i]]$setDescription(DescriptionLookup$Description[DescriptionLookup$Year == CompHeader[5,i]])
         Comparisons[[i]]$setSummary(CompHeader[,i])
-        ItemComparisons = set_colnames(d2[-c(1:9),c(1,(2*i),(1+2*i))],c("This test item", "Prior test item","Prior test score"))
+        ItemComparisons = magrittr::set_colnames(d2[-c(1:9),c(1,(2*i),(1+2*i))],c("This test item", "Prior test item","Prior test score"))
         ItemComparisons$`Prior test score` = as.numeric(ItemComparisons$`Prior test score`)
         ItemComparisons$Higher = private$ItemScores > ItemComparisons[,3] + 0.1
         ItemComparisons$Lower =  private$ItemScores < ItemComparisons[,3] - 0.1
@@ -480,14 +487,21 @@ REPORT = R6Class(
         if(nrow(d3) != 0){
           TopicComparisons = d3[,c(1,i+1)]
           TopicComparisons$Higher = private$TopicSummary$All > TopicComparisons[,2] + 0.1
-          TopicComparisons$Lower = private$TopicSummary$All > TopicComparisons[,2] - 0.1
+          TopicComparisons$Lower = private$TopicSummary$All < TopicComparisons[,2] - 0.1
           Comparisons[[i]]$setTopicComparisons(TopicComparisons)
         }
         
         # If there is an overall comparison:
         if(!is.na(CompHeader[1,i])){ 
           #use t.test2 here
-          tTestSummary = t.test2(m1 = private$Summary$Average, m2 = as.numeric(CompHeader[1,i]), s1 = private$Summary$SD, s2 = as.numeric(CompHeader[2,i]), n1 = private$Summary$N, n2 = as.numeric(CompHeader[3,i]))
+          tTestSummary = t.test2(
+            m1 = private$Summary$Average, 
+            m2 = as.numeric(CompHeader[1,i]), 
+            s1 = private$Summary$SD, 
+            s2 = as.numeric(CompHeader[2,i]), 
+            n1 = private$Summary$N, 
+            n2 = as.numeric(CompHeader[3,i])
+          )
           Comparisons[[i]]$setGrowth(tTestSummary$`Difference of means`)
           Comparisons[[i]]$setTtest(tTestSummary$t)
           Comparisons[[i]]$setPvalue(tTestSummary$`p-value`)
@@ -507,10 +521,186 @@ REPORT = R6Class(
       private$Comparison = Comparisons   
     },
     
+    setNarrative = function(x){
+      narrative = paste0("Here are your scores and analysis for **", private$TestName,"**.  ")
+      narrative = c(narrative,"", "* The score distribution ")
+      
+      # If there are check key items, add the line
+      if(sum(private$ItemSummary$CheckKey) > 0){
+        x = "* **Check the answer key for the following question"
+        if(sum(private$ItemSummary$CheckKey) > 1){
+          x = paste0(x,"s")
+        } 
+        x = paste0(x,": ", VectorSentence(private$ItemSummary$ItemName,private$ItemSummary$CheckKey), "**")
+        narrative = c(narrative, x)
+      }
+      
+      # If there are powerful distractors, add the line
+      if(sum(private$ItemSummary$PowerDistrators) > 0){
+        x = "* The following question"
+        if(sum(private$ItemSummary$PowerDistrators) > 1){
+          x = paste0(x, "s")
+        }
+        x = paste0(x, 
+                   " had powerful distractors: ", 
+                   VectorSentence(as.character(private$ItemSummary$ItemName), private$ItemSummary$PowerDistrators), 
+                   ".  Looking at those wrong answers might help you understand where students are making mistakes.")
+        narrative = c(narrative, x)
+      }
+      
+      # If there are overthinking items, add the line
+      if(sum(private$ItemSummary$OverThinking) > 0){
+        x = "* The following question"
+        if(sum(private$ItemSummary$OverThinking) > 1){
+          x = paste0(x, 
+                     "s were missed just as often by your high scoring students as your low scoring students.  ",
+                     "This indicates that they are potential overthinking questions: ")
+        } else {
+          x = paste0(x, 
+                     " was missed just as often by your high scoring students as your low scoring students.  ",
+                     "This indicates that it is a potential overthinking question: ")
+        }
+        x = paste0(x, VectorSentence(private$ItemSummary$ItemName, private$ItemSummary$OverThinking), ".")
+        narrative = c(narrative, x)
+      }
+      
+      # If there are checkdifficult items, add the line
+      if(sum(private$ItemSummary$Difficult) > 0){
+        x = "* Your students found the following question"
+        if(sum(private$ItemSummary$Difficult) > 1){
+          x = paste0(x, "s")
+        } 
+        x = paste0(x, " very difficult: ",VectorSentence(private$ItemSummary$ItemName, private$ItemSummary$Difficult), ".")
+        narrative = c(narrative, x)
+      }
+      
+      # If there are easy items, add the line
+      if(sum(private$ItemSummary$Easy) > 0){
+        x = "* Your students found the following question"
+        if(sum(private$ItemSummary$Easy) > 1){
+          x = paste0(x, "s")
+        } 
+        x = paste0(x, " very easy: ",VectorSentence(private$ItemSummary$ItemName, private$ItemSummary$Easy), ".")
+        narrative = c(narrative, x)
+      }
+      
+      # If there are wheat from chaff items, add the line
+      if(sum(private$ItemSummary$WheatFromChaff) > 0){
+        x = paste0("* ",VectorSentence(private$ItemSummary$ItemName, private$ItemSummary$WheatFromChaff))
+        if(sum(private$ItemSummary$WheatFromChaff) > 1){
+          x = paste0(x, " might be wheat from chaff questions.  Those are very difficult, but the best students get them right.")
+        } else {
+          x = paste0(x, " might be a wheat from chaff question.  Those are very difficult, but the best students get them right.")
+        }
+        narrative = c(narrative, x)
+      }
+      
+      # If there are highly related items, add the line
+      if(sum(private$ItemSummary$HighlyRelated) > 0){
+        x = "* The highly related item"
+        if(sum(private$ItemSummary$HighlyRelated) > 1){
+          x = paste0(x, "s were ")
+        } else {
+          x = paste0(x, " was ")
+        }
+        x = paste0(x, 
+                   VectorSentence(private$ItemSummary$ItemName, private$ItemSummary$HighlyRelated), 
+                   ".  Those are questions to keep, since they are good indicators of student knowledge.")
+        narrative = c(narrative, x)
+      }
+      
+      # Add lines for boxplots and topics
+      narrative = c(narrative, "* Boxplots", "* Topics")
+      
+      # Add sections for the comparisons
+      for(i in 1:length(private$Comparison)){
+        ItemComparisons = private$Comparison[[i]]$getItemComparisons()
+        TopicComparisons = private$Comparison[[i]]$getTopicComparisons()
+        desc = private$Comparison[[i]]$getDescription()
+        growth = private$Comparison[[i]]$getGrowth()
+        if(growth > 0){
+          growthDirection = "higher"
+        } else {
+          growthDirection = "lower"
+        }
+        growth = round(growth)
+        if(abs(growth) == 1){
+          growthDirection = paste0(" point ", growthDirection)
+        } else {
+          growthDirection = paste0(" points ", growthDirection)
+        }
+        x = paste0("* Compared to ", 
+                   desc, 
+                   " your students scored about ", 
+                   growth, 
+                   growthDirection, 
+                   " on average.  This is ", 
+                   private$Comparison[[i]]$getSignificance())
+        narrative = c(narrative, x)
+        
+        if(sum(ItemComparisons$Higher)>0){
+          x = paste0("    * Compared to ", 
+                     desc, 
+                     ", your students did noticeably better on question")
+          if(sum(ItemComparisons$Higher)>1){
+            x = paste0(x, "s")
+          }
+          x = paste0(x, 
+                     " ",
+                     VectorSentence(ItemComparisons$`This test item`, ItemComparisons$Higher))
+          narrative = c(narrative, x)
+        }
+        
+        if(sum(ItemComparisons$Lower)>0){
+          x = paste0("    * Compared to ", 
+                     desc, 
+                     ", your students did noticeably worse on question")
+          if(sum(ItemComparisons$Lower)>1){
+            x = paste0(x, "s")
+          }
+          x = paste0(x, 
+                     " ",
+                     VectorSentence(ItemComparisons$`This test item`, ItemComparisons$Lower))
+          narrative = c(narrative, x)
+        }
+        
+        if(sum(TopicComparisons$Higher)>0){
+          x = paste0("    * Compared to ", 
+                     desc, 
+                     ", your students did noticeably better on ", 
+                     VectorSentence(TopicComparisons$Topic, TopicComparisons$Higher))
+          narrative = c(narrative, x)
+        }
+        
+        if(sum(TopicComparisons$Lower)>0){
+          x = paste0("    * Compared to ", 
+                     desc, 
+                     ", your students did noticeably worse on ", 
+                     VectorSentence(TopicComparisons$Topic, TopicComparisons$Lower))
+          narrative = c(narrative, x)
+        }
+      }
+      
+      # Add the closing line
+      narrative = c(narrative,"", "Let me know if you need anything else.")
+      
+      private$Narrative = narrative
+    },
+    
+    exportNarrative = function(){
+      fileConn <- file(paste0(private$DataLocation,"\\narrative.Rmd"))
+      writeLines(c("---",'title: "Report Narrative"', "output: html_document","---","   ",private$Narrative), fileConn)
+      close(fileConn)
+      render(input = paste0(private$DataLocation,"\\narrative.Rmd"),
+             output_format = "html_document", 
+             output_file = "narrative.html", 
+             output_dir = private$DataLocation)
+    },
+    
     
     #Methods still to be made ####
     
-    setHandouts = function(x){private$Handouts = x},
-    setNarrative = function(x){private$Narrative = x}
+    setHandouts = function(x){private$Handouts = x}
+    
   )
 )
