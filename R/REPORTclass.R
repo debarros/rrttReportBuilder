@@ -2,8 +2,7 @@
 
 #An instance of this class holds everything necessary for a score report on a single test
 
-#This file is way too long.  It should be broken up into separate files, where each one adds a method using $set()
-# See details at https://cran.r-project.org/web/packages/R6/vignettes/Introduction.html#adding-members-to-an-existing-class
+#This file is way too long.  Methods should be moved to separate files and set up as functions
 
 REPORT = R6Class(
   
