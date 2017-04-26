@@ -12,6 +12,7 @@ Imports:
     magrittr,
     data.table,
     Rcpp,
-    devtools
+    devtools,
+    rmarkdown
 LazyData: true
 RoxygenNote: 6.0.1
