@@ -24,13 +24,14 @@ RESULT = R6Class(
       ItemResponses = read.csv(sourceLocation, skip = 13, header = F, stringsAsFactors = F) #read the item response info
       colnames(ItemResponses) = c("StudentID", "LastName","FirstName","TestDate","TotalPoints",itemNames) #set the column names 
       ItemResponses$score = ItemResponses$TotalPoints/sum(itemValues)*100
+      ItemResponses = ItemResponses[,c(which(colnames(ItemResponses)=="score"),which(colnames(ItemResponses)!="score"))] #put the score column first
       private$ItemResponses = ItemResponses
     },
     setSectionName = function(x){private$SectionName= x},
     setItemResponseScores = function(ItemInfo){
       #create a data.frame to hold the item scores
       ItemResponseScores = setNames(as.data.frame(array(data = NA_integer_, dim = dim(private$ItemResponses))), colnames(private$ItemResponses)) 
-      ItemResponseScores[,1:5] = private$ItemResponses[,1:5] #pull in the student info from the results data.table
+      ItemResponseScores[,1:6] = private$ItemResponses[,1:6] #pull in the student info from the results data.table
       #Calculate scores for each response on each item
       for(i in 1:nrow(ItemInfo)){
         if(ItemInfo$Type[i] == "MC"){
@@ -41,6 +42,7 @@ RESULT = R6Class(
       }
       private$ItemResponseScores = ItemResponseScores
     },
+    
     setDropScores = function(ItemInfo){
       #Set up a dataframe to hold the scores of each students with each item dropped and then calculate those scores
       DropScores = private$ItemResponseScores 
@@ -51,6 +53,7 @@ RESULT = R6Class(
       }
       private$DropScores = DropScores
     },
+    
     getItemResponses = function(){return(private$ItemResponses)},
     getSectionName = function(){return(private$SectionName)},
     getItemResponseScores = function(){return(private$ItemResponseScores)},
@@ -64,7 +67,7 @@ RESULT = R6Class(
     setTopicScores = function(TopicAlignments, ItemInfo){
       TopicNames = colnames(TopicAlignments)[-1]
       TopicAlignments$Value = ItemInfo$Value
-      TopicScores = private$ItemResponses[,1:3]
+      TopicScores = private$ItemResponses[,2:4]
       TopicScores[,TopicNames] = NA_real_
       for(i in TopicNames){
         itemset = TopicAlignments[,i]
