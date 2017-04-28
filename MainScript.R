@@ -41,6 +41,13 @@ currentReport$setComparison()
 currentReport$getComparison() # just to check
 currentReport$setNarrative()
 currentReport$getNarrative() # just to check
+
+
+currentReport$setTopicScores()
+currentReport$getTopicScores() # just to check
+currentReport$setHandouts()
+currentReport$getHandouts() # just to check
+View(currentReport$getHandouts())
 currentReport$exportNarrative()
 
 
