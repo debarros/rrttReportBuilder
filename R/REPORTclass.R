@@ -19,6 +19,7 @@ REPORT = R6Class(
     Results = NULL, #list of objects of class RESULT
     TopicAlignments = NULL, #data.frame holding the topic alignments
     TopicSummary = NULL, #data.frame with stuff that would go on the Topic Chart Calculation tab
+    TopicScores = NULL, #data.frame with one row per student and one column per topic
     Summary = NULL, #list with the overall stats from the Scores tab
     ItemSummary = NULL, #data.frame With  the info in the table at the top of the Item Summary tab.  One row per item, one column per type
     Narrative = NULL, #Character vector.  The text in cell A11 of the Item Summary tab, but with markdown formatting
@@ -139,7 +140,7 @@ REPORT = R6Class(
         ItemResponseScores = data.table::rbindlist(ItemResponseScores) 
         #Calculate the average score for each question
         for(i in 1:nrow(private$ItemInfo)){
-          private$ItemInfo$AverageScore[i] = mean(ItemResponseScores[[private$ItemInfo$ItemName[i]]])/private$ItemInfo$Value[i]*100
+          private$ItemInfo$AverageScore[i] = mean(ItemResponseScores[[private$ItemInfo$ItemName[i]]])/private$ItemInfo$Value[i]
         }
         private$ItemScores = private$ItemInfo$AverageScore
         private$ItemResponseScores = ItemResponseScores
@@ -150,7 +151,7 @@ REPORT = R6Class(
       ItemResponses = as.data.frame(self$getResponses())
       UploadTab = data.frame(StudentID = ItemResponses$StudentID)
       UploadTab$StudentName = paste0(ItemResponses$LastName, ", ",ItemResponses$FirstName)
-      UploadTab$Percentage = ItemResponses$score
+      UploadTab$Percentage = round(ItemResponses$score, digits = 2)
       private$UploadTab = UploadTab
     },
     
@@ -352,7 +353,14 @@ REPORT = R6Class(
     getCorrelations = function(){return(private$Correlations)},
     getResponseSet = function(){return(private$ResponseSet)},
     getPassingScore = function(){return(private$PassingScore)},
-    getTopicAlignments = function(){return(private$TopicAlignments)},
+    
+    getTopicAlignments = function(){
+      TopicAlignments =  private$TopicAlignments
+      for(i in 2:ncol(TopicAlignments)){
+        TopicAlignments[,i] = as.integer(TopicAlignments[,i])
+      }
+      return(TopicAlignments)
+    },
     
     setSummary = function(){
       Summarize = vector(mode = "list")
@@ -368,6 +376,9 @@ REPORT = R6Class(
       Summarize$N = nrow(private$UploadTab)
       Summarize$NPassed = sum(private$UploadTab$Percentage >= private$PassingScore)
       Summarize$PassRate = Summarize$NPassed / Summarize$N
+      Summarize$TestName = private$TestName
+      Summarize$Sections = length(private$Results)
+      Summarize$Items = nrow(private$ItemInfo)
       private$Summary = Summarize
     },
     
@@ -383,7 +394,7 @@ REPORT = R6Class(
       } else {
         
         # set the parameters
-        DifficultCutoff = 100* min(
+        DifficultCutoff = min(
           private$DifficultCutoffParams$Lower, 
           max(private$DifficultCutoffParams$Upper, 
               quantile(private$ItemInfo$AverageScore, private$DifficultCutoffParams$Proportion)))
@@ -413,7 +424,7 @@ REPORT = R6Class(
         ItemSummary$Difficult = private$ItemInfo$AverageScore < DifficultCutoff
         
         # average score >= private$EasyCutoff
-        ItemSummary$Easy = private$ItemInfo$AverageScore >= private$EasyCutoff * 100
+        ItemSummary$Easy = private$ItemInfo$AverageScore >= private$EasyCutoff
         
         #item fits one of the ChaffRules (score < ChaffRules$score and correlation > ChaffRules$correlation)
         #this should be altered to not be a loop
@@ -439,7 +450,7 @@ REPORT = R6Class(
     setTopicSummary = function(){
       TopicNames = colnames(private$TopicAlignments)[-1]
       TopicScores = vector(mode = "list", length = length(private$Results))
-      sectionNames = c("All", names(private$Results))
+      sectionNames = c("All Classes", names(private$Results))
       TopicSummary = magrittr::set_rownames(magrittr::set_colnames(
         as.data.frame.matrix(matrix(data = NA_real_, nrow = ncol(private$TopicAlignments)-1, ncol = length(sectionNames))),
         sectionNames),TopicNames)
@@ -455,7 +466,7 @@ REPORT = R6Class(
       for(i in TopicNames){
         itemset = private$TopicAlignments[,i]
         totalpoints = sum(private$TopicAlignments$Value[itemset])
-        TopicSummary$All[rownames(TopicSummary) == i] = mean(unlist(TopicScores[,i, with = F]))
+        TopicSummary$`All Classes`[rownames(TopicSummary) == i] = mean(unlist(TopicScores[,i, with = F]))
       }
       private$TopicSummary = TopicSummary
     }, 
@@ -485,8 +496,8 @@ REPORT = R6Class(
         # If there is a topic comparison:
         if(nrow(d3) != 0){
           TopicComparisons = d3[,c(1,i+1)]
-          TopicComparisons$Higher = private$TopicSummary$All > TopicComparisons[,2] + 0.1
-          TopicComparisons$Lower = private$TopicSummary$All < TopicComparisons[,2] - 0.1
+          TopicComparisons$Higher = private$TopicSummary$`All Classes` > TopicComparisons[,2] + 0.1
+          TopicComparisons$Lower = private$TopicSummary$`All Classes` < TopicComparisons[,2] - 0.1
           Comparisons[[i]]$setTopicComparisons(TopicComparisons)
         }
         
@@ -690,16 +701,103 @@ REPORT = R6Class(
       fileConn <- file(paste0(private$DataLocation,"\\narrative.Rmd"))
       writeLines(c("---",'title: "Report Narrative"', "output: html_document","---","   ",private$Narrative), fileConn)
       close(fileConn)
-      render(input = paste0(private$DataLocation,"\\narrative.Rmd"),
-             output_format = "html_document", 
-             output_file = "narrative.html", 
-             output_dir = private$DataLocation)
+      rmarkdown::render(input = paste0(private$DataLocation,"\\narrative.Rmd"),
+                        output_format = "html_document", 
+                        output_file = "narrative.html", 
+                        output_dir = private$DataLocation)
     },
+    
+    exportReport = function(){
+      
+    },
+    
+    setTopicScores = function(){
+      #establish a list that will hold the Topic Scores data.frames
+      TopicScores = vector(mode = "list", length = length(private$Results))
+      #pull the topic scores for each section and load them in the list
+      for(i in 1:length(private$Results)){
+        TopicScores[[i]] = private$Results[[i]]$getTopicScores()
+      }
+      #make a single data.table with all of the item response scores from all of the sections
+      TopicScores = data.table::rbindlist(TopicScores) 
+      private$TopicScores = TopicScores
+    },
+    
+    
+    getTopicScores = function(){return(private$TopicScores)},
+    
     
     
     #Methods still to be made ####
     
-    setHandouts = function(x){private$Handouts = x}
+    setHandouts = function(){
+      ItemInfo = private$ItemInfo
+      ItemResponseScores = private$ItemResponseScores
+      ItemResponses = self$getResponses()
+      Handouts = as.data.frame(ItemResponses, stringsAsFactors = F)[,1:5]
+      colnames(ItemResponseScores) = paste0(colnames(ItemResponseScores),"_Score")
+      colnames(ItemResponses) = paste0(colnames(ItemResponses),"_Response")
+      
+      for(i in 7:ncol(ItemResponses)){
+        ItemResponseScores[,i] = ItemResponseScores[,i]/ItemInfo$Value[i-6]
+        Handouts = cbind.data.frame(Handouts, ItemResponses[,i, drop = F], stringsAsFactors = F)
+        Handouts = cbind.data.frame(Handouts, ItemResponseScores[,i, drop = F], stringsAsFactors = F)
+      }
+      
+      topicNames = row.names(private$TopicSummary)
+      for(i in 1:length(topicNames)){
+        Handouts = cbind.data.frame(Handouts, NA, stringsAsFactors = F)
+        Handouts = cbind.data.frame(Handouts, private$TopicScores[,topicNames[i], drop = F], stringsAsFactors = F)
+      }
+      
+      private$Handouts = Handouts
+    }
+    
     
   )
 )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
