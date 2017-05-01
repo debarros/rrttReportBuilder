@@ -623,7 +623,7 @@ REPORT = R6Class(
       narrative = c(narrative, "* Boxplots", "* Topics")
       
       # Add sections for the comparisons
-      for(i in 1:length(private$Comparison)){
+      for(i in length(private$Comparison):1){
         ItemComparisons = private$Comparison[[i]]$getItemComparisons()
         TopicComparisons = private$Comparison[[i]]$getTopicComparisons()
         desc = private$Comparison[[i]]$getDescription()
@@ -633,8 +633,8 @@ REPORT = R6Class(
         } else {
           growthDirection = "lower"
         }
-        growth = round(growth)
-        if(abs(growth) == 1){
+        growth = abs(round(growth))
+        if(growth == 1){
           growthDirection = paste0(" point ", growthDirection)
         } else {
           growthDirection = paste0(" points ", growthDirection)
