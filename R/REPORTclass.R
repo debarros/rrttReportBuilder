@@ -486,7 +486,7 @@ REPORT = R6Class(
         
         Comparisons[[i]] = COMPARISON$new()
         Comparisons[[i]]$setDescription(DescriptionLookup$Description[DescriptionLookup$Year == CompHeader[5,i]])
-        Comparisons[[i]]$setSummary(CompHeader[,i])
+        Comparisons[[i]]$setSummary(CompHeader[,i], row.names(CompHeader))
         ItemComparisons = magrittr::set_colnames(d2[-c(1:9),c(1,(2*i),(1+2*i))],c("This test item", "Prior test item","Prior test score"))
         ItemComparisons$`Prior test score` = as.numeric(ItemComparisons$`Prior test score`)
         ItemComparisons$Higher = private$ItemScores > ItemComparisons[,3] + 0.1

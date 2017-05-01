@@ -23,7 +23,13 @@ COMPARISON = R6Class(
   public = list(
     initialize = function(){},
     setDescription = function(x){private$Description= x},
-    setSummary = function(x){private$Summary= x},
+    
+    setSummary = function(VAL, NAM){
+      VAL = as.list(VAL)
+      names(VAL) = NAM      
+      private$Summary= VAL
+      },
+    
     setItemComparisons = function(x){private$ItemComparisons= x},
     setTopicComparisons = function(x){private$TopicComparisons= x},
     setGrowth = function(x){private$Growth= x},
