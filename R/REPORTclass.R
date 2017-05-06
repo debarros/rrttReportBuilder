@@ -40,7 +40,7 @@ REPORT = R6Class(
     DropScores = NULL, #data.table with the score for each student after dropping each item
     PassingScore = 0.7, #passing score for the test
     ComparisonFileName = "comparison and topic alignment.xlsx" #test setup info filename (no file path)
-  ),
+  ), # /private
   
   public = list(
     initialize = function(TMS = "LinkIt"){private$TMS = TMS}, #default the Testing Management System to LinkIt
@@ -54,7 +54,7 @@ REPORT = R6Class(
       } else {
         private$Sources = list.files(paste0(private$DataLocation,"\\exports"), full.names = T)  
       }
-    },
+    }, # /setSources
     
     setTestName = function(){
       if(is.null(private$Sources)){
@@ -62,7 +62,7 @@ REPORT = R6Class(
       } else {
         private$TestName = read.csv(private$Sources[1], header = F, nrows = 1, stringsAsFactors = F)[1,2] 
       }
-    },
+    }, # /setTestName
     
     setItemInfo = function(){
       if(is.null(private$Sources)){
@@ -91,7 +91,7 @@ REPORT = R6Class(
         ItemInfo$options = NA_integer_
         private$ItemInfo = ItemInfo
       }
-    },
+    }, # /setItemInfo
     
     enhanceItemInfo = function(){
       badmessage = ""
@@ -126,7 +126,7 @@ REPORT = R6Class(
         #set the number of options
         private$ItemInfo$options = as.integer(d2$options[match(private$ItemInfo$ItemName, d2$`Question #:`)]) 
       }
-    },
+    }, # /enhanceItemInfo
     
     setTopicAlignments = function(d2){
       Topics = d2[,5:ncol(d2)] #set up a data.frame to hold topic info
@@ -135,7 +135,7 @@ REPORT = R6Class(
         Topics[,i] = as.logical(as.numeric(Topics[,i]))
       }
       private$TopicAlignments = Topics
-    },
+    }, # /setTopicAlignments
     
     addItemScores = function(){
       badmessage = ""
@@ -168,7 +168,7 @@ REPORT = R6Class(
         private$ItemScores = private$ItemInfo$AverageScore
         private$ItemResponseScores = ItReScores
       }
-    },
+    }, # /addItemScores
     
     setUploadTab = function(){
       ItemResponses = as.data.frame(self$getResponses())
@@ -176,7 +176,7 @@ REPORT = R6Class(
       UploadTab$StudentName = paste0(ItemResponses$LastName, ", ",ItemResponses$FirstName)
       UploadTab$Percentage = round(ItemResponses$score, digits = 2)
       private$UploadTab = UploadTab
-    },
+    }, # /setUploadTab
     
     setResults = function(){
       if(is.null(private$Sources)){
@@ -199,7 +199,7 @@ REPORT = R6Class(
         }
         private$Results = results
       }
-    },
+    }, # /setResults
     
     setPassingScore = function(x){private$PassingScore = x},
     
@@ -235,7 +235,7 @@ REPORT = R6Class(
       }
       private$Correlations = private$ItemInfo$Correlation
       private$DropScores = DropScores
-    },
+    }, # /addCorrelations
     
     addResponseFrequencies = function(){
       badmessage = ""
@@ -283,7 +283,7 @@ REPORT = R6Class(
         }
         private$ResponseSet = responseSet
       }
-    }, 
+    },  # /addResponseFrequencies
     
     getResponses = function(){
       #establish a list that will hold the Item Response data.frames
@@ -295,7 +295,7 @@ REPORT = R6Class(
       #make a data.table with all of the item responses from all of the sections
       ItemResponses = data.table::rbindlist(ItemResponses) 
       return(ItemResponses)
-    }, 
+    },  # /getResponses
     
     badMessage = function(method){
       badmessage = ""
@@ -375,7 +375,7 @@ REPORT = R6Class(
       if(method %in% c("getUploadTab")){
         return(badmessage)
       }
-    }, 
+    },  # /badMessage
     
     getSources = function(){return(private$Sources)},
     getTestName = function(){return(private$TestName)},
@@ -401,7 +401,7 @@ REPORT = R6Class(
         TopicAlignments[,i] = as.integer(TopicAlignments[,i])
       }
       return(TopicAlignments)
-    },
+    }, # /getTopicAlignments
     
     setSummary = function(){
       Summarize = vector(mode = "list")
@@ -421,7 +421,7 @@ REPORT = R6Class(
       Summarize$Sections = length(private$Results)
       Summarize$Items = nrow(private$ItemInfo)
       private$Summary = Summarize
-    },
+    }, # /setSummary
     
     setItemSummary = function(){
       badmessage = ""
@@ -487,7 +487,7 @@ REPORT = R6Class(
         
         private$ItemSummary = ItemSummary
       }
-    },
+    }, # /setItemSummary
     
     setTopicSummary = function(){
       TopicNames = colnames(private$TopicAlignments)[-1]
@@ -516,7 +516,7 @@ REPORT = R6Class(
         TopicSummary$`All Classes`[rownames(TopicSummary) == i] = mean(unlist(TopicScores[,i, with = F]))
       }
       private$TopicSummary = TopicSummary
-    }, 
+    }, # /setTopicSummary
     
     setComparison = function(){
       
@@ -528,68 +528,69 @@ REPORT = R6Class(
       row.names(CompHeader) = CompHeader[,1]
       CompHeader = CompHeader[,2*(1:(ncol(CompHeader)/2))]
       CompHeader = CompHeader[1:nrow(CompHeader),apply(X = !is.na(CompHeader), MARGIN = 2, FUN = any), drop = FALSE]
-      Comparisons = vector(mode = "list", length = ncol(CompHeader))
-      
-      d3 = openxlsx::read.xlsx(xlsxFile = private$ComparisonLocation, 
-                               sheet = "Topic Comparison", 
-                               startRow = 4, 
-                               colNames = T)
-      i = 1
-      for(i in 1:ncol(CompHeader)){
+      if(ncol(CompHeader)>0){
+        Comparisons = vector(mode = "list", length = ncol(CompHeader))
         
-        Comparisons[[i]] = COMPARISON$new()
-        Comparisons[[i]]$setDescription(DescriptionLookup$Description[DescriptionLookup$Year == CompHeader[5,i]])
-        Comparisons[[i]]$setSummary(CompHeader[,i], row.names(CompHeader))
-        ItemComparisons = magrittr::set_colnames(
-          d2[-c(1:9),c(1,(2*i),(1+2*i))],
-          c("This test item", "Prior test item","Prior test score"))
-        ItemComparisons$`Prior test score` = as.numeric(ItemComparisons$`Prior test score`)
-        ItemComparisons$Higher = private$ItemScores > ItemComparisons[,3] + 0.1
-        ItemComparisons$Lower =  private$ItemScores < ItemComparisons[,3] - 0.1
-        Comparisons[[i]]$setItemComparisons(ItemComparisons)
-        
-        # If there is a topic comparison:
-        if(nrow(d3) != 0){
-          TopicComparisons = d3[,c(1,i+1)]
-          TopicComparisons$Higher = private$TopicSummary$`All Classes` > TopicComparisons[,2] + 0.1
-          TopicComparisons$Lower = private$TopicSummary$`All Classes` < TopicComparisons[,2] - 0.1
-          Comparisons[[i]]$setTopicComparisons(TopicComparisons)
+        d3 = openxlsx::read.xlsx(xlsxFile = private$ComparisonLocation, 
+                                 sheet = "Topic Comparison", 
+                                 startRow = 4, 
+                                 colNames = T)
+        i = 1
+        for(i in 1:ncol(CompHeader)){
+          
+          Comparisons[[i]] = COMPARISON$new()
+          Comparisons[[i]]$setDescription(DescriptionLookup$Description[DescriptionLookup$Year == CompHeader[5,i]])
+          Comparisons[[i]]$setSummary(CompHeader[,i], row.names(CompHeader))
+          ItemComparisons = magrittr::set_colnames(
+            d2[-c(1:9),c(1,(2*i),(1+2*i))],
+            c("This test item", "Prior test item","Prior test score"))
+          ItemComparisons$`Prior test score` = as.numeric(ItemComparisons$`Prior test score`)
+          ItemComparisons$Higher = private$ItemScores > ItemComparisons[,3] + 0.1
+          ItemComparisons$Lower =  private$ItemScores < ItemComparisons[,3] - 0.1
+          Comparisons[[i]]$setItemComparisons(ItemComparisons)
+          
+          # If there is a topic comparison:
+          if(nrow(d3) != 0){
+            TopicComparisons = d3[,c(1,i+1)]
+            TopicComparisons$Higher = private$TopicSummary$`All Classes` > TopicComparisons[,2] + 0.1
+            TopicComparisons$Lower = private$TopicSummary$`All Classes` < TopicComparisons[,2] - 0.1
+            Comparisons[[i]]$setTopicComparisons(TopicComparisons)
+          }
+          
+          # If there is an overall comparison:
+          if(!is.na(CompHeader[1,i])){ 
+            #use t.test2 here
+            tTestSummary = t.test2(
+              m1 = private$Summary$Average, 
+              m2 = as.numeric(CompHeader[1,i]), 
+              s1 = private$Summary$SD, 
+              s2 = as.numeric(CompHeader[2,i]), 
+              n1 = private$Summary$N, 
+              n2 = as.numeric(CompHeader[3,i])
+            )
+            Comparisons[[i]]$setGrowth(tTestSummary$`Difference of means`)
+            Comparisons[[i]]$setTtest(tTestSummary$t)
+            Comparisons[[i]]$setPvalue(tTestSummary$`p-value`)
+            significance = "not a significant difference, and is probably due to chance."
+            if(tTestSummary$`p-value`<0.1){
+              significance = "a somewhat significant difference, and could be due to chance."
+            }
+            if(tTestSummary$`p-value`<0.05){
+              significance = "a very significant difference, and is unlikely to be due to chance."
+            }
+            if(tTestSummary$`p-value`<0.01){
+              significance = "an extremely significant difference, and could not be due to chance."
+            }
+            Comparisons[[i]]$setSignificance(significance)
+          }
         }
-        
-        # If there is an overall comparison:
-        if(!is.na(CompHeader[1,i])){ 
-          #use t.test2 here
-          tTestSummary = t.test2(
-            m1 = private$Summary$Average, 
-            m2 = as.numeric(CompHeader[1,i]), 
-            s1 = private$Summary$SD, 
-            s2 = as.numeric(CompHeader[2,i]), 
-            n1 = private$Summary$N, 
-            n2 = as.numeric(CompHeader[3,i])
-          )
-          Comparisons[[i]]$setGrowth(tTestSummary$`Difference of means`)
-          Comparisons[[i]]$setTtest(tTestSummary$t)
-          Comparisons[[i]]$setPvalue(tTestSummary$`p-value`)
-          significance = "not a significant difference, and is probably due to chance."
-          if(tTestSummary$`p-value`<0.1){
-            significance = "a somewhat significant difference, and could be due to chance."
-          }
-          if(tTestSummary$`p-value`<0.05){
-            significance = "a very significant difference, and is unlikely to be due to chance."
-          }
-          if(tTestSummary$`p-value`<0.01){
-            significance = "an extremely significant difference, and could not be due to chance."
-          }
-          Comparisons[[i]]$setSignificance(significance)
-        }
+        private$Comparison = Comparisons
       }
-      private$Comparison = Comparisons   
-    },
+    }, # /setComparison
     
-    setNarrative = function(x){
+    setNarrative = function(){
       narrative = paste0("Here are your scores and analysis for **", private$TestName,"**.  ")
       narrative = c(narrative,"", "* The score distribution ")
-      
       # If there are check key items, add the line
       if(sum(private$ItemSummary$CheckKey) > 0){
         x = "* **Check the answer key for the following question"
@@ -599,7 +600,6 @@ REPORT = R6Class(
         x = paste0(x,": ", VectorSentence(private$ItemSummary$ItemName,private$ItemSummary$CheckKey), "**")
         narrative = c(narrative, x)
       }
-      
       # If there are powerful distractors, add the line
       if(sum(private$ItemSummary$PowerDistrators) > 0){
         x = "* The following question"
@@ -612,7 +612,6 @@ REPORT = R6Class(
                    ".  Looking at those wrong answers might help you understand where students are making mistakes.")
         narrative = c(narrative, x)
       }
-      
       # If there are overthinking items, add the line
       if(sum(private$ItemSummary$OverThinking) > 0){
         x = "* The following question"
@@ -628,7 +627,6 @@ REPORT = R6Class(
         x = paste0(x, VectorSentence(private$ItemSummary$ItemName, private$ItemSummary$OverThinking), ".")
         narrative = c(narrative, x)
       }
-      
       # If there are checkdifficult items, add the line
       if(sum(private$ItemSummary$Difficult) > 0){
         x = "* Your students found the following question"
@@ -641,7 +639,6 @@ REPORT = R6Class(
                    ".")
         narrative = c(narrative, x)
       }
-      
       # If there are easy items, add the line
       if(sum(private$ItemSummary$Easy) > 0){
         x = "* Your students found the following question"
@@ -651,7 +648,6 @@ REPORT = R6Class(
         x = paste0(x, " very easy: ",VectorSentence(private$ItemSummary$ItemName, private$ItemSummary$Easy), ".")
         narrative = c(narrative, x)
       }
-      
       # If there are wheat from chaff items, add the line
       if(sum(private$ItemSummary$WheatFromChaff) > 0){
         a = "  Those are very difficult, but the best students get them right."
@@ -663,7 +659,6 @@ REPORT = R6Class(
         }
         narrative = c(narrative, x)
       }
-      
       # If there are highly related items, add the line
       if(sum(private$ItemSummary$HighlyRelated) > 0){
         x = "* The highly related item"
@@ -677,84 +672,82 @@ REPORT = R6Class(
                    ".  Those are questions to keep, since they are good indicators of student knowledge.")
         narrative = c(narrative, x)
       }
-      
       # Add lines for boxplots and topics
       narrative = c(narrative, "* Boxplots", "* Topics")
-      
-      # Add sections for the comparisons
-      for(i in length(private$Comparison):1){
-        ItemComparisons = private$Comparison[[i]]$getItemComparisons()
-        TopicComparisons = private$Comparison[[i]]$getTopicComparisons()
-        desc = private$Comparison[[i]]$getDescription()
-        growth = private$Comparison[[i]]$getGrowth()
-        if(growth > 0){
-          growthDirection = "higher"
-        } else {
-          growthDirection = "lower"
-        }
-        growth = abs(round(growth))
-        if(growth == 1){
-          growthDirection = paste0(" point ", growthDirection)
-        } else {
-          growthDirection = paste0(" points ", growthDirection)
-        }
-        x = paste0("* Compared to ", 
-                   desc, 
-                   " your students scored about ", 
-                   growth, 
-                   growthDirection, 
-                   " on average.  This is ", 
-                   private$Comparison[[i]]$getSignificance())
-        narrative = c(narrative, x)
-        
-        if(sum(ItemComparisons$Higher)>0){
-          x = paste0("    * Compared to ", 
-                     desc, 
-                     ", your students did noticeably better on question")
-          if(sum(ItemComparisons$Higher)>1){
-            x = paste0(x, "s")
+      # Add sections for the comparisons, if they exist
+      if(length(private$Comparison) > 0){
+        for(i in length(private$Comparison):1){
+          ItemComparisons = private$Comparison[[i]]$getItemComparisons()
+          TopicComparisons = private$Comparison[[i]]$getTopicComparisons()
+          desc = private$Comparison[[i]]$getDescription()
+          growth = private$Comparison[[i]]$getGrowth()
+          if(growth > 0){
+            growthDirection = "higher"
+          } else {
+            growthDirection = "lower"
           }
-          x = paste0(x, 
-                     " ",
-                     VectorSentence(ItemComparisons$`This test item`, ItemComparisons$Higher))
-          narrative = c(narrative, x)
-        }
-        
-        if(sum(ItemComparisons$Lower)>0){
-          x = paste0("    * Compared to ", 
-                     desc, 
-                     ", your students did noticeably worse on question")
-          if(sum(ItemComparisons$Lower)>1){
-            x = paste0(x, "s")
+          growth = abs(round(growth))
+          if(growth == 1){
+            growthDirection = paste0(" point ", growthDirection)
+          } else {
+            growthDirection = paste0(" points ", growthDirection)
           }
-          x = paste0(x, 
-                     " ",
-                     VectorSentence(ItemComparisons$`This test item`, ItemComparisons$Lower))
-          narrative = c(narrative, x)
-        }
-        
-        if(sum(TopicComparisons$Higher)>0){
-          x = paste0("    * Compared to ", 
+          x = paste0("* Compared to ", 
                      desc, 
-                     ", your students did noticeably better on ", 
-                     VectorSentence(TopicComparisons$Topic, TopicComparisons$Higher))
+                     " your students scored about ", 
+                     growth, 
+                     growthDirection, 
+                     " on average.  This is ", 
+                     private$Comparison[[i]]$getSignificance())
           narrative = c(narrative, x)
-        }
-        
-        if(sum(TopicComparisons$Lower)>0){
-          x = paste0("    * Compared to ", 
-                     desc, 
-                     ", your students did noticeably worse on ", 
-                     VectorSentence(TopicComparisons$Topic, TopicComparisons$Lower))
-          narrative = c(narrative, x)
+          
+          if(sum(ItemComparisons$Higher)>0){
+            x = paste0("    * Compared to ", 
+                       desc, 
+                       ", your students did noticeably better on question")
+            if(sum(ItemComparisons$Higher)>1){
+              x = paste0(x, "s")
+            }
+            x = paste0(x, 
+                       " ",
+                       VectorSentence(ItemComparisons$`This test item`, ItemComparisons$Higher))
+            narrative = c(narrative, x)
+          }
+          
+          if(sum(ItemComparisons$Lower)>0){
+            x = paste0("    * Compared to ", 
+                       desc, 
+                       ", your students did noticeably worse on question")
+            if(sum(ItemComparisons$Lower)>1){
+              x = paste0(x, "s")
+            }
+            x = paste0(x, 
+                       " ",
+                       VectorSentence(ItemComparisons$`This test item`, ItemComparisons$Lower))
+            narrative = c(narrative, x)
+          }
+          
+          if(sum(TopicComparisons$Higher)>0){
+            x = paste0("    * Compared to ", 
+                       desc, 
+                       ", your students did noticeably better on ", 
+                       VectorSentence(TopicComparisons$Topic, TopicComparisons$Higher))
+            narrative = c(narrative, x)
+          }
+          
+          if(sum(TopicComparisons$Lower)>0){
+            x = paste0("    * Compared to ", 
+                       desc, 
+                       ", your students did noticeably worse on ", 
+                       VectorSentence(TopicComparisons$Topic, TopicComparisons$Lower))
+            narrative = c(narrative, x)
+          }
         }
       }
-      
       # Add the closing line
       narrative = c(narrative,"", "Let me know if you need anything else.")
-      
       private$Narrative = narrative
-    },
+    },# /setNarrative
     
     exportNarrative = function(){
       fileConn <- file(paste0(private$DataLocation,"\\narrative.Rmd"))
@@ -767,7 +760,7 @@ REPORT = R6Class(
                         output_file = "narrative.html", 
                         output_dir = private$DataLocation,
                         quiet = T)
-    },
+    }, # /exportNarrative
     
     exportReport = function(filename = "scores.xlsx"){
       wb1 = loadWorkbook2(file = system.file("extdata", 
@@ -883,7 +876,7 @@ REPORT = R6Class(
         }
       }
       openxlsx::saveWorkbook(wb1, paste0(private$DataLocation,"\\",filename))
-    },
+    }, # /exportReport method
     
     setTopicScores = function(){
       #establish a list that will hold the Topic Scores data.frames
@@ -895,7 +888,7 @@ REPORT = R6Class(
       #make a single data.table with all of the item response scores from all of the sections
       TopicScores = data.table::rbindlist(TopicScores) 
       private$TopicScores = TopicScores
-    },
+    }, # /setTopicScores method
     
     getTopicScores = function(){return(private$TopicScores)},
     
@@ -909,17 +902,32 @@ REPORT = R6Class(
       
       for(i in 7:ncol(ItemResponses)){
         ItemResponseScores[,i] = ItemResponseScores[,i]/ItemInfo$Value[i-6]
-        Handouts = cbind.data.frame(Handouts, ItemResponses[,i, drop = F], stringsAsFactors = F)
-        Handouts = cbind.data.frame(Handouts, ItemResponseScores[,i, drop = F], stringsAsFactors = F)
-      }
+        Handouts = cbind.data.frame(Handouts, 
+                                    ItemResponses[,i, drop = F], 
+                                    stringsAsFactors = F)
+        Handouts = cbind.data.frame(Handouts, 
+                                    ItemResponseScores[,i, drop = F], 
+                                    stringsAsFactors = F)
+      } # /for
       
       topicNames = row.names(private$TopicSummary)
       for(i in 1:length(topicNames)){
-        Handouts = cbind.data.frame(Handouts, NA, stringsAsFactors = F)
-        Handouts = cbind.data.frame(Handouts, private$TopicScores[,topicNames[i], drop = F], stringsAsFactors = F)
-      }
+        Handouts = cbind.data.frame(Handouts, 
+                                    NA, 
+                                    stringsAsFactors = F)
+        Handouts = cbind.data.frame(Handouts, 
+                                    private$TopicScores[,topicNames[i], drop = F], 
+                                    stringsAsFactors = F)
+      } # /for
       
       private$Handouts = Handouts
-    }
-  )
-)
+    }, # /setHandouts method
+    
+    exportUploads = function(){
+      write.csv(x = private$UploadTab, 
+                file = paste0(private$DataLocation,"\\","upload.csv"), 
+                row.names = F)
+    } # /exportUploads method
+    
+  ) # /public
+) # /REPORT R6 class
