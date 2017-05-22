@@ -3,6 +3,11 @@
 #An instance of this class holds everything necessary for a score report on a single test
 
 #This file is way too long.  Methods should be moved to separate files and set up as functions
+#How to deal with questions where the item name is the setup file differs from the item name in the export?
+#This becomes an issue when running the enhanceItemInfo method
+#At that point, the ItemInfo member of the report object and the ItemResponses member of each RESULT object 
+# already have the item names from the export file
+#There should probably be a an object that shows the correspondence between the two sets of item names
 
 REPORT = R6Class(
   
@@ -30,8 +35,8 @@ REPORT = R6Class(
     EasyCutoff = 0.9, #cutoff score for determining whether an item is easy
     #lower bound, upper bound, and target proportion for criterion for determining whether an item is difficult
     DifficultCutoffParams = list("Lower" = 0.4, "Upper" = 0.5, "Proportion" = 0.2), 
-    ChaffRules = data.frame(score = c(.3, .4), 
-                            correlation = c(.3, .5)), #rules for determining whether an item is Wheat From Chaff
+    #rules for determining whether an item is Wheat From Chaff
+    ChaffRules = data.frame(score = c(.3, .4), correlation = c(.3, .5)), 
     RelatedCutoffProportion = 0.2, #target proportion of items to count as highly related
     ResponseSet = NULL, #character vector hold the names of the different response frequencies columns
     Correlations = NULL, #correlations column from the ItemInfo
@@ -39,7 +44,8 @@ REPORT = R6Class(
     ItemResponseScores = NULL, #data.table with the score for every student on every item
     DropScores = NULL, #data.table with the score for each student after dropping each item
     PassingScore = 0.7, #passing score for the test
-    ComparisonFileName = "comparison and topic alignment.xlsx" #test setup info filename (no file path)
+    ComparisonFileName = "comparison and topic alignment.xlsx", #test setup info filename (no file path)
+    HasTopics = NULL # logical that indicates whether the test has topic alignments
   ), # /private
   
   public = list(
@@ -93,7 +99,7 @@ REPORT = R6Class(
       }
     }, # /setItemInfo
     
-    enhanceItemInfo = function(){
+    enhanceItemInfo = function(useLocalNames = F){
       badmessage = ""
       if(is.null(private$ComparisonLocation)){ 
         badmessage = paste0(badmessage, "Need Comparison Location first.  ")
@@ -114,6 +120,13 @@ REPORT = R6Class(
         d2 = d2[-1,] #remove the first row
         row.names(d2) = NULL #remove the row names
         d2 = as.data.frame(d2, stringsAsFactors = F) #convert it to a data.frame
+        # Should the report use item names from the test set up file?
+        if(useLocalNames){ # if so,
+          private$ItemInfo$ItemName = d2$`Question #:` # pull them in from the setup info
+          #do something here to set the column names in the ItemResponse members of the results 
+        } else { # if not,
+          d2$`Question #:` = private$ItemInfo$ItemName # rename the items in the setup info
+        }
         self$setTopicAlignments(d2) #set the topic alignments
         d2$isMC = grepl("mc",d2$`Type:`, ignore.case = T) #determine which questions are MC
         d2$`Value:` = as.integer(d2$`Value:`) #convert the Value column to integer
@@ -129,12 +142,18 @@ REPORT = R6Class(
     }, # /enhanceItemInfo
     
     setTopicAlignments = function(d2){
-      Topics = d2[,5:ncol(d2)] #set up a data.frame to hold topic info
-      colnames(Topics)[1] = "ItemName" #set the name of the first column
-      for(i in 2:ncol(Topics)){
-        Topics[,i] = as.logical(as.numeric(Topics[,i]))
-      }
-      private$TopicAlignments = Topics
+      if(ncol(d2) > 5){ #check to see if there are topics at all
+        private$HasTopics = T
+        Topics = d2[,5:ncol(d2)] #set up a data.frame to hold topic info
+        colnames(Topics)[1] = "ItemName" #set the name of the first column
+        for(i in 2:ncol(Topics)){
+          Topics[,i] = as.logical(as.numeric(Topics[,i]))
+        } # /for
+        private$TopicAlignments = Topics
+      } else {
+        private$HasTopics = F
+        private$TopicAlignments = NULL
+      } # /if-else
     }, # /setTopicAlignments
     
     addItemScores = function(){
@@ -230,7 +249,12 @@ REPORT = R6Class(
         # and the student total scores after dropping the item
         for(i in 1:nrow(private$ItemInfo)){
           thisItem = private$ItemInfo$ItemName[i]
-          private$ItemInfo$Correlation[i] = cor(private$ItemResponseScores[[thisItem]], DropScores[[thisItem]])
+          if(sd(private$ItemResponseScores[[thisItem]]) * sd(DropScores[[thisItem]]) == 0){
+            private$ItemInfo$Correlation[i] = 0
+          } else {
+            private$ItemInfo$Correlation[i] = cor(private$ItemResponseScores[[thisItem]], DropScores[[thisItem]])  
+          }
+          
         }
       }
       private$Correlations = private$ItemInfo$Correlation
@@ -341,7 +365,7 @@ REPORT = R6Class(
         return(badmessage)
       }
       
-      if(is.null(private$TopicAlignments)){
+      if(is.null(private$HasTopics)){
         badmessage = paste0(badmessage, "Need Topic Alignments first.  ")
       }
       if(method %in% c("addItemScores", "getTopicAlignments")){
@@ -396,11 +420,15 @@ REPORT = R6Class(
     getPassingScore = function(){return(private$PassingScore)},
     
     getTopicAlignments = function(){
-      TopicAlignments =  private$TopicAlignments
-      for(i in 2:ncol(TopicAlignments)){
-        TopicAlignments[,i] = as.integer(TopicAlignments[,i])
-      }
-      return(TopicAlignments)
+      if(private$HasTopics){
+        TopicAlignments =  private$TopicAlignments
+        for(i in 2:ncol(TopicAlignments)){
+          TopicAlignments[,i] = as.integer(TopicAlignments[,i])
+        } # /for
+        return(TopicAlignments)    
+      } else {
+        return(NULL)
+      } # /if-else
     }, # /getTopicAlignments
     
     setSummary = function(){
@@ -490,32 +518,36 @@ REPORT = R6Class(
     }, # /setItemSummary
     
     setTopicSummary = function(){
-      TopicNames = colnames(private$TopicAlignments)[-1]
-      TopicScores = vector(mode = "list", length = length(private$Results))
-      sectionNames = c("All Classes", names(private$Results))
-      TopicSummary = magrittr::set_rownames(
-        magrittr::set_colnames(
-          as.data.frame.matrix(
-            matrix(data = NA_real_, 
-                   nrow = ncol(private$TopicAlignments)-1, 
-                   ncol = length(sectionNames))),
-          sectionNames),
-        TopicNames)
-      
-      for(i in 1:length(private$Results)){
-        private$Results[[i]]$setTopicScores(private$TopicAlignments,private$ItemInfo)
-        TopicScores[[i]] = private$Results[[i]]$getTopicScores()
-        TopicSummary[,names(private$Results)[i]] = private$Results[[i]]$getTopicSummary()
+      if(private$HasTopics){
+        TopicNames = colnames(private$TopicAlignments)[-1]
+        TopicScores = vector(mode = "list", length = length(private$Results))
+        sectionNames = c("All Classes", names(private$Results))
+        TopicSummary = magrittr::set_rownames(
+          magrittr::set_colnames(
+            as.data.frame.matrix(
+              matrix(data = NA_real_, 
+                     nrow = ncol(private$TopicAlignments)-1, 
+                     ncol = length(sectionNames))),
+            sectionNames),
+          TopicNames)
+        
+        for(i in 1:length(private$Results)){
+          private$Results[[i]]$setTopicScores(private$TopicAlignments,private$ItemInfo)
+          TopicScores[[i]] = private$Results[[i]]$getTopicScores()
+          TopicSummary[,names(private$Results)[i]] = private$Results[[i]]$getTopicSummary()
+        }
+        
+        
+        TopicScores = data.table::rbindlist(TopicScores)
+        for(i in TopicNames){
+          itemset = private$TopicAlignments[,i]
+          totalpoints = sum(private$TopicAlignments$Value[itemset])
+          TopicSummary$`All Classes`[rownames(TopicSummary) == i] = mean(unlist(TopicScores[,i, with = F]))
+        }
+        private$TopicSummary = TopicSummary  
+      } else {
+        private$TopicSummary = NULL
       }
-      
-      
-      TopicScores = data.table::rbindlist(TopicScores)
-      for(i in TopicNames){
-        itemset = private$TopicAlignments[,i]
-        totalpoints = sum(private$TopicAlignments$Value[itemset])
-        TopicSummary$`All Classes`[rownames(TopicSummary) == i] = mean(unlist(TopicScores[,i, with = F]))
-      }
-      private$TopicSummary = TopicSummary
     }, # /setTopicSummary
     
     setComparison = function(){
@@ -546,16 +578,22 @@ REPORT = R6Class(
             c("This test item", "Prior test item","Prior test score"))
           ItemComparisons$`Prior test score` = as.numeric(ItemComparisons$`Prior test score`)
           ItemComparisons$Higher = private$ItemScores > ItemComparisons[,3] + 0.1
+          #if there is no comparison for that item, mark as FALSE
+          ItemComparisons$Higher[is.na(ItemComparisons$Higher)] = F 
           ItemComparisons$Lower =  private$ItemScores < ItemComparisons[,3] - 0.1
+          #if there is no comparison for that item, mark as FALSE
+          ItemComparisons$Lower[is.na(ItemComparisons$Lower)] = F 
           Comparisons[[i]]$setItemComparisons(ItemComparisons)
           
-          # If there is a topic comparison:
-          if(nrow(d3) != 0){
-            TopicComparisons = d3[,c(1,i+1)]
-            TopicComparisons$Higher = private$TopicSummary$`All Classes` > TopicComparisons[,2] + 0.1
-            TopicComparisons$Lower = private$TopicSummary$`All Classes` < TopicComparisons[,2] - 0.1
-            Comparisons[[i]]$setTopicComparisons(TopicComparisons)
-          }
+          # If there are topics and there is a topic comparison:
+          if(private$HasTopics){
+            if(nrow(d3) != 0){
+              TopicComparisons = d3[,c(1,i+1)]
+              TopicComparisons$Higher = private$TopicSummary$`All Classes` > TopicComparisons[,2] + 0.1
+              TopicComparisons$Lower = private$TopicSummary$`All Classes` < TopicComparisons[,2] - 0.1
+              Comparisons[[i]]$setTopicComparisons(TopicComparisons)
+            } # /if
+          } # /if
           
           # If there is an overall comparison:
           if(!is.na(CompHeader[1,i])){ 
@@ -627,7 +665,7 @@ REPORT = R6Class(
         x = paste0(x, VectorSentence(private$ItemSummary$ItemName, private$ItemSummary$OverThinking), ".")
         narrative = c(narrative, x)
       }
-      # If there are checkdifficult items, add the line
+      # If there are difficult items, add the line
       if(sum(private$ItemSummary$Difficult) > 0){
         x = "* Your students found the following question"
         if(sum(private$ItemSummary$Difficult) > 1){
@@ -672,13 +710,21 @@ REPORT = R6Class(
                    ".  Those are questions to keep, since they are good indicators of student knowledge.")
         narrative = c(narrative, x)
       }
-      # Add lines for boxplots and topics
-      narrative = c(narrative, "* Boxplots", "* Topics")
+      # Add lines for boxplots, if necessary
+      if(length(private$Results) > 1){
+        narrative = c(narrative, "* Boxplots") 
+      }
+      # Add line for topics, if necessary
+      if(private$HasTopics){
+        narrative = c(narrative, "* Topics")
+      }
       # Add sections for the comparisons, if they exist
       if(length(private$Comparison) > 0){
         for(i in length(private$Comparison):1){
           ItemComparisons = private$Comparison[[i]]$getItemComparisons()
-          TopicComparisons = private$Comparison[[i]]$getTopicComparisons()
+          if(private$HasTopics){
+            TopicComparisons = private$Comparison[[i]]$getTopicComparisons()  
+          }
           desc = private$Comparison[[i]]$getDescription()
           growth = private$Comparison[[i]]$getGrowth()
           if(growth > 0){
@@ -727,21 +773,25 @@ REPORT = R6Class(
             narrative = c(narrative, x)
           }
           
-          if(sum(TopicComparisons$Higher)>0){
-            x = paste0("    * Compared to ", 
-                       desc, 
-                       ", your students did noticeably better on ", 
-                       VectorSentence(TopicComparisons$Topic, TopicComparisons$Higher))
-            narrative = c(narrative, x)
-          }
-          
-          if(sum(TopicComparisons$Lower)>0){
-            x = paste0("    * Compared to ", 
-                       desc, 
-                       ", your students did noticeably worse on ", 
-                       VectorSentence(TopicComparisons$Topic, TopicComparisons$Lower))
-            narrative = c(narrative, x)
-          }
+          #If there are topic comparisons, add the lines in
+          if(private$HasTopics){
+            if(!is.null(TopicComparisons)){
+              if(sum(TopicComparisons$Higher)>0){
+                x = paste0("    * Compared to ", 
+                           desc, 
+                           ", your students did noticeably better on ", 
+                           VectorSentence(TopicComparisons$Topic, TopicComparisons$Higher))
+                narrative = c(narrative, x)
+              } # /if there are higher topics
+              if(sum(TopicComparisons$Lower)>0){
+                x = paste0("    * Compared to ", 
+                           desc, 
+                           ", your students did noticeably worse on ", 
+                           VectorSentence(TopicComparisons$Topic, TopicComparisons$Lower))
+                narrative = c(narrative, x)
+              } # /if there are lower topics
+            } # /if TopicComparisons not null 
+          } # /if HasTopics
         }
       }
       # Add the closing line
@@ -763,6 +813,12 @@ REPORT = R6Class(
     }, # /exportNarrative
     
     exportReport = function(filename = "scores.xlsx"){
+      uploadFilePath = paste0(private$DataLocation,"\\upload.csv")
+      if(file.exists(uploadFilePath)){
+        self$exportUpdate(uploadFilePath)
+      }
+      
+      #This next line creates a slight delay
       wb1 = loadWorkbook2(file = system.file("extdata", 
                                              "template", 
                                              package = "rrttReportBuilder"), 
@@ -779,7 +835,6 @@ REPORT = R6Class(
                             startCol = 1, 
                             startRow = 100*(i-1) + 2)
       }
-      
       for(i in 1:length(private$Results)){
         openxlsx::writeData(wb = wb1, 
                             sheet = "ItemScores", 
@@ -792,7 +847,6 @@ REPORT = R6Class(
                             startCol = 1, 
                             startRow = 100*(i-1) + 2)
       }
-      
       openxlsx::writeData(wb = wb1, 
                           sheet = "ItemInfo", 
                           x = private$ItemInfo)
@@ -801,18 +855,36 @@ REPORT = R6Class(
                           x = data.frame(private$Summary), 
                           startRow = 1)
       openxlsx::writeData(wb = wb1, 
+                          sheet = "Summary", 
+                          x = names(private$Results), 
+                          startRow = 3)
+      openxlsx::writeData(wb = wb1, 
                           sheet = "Upload", 
                           x = private$UploadTab, 
                           startRow = 1)
-      openxlsx::writeData(wb = wb1, 
-                          sheet = "TopicAlignments", 
-                          x = self$getTopicAlignments(), 
-                          startRow = 1)
-      openxlsx::writeData(wb = wb1, 
-                          sheet = "TopicSummary", 
-                          x = private$TopicSummary, 
-                          startRow = 1, 
-                          rowNames = T)
+      if(private$HasTopics){
+        openxlsx::writeData(wb = wb1, 
+                            sheet = "TopicAlignments", 
+                            x = self$getTopicAlignments(), 
+                            startRow = 1)
+        openxlsx::writeData(wb = wb1, 
+                            sheet = "TopicSummary", 
+                            x = private$TopicSummary, 
+                            startRow = 1, 
+                            rowNames = T)
+        for(i in 1:length(private$Results)){
+          openxlsx::writeData(wb = wb1, 
+                              sheet = "TopicScores", 
+                              x = names(private$Results)[i], 
+                              startCol = 1, 
+                              startRow = 100*(i-1) + 1)
+          openxlsx::writeData(wb = wb1, 
+                              sheet = "TopicScores", 
+                              x = private$Results[[i]]$getTopicScores(), 
+                              startCol = 1, 
+                              startRow = 100*(i-1) + 2)
+        } # /for
+      } # /if
       ItemSummary = data.frame(private$Narrative)
       ItemSummary = ItemSummary[4:(nrow(ItemSummary)-2),,drop=F]
       ItemSummary = ItemSummary[!(ItemSummary[,1] %in% c("* Boxplots", "* Topics")),,drop=F]
@@ -821,24 +893,12 @@ REPORT = R6Class(
                           x = ItemSummary, 
                           startRow = 3, 
                           colNames = F)
-      
-      for(i in 1:length(private$Results)){
-        openxlsx::writeData(wb = wb1, 
-                            sheet = "TopicScores", 
-                            x = names(private$Results)[i], 
-                            startCol = 1, 
-                            startRow = 100*(i-1) + 1)
-        openxlsx::writeData(wb = wb1, 
-                            sheet = "TopicScores", 
-                            x = private$Results[[i]]$getTopicScores(), 
-                            startCol = 1, 
-                            startRow = 100*(i-1) + 2)
-      }
-      
       openxlsx::writeData(wb = wb1, 
                           sheet = "Raw Handout Data", 
                           x = private$Handouts, 
                           startRow = 1)
+      
+      
       
       numberOfComparisons = length(private$Comparison)
       if(numberOfComparisons > 0){
@@ -870,24 +930,35 @@ REPORT = R6Class(
                               startCol = 3 + colShift, startRow = 14, colNames = F)
           openxlsx::writeData(wb = wb1, sheet = "Comparison", x = private$Comparison[[i]]$getSignificance(), 
                               startCol = 3 + colShift, startRow = 9)
-          Topics = private$Comparison[[i]]$getTopicComparisons()
-          openxlsx::writeData(wb = wb1, sheet = "Comparison", x = Topics$Average.score, 
-                              startCol = 10 + colShift, startRow = 14, colNames = F)
-        }
-      }
-      openxlsx::saveWorkbook(wb1, paste0(private$DataLocation,"\\",filename))
+          if(private$HasTopics){
+            Topics = private$Comparison[[i]]$getTopicComparisons()
+            if(!is.null(Topics)){
+              openxlsx::writeData(wb = wb1, sheet = "Comparison", x = Topics$Average.score, 
+                                  startCol = 10 + colShift, startRow = 14, colNames = F)
+            } # /if there are topic comparisons
+          } # /if HasTopics
+        } #/for 
+      } # /if # of comparison > 0
+      
+      # This next line creates a long delay
+      openxlsx::saveWorkbook(wb1, paste0(private$DataLocation,"\\",filename), overwrite = TRUE)
+      
     }, # /exportReport method
     
     setTopicScores = function(){
-      #establish a list that will hold the Topic Scores data.frames
-      TopicScores = vector(mode = "list", length = length(private$Results))
-      #pull the topic scores for each section and load them in the list
-      for(i in 1:length(private$Results)){
-        TopicScores[[i]] = private$Results[[i]]$getTopicScores()
-      }
-      #make a single data.table with all of the item response scores from all of the sections
-      TopicScores = data.table::rbindlist(TopicScores) 
-      private$TopicScores = TopicScores
+      if(private$HasTopics){
+        #establish a list that will hold the Topic Scores data.frames
+        TopicScores = vector(mode = "list", length = length(private$Results))
+        #pull the topic scores for each section and load them in the list
+        for(i in 1:length(private$Results)){
+          TopicScores[[i]] = private$Results[[i]]$getTopicScores()
+        }
+        #make a single data.table with all of the item response scores from all of the sections
+        TopicScores = data.table::rbindlist(TopicScores) 
+        private$TopicScores = TopicScores
+      } else {
+        private$TopicScores = NULL
+      } # /if-else
     }, # /setTopicScores method
     
     getTopicScores = function(){return(private$TopicScores)},
@@ -910,16 +981,17 @@ REPORT = R6Class(
                                     stringsAsFactors = F)
       } # /for
       
-      topicNames = row.names(private$TopicSummary)
-      for(i in 1:length(topicNames)){
-        Handouts = cbind.data.frame(Handouts, 
-                                    NA, 
-                                    stringsAsFactors = F)
-        Handouts = cbind.data.frame(Handouts, 
-                                    private$TopicScores[,topicNames[i], drop = F], 
-                                    stringsAsFactors = F)
-      } # /for
-      
+      if(private$HasTopics){
+        topicNames = row.names(private$TopicSummary)
+        for(i in 1:length(topicNames)){
+          Handouts = cbind.data.frame(Handouts, 
+                                      NA, 
+                                      stringsAsFactors = F)
+          Handouts = cbind.data.frame(Handouts, 
+                                      private$TopicScores[,topicNames[i], drop = F], 
+                                      stringsAsFactors = F)
+        } # /for
+      } # /if HasTopics
       private$Handouts = Handouts
     }, # /setHandouts method
     
@@ -927,7 +999,34 @@ REPORT = R6Class(
       write.csv(x = private$UploadTab, 
                 file = paste0(private$DataLocation,"\\","upload.csv"), 
                 row.names = F)
-    } # /exportUploads method
+    }, # /exportUploads method
+    
+    exportUpdate = function(uploadFilePath){
+      
+      #get the existing scores and add an identifying code
+      ExistingScores = read.csv(uploadFilePath, stringsAsFactors = F)
+      ExistingScores$code = apply(X = ExistingScores, MARGIN = 1, FUN = paste0, collapse = "-")
+      
+      #get all scores and add an identifying code
+      AllScores = private$UploadTab
+      AllScores$code = apply(X = AllScores, MARGIN = 1, FUN = paste0, collapse = "-")
+      
+      #get the subset of scores that are new or different
+      NewScores = AllScores[!(AllScores$code %in% ExistingScores$code),]
+      
+      if(nrow(NewScores) > 0){ #If there are new scores, write a new score update
+        #Pad student names to make them the same length
+        maxName = max(nchar(NewScores$StudentName)) 
+        NewScores$StudentName = stringr::str_pad(string = NewScores$StudentName, width = maxName, side = "right")
+        
+        out = paste0("Updated scores for ",private$TestName,":  \n") #Put in the header line for the score update email
+        for(i in 1:nrow(NewScores)){ #for each score append a line with that student's name, id, and score
+          out = paste0(out, "\t",NewScores$StudentName[i], "\t", NewScores$StudentID[i], "\t", NewScores$Percentage[i], "  \n")
+        } # /for loop
+        #write the score update emails to a text file
+        write(out, paste0(private$DataLocation,"\\","ScoreUpdates.txt"))  
+      } # /if
+    } # /exportUpdate method
     
   ) # /public
 ) # /REPORT R6 class
