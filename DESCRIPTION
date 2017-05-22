@@ -13,6 +13,7 @@ Imports:
     data.table,
     Rcpp,
     devtools,
-    rmarkdown
+    rmarkdown,
+    stringr
 LazyData: true
 RoxygenNote: 6.0.1
