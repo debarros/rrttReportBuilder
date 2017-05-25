@@ -6,3 +6,5 @@
 ^YearDescriptions\.csv$
 ^itemResponseScores\.rds$
 ^README\.md$
+^CleanAndRebuild\.R$
+^UpdateDescription\.R$
