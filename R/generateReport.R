@@ -5,7 +5,7 @@
 #' @param ReportFileName Desired name of the output excel file
 #' @param TMS Name of the testing management system.  Options currently limited to Linkit.
 #' @param SMS Name of the student management system.  Options currently limited to PowerSchool.
-#' @return an object of clas REPORT
+#' @return an object of class REPORT
 generateReport = function(DataLocation = choose.dir(default = "J:/tests/2016-2017/"),
                           ComparisonFileName = "comparison and topic alignment.xlsx",
                           ReportFileName = "scores.xlsx",
