@@ -323,7 +323,7 @@ REPORT = R6Class(
       return(ItemResponses)
     },  # /getResponses
     
-    badMessage = function(report = self, method){ return(badMessage.REPORT(method)) },
+    badMessage = function(method, report = self){ return(badMessage.REPORT(method, report)) },
     
     getSources = function(){return(private$Sources)},
     getTestName = function(){return(private$TestName)},

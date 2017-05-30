@@ -17,7 +17,7 @@
 # 
 #   Need to put getPassingScore and setPassingScore in here somewhere, once those are implemented
 
-badMessage.REPORT = function(report, method){
+badMessage.REPORT = function(method, report){
   badmessage = ""
   if(is.null(report$.__enclos_env__$private$DataLocation)) badmessage = paste0(badmessage, "Need a data location first.  ")
   if(method %in% c("setSources", "getDataLocation")) return(badmessage)
