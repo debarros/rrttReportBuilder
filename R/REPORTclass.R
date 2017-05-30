@@ -9,6 +9,8 @@
 # already have the item names from the export file
 #There should probably be a an object that shows the correspondence between the two sets of item names
 
+# need a reason to use setPassingScore - where is this encoded?  How is the call triggered?
+
 REPORT = R6Class(
   
   classname = "REPORT",
@@ -321,85 +323,7 @@ REPORT = R6Class(
       return(ItemResponses)
     },  # /getResponses
     
-    badMessage = function(method){
-      badmessage = ""
-      if(is.null(private$DataLocation)){
-        badmessage = paste0(badmessage, "Need a data location first.  ")
-      }
-      if(method %in% c("setSources", "getDataLocation")){
-        return(badmessage)
-      }
-      
-      if(is.null(private$Sources)){
-        badmessage = paste0(badmessage, "Need sources first.  ")
-      }
-      if(method %in% c("setTestName", "getSources")){
-        return(badmessage)
-      }
-      
-      if(is.null(private$TestName)){
-        badmessage = paste0(badmessage, "Need the test name first.  ")
-      }
-      if(method %in% c("setItemInfo", "getTestName")){
-        return(badmessage)
-      }
-      
-      if(is.null(private$ItemInfo)){
-        badmessage = paste0(badmessage, "Need Item Info first.  ")
-      }
-      if(method %in% c("setResults", "getItemInfo")){
-        return(badmessage)
-      }
-      
-      if(length(private$Results) == 0){
-        badmessage = paste0(badmessage, "Need results first.  ")
-      }
-      if(method %in% c("setComparisonLocation", "getResults")){
-        return(badmessage)
-      }
-      
-      if(is.null(private$ComparisonLocation)){
-        badmessage = paste0(badmessage, "Need Comparison Location first.  ")
-      }
-      if(method %in% c("getComparisonLocation")){
-        return(badmessage)
-      }
-      
-      if(is.null(private$HasTopics)){
-        badmessage = paste0(badmessage, "Need Topic Alignments first.  ")
-      }
-      if(method %in% c("addItemScores", "getTopicAlignments")){
-        return(badmessage)
-      }
-      
-      if(is.null(private$ItemScores)){
-        badmessage = paste0(badmessage, "Need item scores first.  ")
-      }
-      if(method %in% c("addCorrelations", "getItemScores")){
-        return(badmessage)
-      }
-      
-      if(is.null(private$Correlations)){
-        badmessage = paste0(badmessage, "Need item correlations first.  ")
-      }
-      if(method %in% c("addResponseFrequencies", "getCorrelations")){
-        return(badmessage)
-      }
-      
-      if(is.null(private$ResponseSet)){
-        badmessage = paste0(badmessage, "Need Response Frequencies first.  ")
-      }
-      if(method %in% c("setUploadTab")){
-        return(badmessage)
-      }
-      
-      if(is.null(private$UploadTab)){
-        badmessage = paste0(badmessage, "Need upload tab first.  ")
-      }
-      if(method %in% c("getUploadTab")){
-        return(badmessage)
-      }
-    },  # /badMessage
+    badMessage = function(report = self, method){ return(badMessage.REPORT(method)) },
     
     getSources = function(){return(private$Sources)},
     getTestName = function(){return(private$TestName)},
@@ -519,6 +443,7 @@ REPORT = R6Class(
     
     setTopicSummary = function(){
       if(private$HasTopics){
+        #put badmessage call here
         TopicNames = colnames(private$TopicAlignments)[-1]
         TopicScores = vector(mode = "list", length = length(private$Results))
         sectionNames = c("All Classes", names(private$Results))
@@ -823,6 +748,8 @@ REPORT = R6Class(
                                              "template", 
                                              package = "rrttReportBuilder"), 
                           isUnzipped = T)
+      
+      # For each class section, write the student responses to the Responses tab
       for(i in 1:length(private$Results)){
         openxlsx::writeData(wb = wb1, 
                             sheet = "Responses", 
@@ -834,7 +761,9 @@ REPORT = R6Class(
                             x = private$Results[[i]]$getItemResponses(), 
                             startCol = 1, 
                             startRow = 100*(i-1) + 2)
-      }
+      } # /for
+      
+      # For each class section, write the student item response scores to the ItemScores tab
       for(i in 1:length(private$Results)){
         openxlsx::writeData(wb = wb1, 
                             sheet = "ItemScores", 
@@ -846,7 +775,8 @@ REPORT = R6Class(
                             x = private$Results[[i]]$getItemResponseScores(), 
                             startCol = 1, 
                             startRow = 100*(i-1) + 2)
-      }
+      } # /for
+      
       openxlsx::writeData(wb = wb1, 
                           sheet = "ItemInfo", 
                           x = private$ItemInfo)
@@ -862,6 +792,8 @@ REPORT = R6Class(
                           sheet = "Upload", 
                           x = private$UploadTab, 
                           startRow = 1)
+      
+      # If there are topics, write data to the relevant tabs
       if(private$HasTopics){
         openxlsx::writeData(wb = wb1, 
                             sheet = "TopicAlignments", 
@@ -872,6 +804,8 @@ REPORT = R6Class(
                             x = private$TopicSummary, 
                             startRow = 1, 
                             rowNames = T)
+        
+        # Write the student topic scores one section at a time
         for(i in 1:length(private$Results)){
           openxlsx::writeData(wb = wb1, 
                               sheet = "TopicScores", 
@@ -899,7 +833,7 @@ REPORT = R6Class(
                           startRow = 1)
       
       
-      
+      # If there are comparisons, write data to the comparison tab
       numberOfComparisons = length(private$Comparison)
       if(numberOfComparisons > 0){
         
@@ -930,6 +864,8 @@ REPORT = R6Class(
                               startCol = 3 + colShift, startRow = 14, colNames = F)
           openxlsx::writeData(wb = wb1, sheet = "Comparison", x = private$Comparison[[i]]$getSignificance(), 
                               startCol = 3 + colShift, startRow = 9)
+          
+          # If there are both topics and comparisons, write topic comparison data to the comparison tab
           if(private$HasTopics){
             Topics = private$Comparison[[i]]$getTopicComparisons()
             if(!is.null(Topics)){
