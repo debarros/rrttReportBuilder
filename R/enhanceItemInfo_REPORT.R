@@ -28,7 +28,7 @@ enhanceItemInfo.REPORT = function(report, useLocalNames) {
         } else { # if not,
           d2$`Question #:` = report$.__enclos_env__$private$ItemInfo$ItemName # rename the items in the setup info
         }
-        self$setTopicAlignments(d2) #set the topic alignments
+        report$setTopicAlignments(d2) #set the topic alignments
         d2$isMC = grepl("mc",d2$`Type:`, ignore.case = T) #determine which questions are MC
         d2$`Value:` = as.integer(d2$`Value:`) #convert the Value column to integer
         d2$options = d2$`Value:` + 1 #default the number of options to what it should be for ER questions

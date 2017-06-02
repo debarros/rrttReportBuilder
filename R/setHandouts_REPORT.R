@@ -3,7 +3,7 @@
 setHandouts.REPORT = function(report) {
       ItemInfo = report$.__enclos_env__$private$ItemInfo
       ItemResponseScores = report$.__enclos_env__$private$ItemResponseScores
-      ItemResponses = self$getResponses()
+      ItemResponses = report$getResponses()
       Handouts = as.data.frame(ItemResponses, stringsAsFactors = F)[,1:5]
       colnames(ItemResponseScores) = paste0(colnames(ItemResponseScores),"_Score")
       colnames(ItemResponses) = paste0(colnames(ItemResponses),"_Response")

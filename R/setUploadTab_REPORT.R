@@ -1,7 +1,7 @@
 # setUploadTab_REPORT
 
 setUploadTab.REPORT = function(report) {
-	ItemResponses = as.data.frame(self$getResponses())
+	ItemResponses = as.data.frame(report$getResponses())
       UploadTab = data.frame(StudentID = ItemResponses$StudentID)
       UploadTab$StudentName = paste0(ItemResponses$LastName, ", ",ItemResponses$FirstName)
       UploadTab$Percentage = round(ItemResponses$score, digits = 2)

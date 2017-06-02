@@ -8,7 +8,7 @@ addResponseFrequencies.REPORT = function(report) {
   if(nchar(badmessage) > 0){
     return(badmessage)
   } else {
-    ItemResponses = self$getResponses()
+    ItemResponses = report$getResponses()
     
     #Set default values for the number of letter options and number of point options
     topletter = 0
