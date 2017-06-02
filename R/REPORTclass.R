@@ -55,33 +55,19 @@ REPORT = R6Class(
     setDataLocation = function(x){private$DataLocation = x},
     setComparisonFileName = function(x){private$ComparisonFileName = x},
     setComparisonLocation = function(x){private$ComparisonLocation = x},
-    
     setSources = function(report = self){ setSources.REPORT(report) }, 
-    
     setTestName = function(report = self){ setTestName.REPORT(report) }, 
-    
     setItemInfo = function(report = self){ setItemInfo.REPORT(report) }, 
-    
     enhanceItemInfo = function(report = self, useLocalNames = F){ enhanceItemInfo.REPORT(report, useLocalNames) }, 
-    
     setTopicAlignments = function(d2, report = self){ setTopicAlignments.REPORT(d2, report) }, 
-    
     addItemScores = function(report = self){ addItemScores.REPORT(report) },
-    
     setUploadTab = function(report = self){ setUploadTab.REPORT(report) },
-    
     setResults = function(report = self){ setResults.REPORT(report) }, 
-    
     setPassingScore = function(x){private$PassingScore = x},
-    
     addCorrelations = function(report = self){ addCorrelations.REPORT(report) }, 
-    
     addResponseFrequencies = function(report = self){ addResponseFrequencies.REPORT(report) },
-    
     getResponses = function(report = self){ return(getResponses.REPORT(report)) }, 
-    
     badMessage = function(method, report = self){ return(badMessage.REPORT(method, report)) },
-    
     getSources = function(){return(private$Sources)},
     getTestName = function(){return(private$TestName)},
     getItemInfo = function(){return(private$ItemInfo)},
@@ -99,32 +85,19 @@ REPORT = R6Class(
     getCorrelations = function(){return(private$Correlations)},
     getResponseSet = function(){return(private$ResponseSet)},
     getPassingScore = function(){return(private$PassingScore)},
-    
     getTopicAlignments = function(report = self){ return(getTopicAlignments.REPORT(report)) }, 
-    
     setSummary = function(report = self){ setSummary.REPORT(report) }, 
-    
     setItemSummary = function(report = self){ setItemSummary.REPORT(report) }, 
-    
     setTopicSummary = function(report = self){ setTopicSummary.REPORT(report) }, 
-    
     setComparison = function(report = self){ setComparison.REPORT(report) }, 
-    
     setNarrative = function(report = self){ setNarrative.REPORT(report) },
-    
     exportNarrative = function(report = self){ exportNarrative.REPORT(report) }, 
-    
     exportReport = function(report = self, filename = "scores.xlsx"){ exportReport.REPORT(report, filename) }, 
-    
     setTopicScores = function(report = self){ setTopicScores.REPORT(report) }, 
-    
     getTopicScores = function(){return(private$TopicScores)},
-    
     setHandouts = function(report = self){ setHandouts.REPORT(report) }, 
-    
     exportUploads = function(report = self){ exportUploads.REPORT(report) }, 
-    
     exportUpdate = function(report = self, uploadFilePath){ exportUpdate.REPORT(report, uploadFilePath) }
-    
+
   ) # /public
 ) # /REPORT R6 class
