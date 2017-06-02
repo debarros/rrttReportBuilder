@@ -1,6 +1,6 @@
 # setTopicAlignments_REPORT
 
-setTopicAlignments.REPORT = function(report, d2) {
+setTopicAlignments.REPORT = function(d2, report) {
       if(ncol(d2) > 5){ #check to see if there are topics at all
         report$.__enclos_env__$private$HasTopics = T
         Topics = d2[,5:ncol(d2)] #set up a data.frame to hold topic info

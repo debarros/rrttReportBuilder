@@ -64,7 +64,7 @@ REPORT = R6Class(
     
     enhanceItemInfo = function(report = self, useLocalNames = F){ enhanceItemInfo.REPORT(report, useLocalNames) }, 
     
-    setTopicAlignments = function(report = self, d2){ setTopicAlignments.REPORT(report, d2) }, 
+    setTopicAlignments = function(d2, report = self){ setTopicAlignments.REPORT(d2, report) }, 
     
     addItemScores = function(report = self){ addItemScores.REPORT(report) },
     
@@ -106,7 +106,7 @@ REPORT = R6Class(
     
     setItemSummary = function(report = self){ setItemSummary.REPORT(report) }, 
     
-    setTopicSummary = function(report = self){ setTopicAlignments.REPORT(report) }, 
+    setTopicSummary = function(report = self){ setTopicSummary.REPORT(report) }, 
     
     setComparison = function(report = self){ setComparison.REPORT(report) }, 
     
