@@ -1,4 +1,13 @@
+#' @title Load Workbook 2
+#' @description Load an xlsx workbook object in original or unzipped form
+#' @param file filename of an xlsx file or path to an unzipped xlsx file
+#' @param xlsxFile duplicate of \code{file}
+#' @param isUnzipped logical, is \code{file} an xlsx file or a folder containing an unzipped xlsx file?
+#' @return Workbook object
 loadWorkbook2 <- function(file, xlsxFile = NULL, isUnzipped = FALSE){
+  
+  if(!is.null(xlsxFile))
+    file <- xlsxFile
   
   ## If this is an unzipped workbook, skip the temp dir stuff
   if(isUnzipped){
@@ -6,8 +15,6 @@ loadWorkbook2 <- function(file, xlsxFile = NULL, isUnzipped = FALSE){
     xmlFiles <- list.files(path = xmlDir, full.names = T, recursive = T, all.files = T)
   } else {
     
-    if(!is.null(xlsxFile))
-      file <- xlsxFile
     
     file <- getFile(file)
     
