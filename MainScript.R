@@ -1,14 +1,21 @@
 #MainScript.R
 library(rrttReportBuilder)
 library(dBtools)
-
+library(roxygen2)
 
 currentReport = generateReport(DataLocation = DataLocation)
 
 
-DataLocation = "\\25.59.81.175\\Data\\tests\\2016-2017\\Science\\Chem\\week23 (2017-02-15) U3 Periodic Table"
+DataLocation = "C:/Users/pauldeba/Downloads/week23 (2017-02-15) U3 Periodic Table"
 
-
+library(openxlsx)
+?loadWorkbook2
 
 
 UpdateDescription()
+
+
+currentReport$getResponseSet()
+
+?VectorSentence
+
