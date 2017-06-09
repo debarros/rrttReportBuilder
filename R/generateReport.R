@@ -21,6 +21,8 @@ generateReport = function(DataLocation = choose.dir(default = "J:/tests/2016-201
   currentReport$setComparisonLocation(paste0(DataLocation, "\\", ComparisonFileName))
   currentReport$enhanceItemInfo()
   currentReport$addItemScores()
+  currentReport$loadSpecialScoring()  # Load special scoring rules
+  currentReport$applySpecialScoring()  # Apply special scoring rules
   currentReport$addCorrelations()
   currentReport$addResponseFrequencies()
   currentReport$setUploadTab()
