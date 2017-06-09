@@ -23,21 +23,26 @@ RESULT = R6Class(
     setItemResponses = function(sourceLocation, itemNames, itemValues){
       ItemResponses = read.csv(sourceLocation, skip = 13, header = F, stringsAsFactors = F) #read the item response info
       colnames(ItemResponses) = c("StudentID", "LastName","FirstName","TestDate","TotalPoints",itemNames) #set the column names 
+      # Set the basic score column.  Note that, if there is special scoring, that will be applied later.
       ItemResponses$score = ItemResponses$TotalPoints/sum(itemValues)*100
-      ItemResponses = ItemResponses[,c(which(colnames(ItemResponses)=="score"),which(colnames(ItemResponses)!="score"))] #put the score column first
+      #put the score column first
+      ItemResponses = ItemResponses[,c(which(colnames(ItemResponses)=="score"),which(colnames(ItemResponses)!="score"))] 
       private$ItemResponses = ItemResponses
     },
     setSectionName = function(x){private$SectionName= x},
     setItemResponseScores = function(ItemInfo){
+      ItemResp = private$ItemResponses
       #create a data.frame to hold the item scores
-      ItemResponseScores = setNames(as.data.frame(array(data = NA_integer_, dim = dim(private$ItemResponses))), colnames(private$ItemResponses)) 
-      ItemResponseScores[,1:6] = private$ItemResponses[,1:6] #pull in the student info from the results data.table
+      ItemResponseScores = setNames(as.data.frame(
+        array(data = NA_integer_, dim = dim(ItemResp))),
+        colnames(ItemResp)) 
+      ItemResponseScores[,1:6] = ItemResp[,1:6] #pull in the student info from the results data.table
       #Calculate scores for each response on each item
       for(i in 1:nrow(ItemInfo)){
         if(ItemInfo$Type[i] == "MC"){
-          ItemResponseScores[,ItemInfo$ItemName[i]] = ItemInfo$Value[i]*(private$ItemResponses[,ItemInfo$ItemName[i]] == ItemInfo$Answer[i])
+          ItemResponseScores[,ItemInfo$ItemName[i]] = ItemInfo$Value[i]*(ItemResp[,ItemInfo$ItemName[i]] == ItemInfo$Answer[i])
         } else {
-          ItemResponseScores[,ItemInfo$ItemName[i]] = private$ItemResponses[,ItemInfo$ItemName[i]]
+          ItemResponseScores[,ItemInfo$ItemName[i]] = ItemResp[,ItemInfo$ItemName[i]]
         }
       }
       private$ItemResponseScores = ItemResponseScores
@@ -78,9 +83,11 @@ RESULT = R6Class(
       }
       private$TopicScores = TopicScores
       self$setTopicSummary(TopicScores)
-      },
+    },
     setTopicSummary = function(TopicScores){
       private$TopicSummary = apply(TopicScores[,-c(1:3)], 2, mean)
-      }
+    },
+    setIRSquick = function(x){private$ItemResponseScores = x},
+    setIRquick = function(x){private$ItemResponses = x}
   ) #public
 )
