@@ -34,9 +34,9 @@ curveScore = function(itemScores, itemValues, itemWeights, specialScoring, looku
   }
   
   if(TYPE %in% c("Extra Credit items", "Out of x points")){
-	thisScore = sum(itemPercents * itemWeights) / sum(itemWeights)
-	thisScore = thisScore * sum(itemValues) / p1
-	return(thisScore)
+    thisScore = sum(itemPercents * itemWeights) / sum(itemWeights)
+    thisScore = thisScore * sum(itemValues) / p1
+    return(thisScore)
   }
   
   if(TYPE == "Lookup score"){
@@ -56,15 +56,15 @@ curveScore = function(itemScores, itemValues, itemWeights, specialScoring, looku
   }
   
   if(TYPE == "Give back x%"){
-	# check this. Alan wrote it...
-	# is p1 where the "x%" would be stored? As a fraction or whole number?
-	thisScore = (sum(itemPercents * itemWeights) / sum(itemWeights)) + p1
+    # check this. Alan wrote it...
+    # is p1 where the "x%" would be stored? As a fraction or whole number?
+    thisScore = (sum(itemPercents * itemWeights) / sum(itemWeights)) + p1
     return(thisScore)
   }
   
   if(TYPE == "Add x points"){
-	# check this. Alan wrote it...
-	# is p1 where the "x points" would be stored?
+    # check this. Alan wrote it...
+    # is p1 where the "x points" would be stored?
     thisScore = (sum(itemPercents * itemWeights) + p1) / sum(itemWeights)
     return(thisScore)
   }
