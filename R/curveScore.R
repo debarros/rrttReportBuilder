@@ -4,14 +4,14 @@
 #' @param itemValues a data frame with 1 row containing max scores for a set of items
 #' @param itemWeights a data frame with 1 row containing weights for a set of items
 #' @param specialScoring a data frame with 1 row containing a scoring rule
-#' @return numeric of length 1 representing the curved score
+#' @return numeric of length 1 representing the curved score (generally on a scale of 0 to 1)
 curveScore = function(itemScores, itemValues, itemWeights, specialScoring, lookup = NULL){
-  TYPE  = specialScoring[,grep(pattern = "function", x = colnames(specialScoring), ignore.case = T, value = T)]
-  p1 = specialScoring[,grep(pattern = "parameter 1", x = colnames(specialScoring), ignore.case = T, value = T)]
-  p2 = specialScoring[,grep(pattern = "parameter 2", x = colnames(specialScoring), ignore.case = T, value = T)]
-  p3 = specialScoring[,grep(pattern = "parameter 3", x = colnames(specialScoring), ignore.case = T, value = T)]
-  p4 = specialScoring[,grep(pattern = "parameter 4", x = colnames(specialScoring), ignore.case = T, value = T)]
-  p5 = specialScoring[,grep(pattern = "parameter 5", x = colnames(specialScoring), ignore.case = T, value = T)]
+  TYPE  = specialScoring[1,grep(pattern = "function", x = colnames(specialScoring), ignore.case = T, value = T)]
+  p1 = specialScoring[1,grep(pattern = "parameter 1", x = colnames(specialScoring), ignore.case = T, value = T)]
+  p2 = specialScoring[1,grep(pattern = "parameter 2", x = colnames(specialScoring), ignore.case = T, value = T)]
+  p3 = specialScoring[1,grep(pattern = "parameter 3", x = colnames(specialScoring), ignore.case = T, value = T)]
+  p4 = specialScoring[1,grep(pattern = "parameter 4", x = colnames(specialScoring), ignore.case = T, value = T)]
+  p5 = specialScoring[1,grep(pattern = "parameter 5", x = colnames(specialScoring), ignore.case = T, value = T)]
   itemPercents = itemScores / itemValues
   
   if(TYPE == "Identity"){

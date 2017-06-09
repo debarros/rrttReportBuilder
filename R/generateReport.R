@@ -19,7 +19,7 @@ generateReport = function(DataLocation = choose.dir(default = "J:/tests/2016-201
   currentReport$setResults()  #Get the actual results
   currentReport$setComparisonFileName(ComparisonFileName)
   currentReport$setComparisonLocation(paste0(DataLocation, "\\", ComparisonFileName))
-  currentReport$enhanceItemInfo()
+  currentReport$enhanceItemInfo() # apply local item names, set topic alignments, set the type and options 
   currentReport$addItemScores()
   currentReport$loadSpecialScoring()  # Load special scoring rules
   currentReport$applySpecialScoring()  # Apply special scoring rules
