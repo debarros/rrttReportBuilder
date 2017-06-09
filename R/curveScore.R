@@ -28,56 +28,70 @@ curveScore = function(itemScores, itemValues, itemWeights, specialScoring, looku
   p5 = specialScoring[1,grep(pattern = "parameter 5", x = colnames(specialScoring), ignore.case = T, value = T)]
   itemPercents = itemScores / itemValues
   
+  # Identity
   if(TYPE == "Identity"){
     thisScore = sum(itemPercents * itemWeights) / sum(itemWeights)
     return(thisScore)
   }
   
+  # Extra credit / out of x
   if(TYPE %in% c("Extra Credit items", "Out of x points")){
     thisScore = sum(itemPercents * itemWeights) / sum(itemWeights)
     thisScore = thisScore * sum(itemValues) / p1
     return(thisScore)
   }
   
-  if(TYPE == "Lookup score"){
+  # Lookup score / Regents
+  if(TYPE %in% c("Lookup score", "Regents curve")){
     # error if no lookup provided
+    
+    thisScore = lookup[lookup[,1] == sum(itsemScores),2]
+    return(thisScore)
   }
   
+  # Lookup table (2 dimensional)
   if(TYPE == "Lookup table"){
     # error if no lookup provided
   }
   
+  # Mutford scoring
+  # NOT IMPLEMENTED
   if(TYPE == "Mutford Scoring"){
     
   }
   
-  if(TYPE == "Regents curve"){
-    
-  }
-  
+  # Give back x%
   if(TYPE == "Give back x%"){
-    # check this. Alan wrote it...
-    # is p1 where the "x%" would be stored? As a fraction or whole number?
-    thisScore = (sum(itemPercents * itemWeights) / sum(itemWeights)) + p1
+    rawScore = sum(itemPercents * itemWeights) / sum(itemWeights)
+    missed  = 1 - rawScore
+    thisScore = rawScore + (p1 * missed)
     return(thisScore)
   }
   
+  # Add x points
   if(TYPE == "Add x points"){
-    # check this. Alan wrote it...
-    # is p1 where the "x points" would be stored?
-    thisScore = (sum(itemPercents * itemWeights) + p1) / sum(itemWeights)
+    thisScore = sum(itemPercents * itemWeights) / sum(itemWeights)
+    thisScore = thisScore + (p1 / sum(itemWeights))
     return(thisScore)
   }
   
+  # Drop by response
+  # NOT IMPLEMENTED
   if(TYPE == "Drop by response"){
     
   }
   
+  # x power
   if(TYPE == "X power"){
-    
+    rawScore = sum(itemPercents * itemWeights) / sum(itemWeights)
+    thisScore = rawScore ^ p1
+    return(thisScore)
   }
-  
+ 
+  # x root 
   if(TYPE == "X root"){
-    
+    rawScore = sum(itemPercents * itemWeights) / sum(itemWeights)
+    thisScore = rawScore ^ (1 / p1)
+    return(thisScore)
   }
 } # /function
