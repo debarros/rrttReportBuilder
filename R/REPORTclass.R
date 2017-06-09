@@ -2,7 +2,6 @@
 
 #An instance of this class holds everything necessary for a score report on a single test
 
-#This file is way too long.  Methods should be moved to separate files and set up as functions
 #How to deal with questions where the item name is the setup file differs from the item name in the export?
 #This becomes an issue when running the enhanceItemInfo method
 #At that point, the ItemInfo member of the report object and the ItemResponses member of each RESULT object 
@@ -47,6 +46,10 @@ REPORT = R6Class(
     DropScores = NULL, #data.table with the score for each student after dropping each item
     PassingScore = 0.7, #passing score for the test
     ComparisonFileName = "comparison and topic alignment.xlsx", #test setup info filename (no file path)
+    SpecialScoring = NULL, # list of special scoring rules
+    HasSpecialScoring = NULL, # logical that indicates whether the test has special scoring
+    HasStudentScoring = NULL, # logical that indicates whether the special scoring is different for different students
+    SpecialScoringTable = NULL, # data.frame showing what special scoring rule to use for each student
     HasTopics = NULL # logical that indicates whether the test has topic alignments
   ), # /private
   
@@ -97,6 +100,8 @@ REPORT = R6Class(
     getTopicScores = function(){return(private$TopicScores)},
     setHandouts = function(report = self){ setHandouts.REPORT(report) }, 
     exportUploads = function(report = self){ exportUploads.REPORT(report) }, 
+    applySpecialScoring = function(report = self){ applySpecialScoring.REPORT(report) },
+    loadSpecialScoring = function(report = self){ loadSpecialScoring.REPORT(report) }, 
     exportUpdate = function(report = self, uploadFilePath){ exportUpdate.REPORT(report, uploadFilePath) }
 
   ) # /public
