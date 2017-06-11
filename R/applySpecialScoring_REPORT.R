@@ -1,55 +1,63 @@
-
 # Special Scoring
+
 applySpecialScoring.REPORT = function(report){
   
-  if(report$.__enclos_env__$private$HasSpecialScoring){ # if there is special scoring
+  # put badmessage call here
+  
+  if(report$checkSpecScor()){ # if there is special scoring
     
-    updateIRandIRS = FALSE
+    StuScoring = report$checkStudScor()
+    if(StuScoring){ # if there is student specific scoring
+      StuScoRules = report$getSpecialScoringTable() # get the table of special scoring rules by students
+    }
+    
+    # Should the ItemResponses and ItemResponseScores be updated?  Default to FALSE.
+    updateIRandIRS = FALSE  
     
     # Grab the special scoring rules
-    SpecialScoring = report$.__enclos_env__$private$SpecialScoring
+    SpecialScoring = report$getSpecialScoring()
     
     # Get a data.frame of the item values, one value per column
     ItemInfo = report$getItemInfo()[,c("ItemName","Value")]
     itemValues = as.data.frame(t(ItemInfo$Value))
     colnames(itemValues) = ItemInfo$ItemName
     
-    for(res in 1:length(report$.__enclos_env__$private$Results)){ # for each section
+    for(res in 1:length(report$getResults())){ # for each section
       
-      CurrentResult = report$.__enclos_env__$private$Results[[res]]
-      ItRespSco = CurrentResult$.__enclos_env__$private$ItemResponseScores
+      CurrentResult = report$getResults()[[res]]
+      ItRespSco = CurrentResult$getIRS()
+      ItResp = CurrentResult$getIR()
       
       for(stu in 1:nrow(ItRespSco)){ # for each student
-      
+        
         curSpecScor = SpecialScoring[[1]] # start with the default special scoring
-        if(report$.__enclos_env__$private$HasStudentScoring){ # if there is student specific scoring
+        if(StuScoring){ # if there is student specific scoring
           # if this student is getting a custom special scoring
-          if(ItRespSco$StudentID[stu] %in% report$.__enclos_env__$private$SpecialScoringTable$Student.ID){
-            #determine the special scoring to use
-            #curSpecScor = match(stuff)
+          if(ItRespSco$StudentID[stu] %in% StuScoRules$Student.ID){
+            curSpecScor = SpecialScoring[[StuScoRules[StuScoRules$Student.ID == ItRespSco$StudentID[stu],2]]]
           }
         } # / if HasStudentScoring
-      
+        
         if(curSpecScor$checkSubset()){ # if there are subsets to use
-      
+          
           #get the weights of the items
           SubsetAlign = curSpecScor$getSubsetAlign()
           itemWeights = as.data.frame(t(SubsetAlign$`Subset weight`))
           colnames(itemWeights) = SubsetAlign$Item
-      
+          
           # set up a data.frame to hold the subset scores
           SubsetScores = curSpecScor$getSubsetSetup()
           SubsetScores$SubsetScore = NA_real_
-      
+          
           # calculate the subset scores
           for(subst in 1:nrow(SubsetScores)){ # for each subset
-      
+            
             #get the name of the subset
             subsetName = SubsetScores$Subset[subst]
-      
+            
             # get the names of the items to use in this subset
             itemNames = SubsetAlign$Item[SubsetAlign$Subset == subsetName]
-      
+            
             # calculate the subset score
             # note: if there is a lookup table, there needs to be another parameter
             SubsetScores$SubsetScore[subst] = curveScore(
@@ -58,33 +66,52 @@ applySpecialScoring.REPORT = function(report){
               itemWeights = itemWeights[,itemNames],
               specialScoring = SubsetScores[subst,])
             
-            # If this special scoring is Drop or Full Credit, 
-            #     1) change the item responses and item response scores
-            #     2) set the updateItemResp flag
-          }
-      
+            # If this special scoring is Drop or Full Credit
+            if(SubsetScores[subst,]$`Subset function` %in% c("Drop", "Full credit")){
+              # set the update Item Respsonses flag
+              updateIRandIRS = TRUE 
+              # change the item responses and item response scores
+              ItRespSco[stu,itemNames] = NA
+              ItResp[stu,itemNames] = NA
+            } # /if drop or full credit
+            
+          } # /for each subset
+          
           # calculate the test score
           ItRespSco$score[stu] = 100 * curveScore(
             itemScores = SubsetScores$SubsetScore,
             itemValues = rep.int(1,nrow(SubsetScores)),
             itemWeights = SubsetScores$`Score weight`,
             specialScoring = curSpecScor$getOverallSetup())
-      
+          
         } else {
+          
           #get the total test score from the items
-          #store the test score
+          itemNames = colnames(itemValues)
+          ItRespSco$score[stu] = 100 * curveScore(
+            itemScores = ItRespSco[stu,itemNames],
+            itemValues = itemValues[,itemNames],
+            itemWeights = itemWeights[,itemNames],
+            specialScoring = curSpecScor$getOverallSetup())
+          
         } # / if-else checkSubset
+        
+        # In case any of the student's item response scores changed (due to dropped or full credit items),
+        # Recalculate the total points, and put it the Item Responses and Item Response Scores
+        ItRespSco$TotalPoints[stu] = sum(ItRespSco[stu,ItemInfo$ItemName], na.rm = TRUE)
+        ItResp$TotalPoints[stu] = ItRespSco$TotalPoints[stu]
+        
       } # / for each student
       
       CurrentResult$setIRSquick(ItRespSco) # put the item response scores back in the result
-      
-      ItResp = CurrentResult$getItemResponses() # grab the item responses
-      
-      ItResp$score = ItRespSco$score # fix the scores
-      
+      ItResp$score = ItRespSco$score # fix the scores in the Item Responses table
       CurrentResult$setIRquick(ItResp) # put the item responses back in the result
-      
     } # / for each section
-    # check the updateItemResp flag and update item responses and item response scores if necessary
+    
+    # check the Update Item Responses flag and update item responses and item response scores if necessary
+    if(updateIRandIRS){
+      report$updateIRandIRS()
+    }
+    
   } # / if HasSpecialScoring
 } # / function

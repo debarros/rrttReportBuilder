@@ -34,6 +34,13 @@ curveScore = function(itemScores, itemValues, itemWeights, specialScoring, looku
     return(thisScore)
   }
   
+  # Drop or Full credit
+  if(TYPE  %in% c("Drop", "Full credit")){
+    thisScore = sum(itemPercents * itemWeights) / sum(itemWeights)
+    return(thisScore)
+  }
+  
+  
   # Extra credit / out of x
   if(TYPE %in% c("Extra Credit items", "Out of x points")){
     thisScore = sum(itemPercents * itemWeights) / sum(itemWeights)

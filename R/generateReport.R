@@ -28,7 +28,7 @@ generateReport = function(DataLocation = choose.dir(default = "J:/tests/2016-201
   currentReport$setUploadTab()
   currentReport$setSummary()
   currentReport$setTopicSummary()
-  currentReport$setItemSummary()
+  currentReport$setItemSummary() # easy, difficult, powerful distractors, wheat from chaff, check key, overthinking, highly related
   currentReport$setComparison()
   currentReport$setNarrative()
   currentReport$setTopicScores()

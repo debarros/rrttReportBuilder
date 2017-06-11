@@ -67,9 +67,9 @@ VectorSentence = function(x, y = NA, OxfordComma = T, End = "and ", hyphenate = 
   }
   
   #If the set of elements to be strung together is small, deal with it right away
-  if(sum(y) == 0){return(NULL)}
-  if(sum(y) == 1){return(x[y])}
-  if(sum(y) == 2){return(paste0(x[y][1]," ",End,x[y][2]))}
+  if(sum(y, na.rm = T) == 0){return(NULL)}
+  if(sum(y, na.rm = T) == 1){return(x[y])}
+  if(sum(y, na.rm = T) == 2){return(paste0(x[y][1]," ",End,x[y][2]))}
   
   #Create the variables that that will be used later in the function
   x1 = 1:length(x)          #create a vector of the indices of the values

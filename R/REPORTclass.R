@@ -21,7 +21,8 @@ REPORT = R6Class(
     Sources = NULL, #character vector with the locations of the csv's
     TestName = NULL, #atomic character with the name of the test
     ItemInfo = NULL, #data.frame with info about the items, will be used to build the breakdown tab
-    UploadTab = NULL, #data.frame that holds the stuff that goes in the upload tab
+    UploadTab = NULL, #data.frame that holds the stuff that goes in the upload tab and upload_percentages export
+    UploadTotalPoints = NULL, # data that holds the stuff that goes in the upload_totalpoints export
     Results = NULL, #list of objects of class RESULT
     TopicAlignments = NULL, #data.frame holding the topic alignments
     TopicSummary = NULL, #data.frame with stuff that would go on the Topic Chart Calculation tab
@@ -75,6 +76,7 @@ REPORT = R6Class(
     getTestName = function(){return(private$TestName)},
     getItemInfo = function(){return(private$ItemInfo)},
     getUploadTab = function(){return(private$UploadTab)},
+    getUploadTotalPoints = function(){return(private$UploadTotalPoints)},
     getDataLocation = function(){return(private$DataLocation)},
     getComparisonLocation = function(){return(private$ComparisonLocation)},
     getResults = function(){return(private$Results)},
@@ -102,7 +104,14 @@ REPORT = R6Class(
     exportUploads = function(report = self){ exportUploads.REPORT(report) }, 
     applySpecialScoring = function(report = self){ applySpecialScoring.REPORT(report) },
     loadSpecialScoring = function(report = self){ loadSpecialScoring.REPORT(report) }, 
+    getSpecialScoring = function(){private$SpecialScoring},
+    getSpecialScoringTable = function(){return(private$SpecialScoringTable)},
+    updateIRandIRS = function(report = self){updateIRandIRS.REPORT(self)},
+    updateItemInfo = function(x){private$ItemInfo = x},
+    checkTopics = function(){return(private$HasTopics)},
+    checkSpecScor = function(){return(private$HasSpecialScoring)},
+    checkStudScor = function(){return(private$HasStudentScoring)},
     exportUpdate = function(report = self, uploadFilePath){ exportUpdate.REPORT(report, uploadFilePath) }
-
+    
   ) # /public
 ) # /REPORT R6 class

@@ -67,9 +67,10 @@ RESULT = R6Class(
     getTopicSummary = function(){return(private$TopicSummary)},
     getDropScores = function(){return(private$DropScores)},
     
-    #Methods yet to be made ####
+    
     setSummary = function(x){private$Summary= x},
     setTopicScores = function(TopicAlignments, ItemInfo){
+      # Does this section need na.rm?
       TopicNames = colnames(TopicAlignments)[-1]
       TopicAlignments$Value = ItemInfo$Value
       TopicScores = private$ItemResponses[,2:4]
@@ -88,6 +89,8 @@ RESULT = R6Class(
       private$TopicSummary = apply(TopicScores[,-c(1:3)], 2, mean)
     },
     setIRSquick = function(x){private$ItemResponseScores = x},
-    setIRquick = function(x){private$ItemResponses = x}
+    setIRquick = function(x){private$ItemResponses = x},
+    getIR = function(x){return(private$ItemResponses)},
+    getIRS = function(x){return(private$ItemResponseScores)}
   ) #public
 )

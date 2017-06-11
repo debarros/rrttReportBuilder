@@ -25,8 +25,8 @@ setTopicSummary.REPORT = function(report) {
         TopicScores = data.table::rbindlist(TopicScores)
         for(i in TopicNames){
           itemset = report$.__enclos_env__$private$TopicAlignments[,i]
-          totalpoints = sum(report$.__enclos_env__$private$TopicAlignments$Value[itemset])
-          TopicSummary$`All Classes`[rownames(TopicSummary) == i] = mean(unlist(TopicScores[,i, with = F]))
+          totalpoints = sum(report$.__enclos_env__$private$TopicAlignments$Value[itemset], na.rm = T)
+          TopicSummary$`All Classes`[rownames(TopicSummary) == i] = mean(unlist(TopicScores[,i, with = F]), na.rm = T)
         }
         report$.__enclos_env__$private$TopicSummary = TopicSummary  
       } else {

@@ -16,12 +16,12 @@ addResponseFrequencies.REPORT = function(report) {
     
     #Find the max number of letter and point options in the test
     if("MC" %in% report$.__enclos_env__$private$ItemInfo$Type){topletter = max(report$.__enclos_env__$private$ItemInfo$options, na.rm = T)}
-    if("ER" %in% report$.__enclos_env__$private$ItemInfo$Type){toppoint = max(report$.__enclos_env__$private$ItemInfo$Value[report$.__enclos_env__$private$ItemInfo$Type == "ER"])} 
+    if("ER" %in% report$.__enclos_env__$private$ItemInfo$Type){toppoint = max(report$.__enclos_env__$private$ItemInfo$Value[report$.__enclos_env__$private$ItemInfo$Type == "ER"], na.rm = T)} 
     
     # Find the max number of response columns needed and the number 
     # of columns that will represent both numbers and letters
-    totalset = max(topletter, toppoint+1)
-    overlapset = min(topletter, toppoint+1)
+    totalset = max(topletter, toppoint+1, na.rm = T)
+    overlapset = min(topletter, toppoint+1, na.rm = T)
     
     #Build the set of response column names
     responseSet = paste0(
@@ -37,10 +37,10 @@ addResponseFrequencies.REPORT = function(report) {
       for(j in 1:report$.__enclos_env__$private$ItemInfo$options[i]){ #for every possible response for that item
         #if it's an ER item, count how many times that point level was awarded
         if(report$.__enclos_env__$private$ItemInfo$Type[i] == "ER"){ 
-          report$.__enclos_env__$private$ItemInfo[i,j+basecolumn] = sum(ItemResponses[,report$.__enclos_env__$private$ItemInfo$ItemName[i], with = F] == j-1)
+          report$.__enclos_env__$private$ItemInfo[i,j+basecolumn] = sum(ItemResponses[,report$.__enclos_env__$private$ItemInfo$ItemName[i], with = F] == j-1, na.rm = T)
         } else { #if it's an MC item, count how many times that letter was used
           report$.__enclos_env__$private$ItemInfo[i,j+basecolumn] = sum(
-            ItemResponses[,report$.__enclos_env__$private$ItemInfo$ItemName[i], with = F] == LETTERS[j])
+            ItemResponses[,report$.__enclos_env__$private$ItemInfo$ItemName[i], with = F] == LETTERS[j], na.rm = T)
         }
       }
     }
