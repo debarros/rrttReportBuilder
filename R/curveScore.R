@@ -44,19 +44,19 @@ curveScore = function(itemScores, itemValues, itemWeights, specialScoring, looku
   # Extra credit / out of x
   if(TYPE %in% c("Extra Credit items", "Out of x points")){
     thisScore = sum(itemPercents * itemWeights) / sum(itemWeights)
-    thisScore = thisScore * sum(itemValues) / p1
+    thisScore = thisScore * sum(itemValues) / as.numeric(p1)
     return(thisScore)
   }
   
   # Lookup score / Regents
   if(TYPE %in% c("Lookup score", "Regents curve")){
     # error if no lookup provided
-    
     thisScore = lookup[lookup[,1] == sum(itsemScores),2]
     return(thisScore)
   }
   
   # Lookup table (2 dimensional)
+  # NOT IMPLEMENTED
   if(TYPE == "Lookup table"){
     # error if no lookup provided
   }
@@ -64,41 +64,48 @@ curveScore = function(itemScores, itemValues, itemWeights, specialScoring, looku
   # Mutford scoring
   # NOT IMPLEMENTED
   if(TYPE == "Mutford Scoring"){
-    
   }
   
   # Give back x%
   if(TYPE == "Give back x%"){
     rawScore = sum(itemPercents * itemWeights) / sum(itemWeights)
     missed  = 1 - rawScore
-    thisScore = rawScore + (p1 * missed)
+    thisScore = rawScore + (as.numeric(p1) * missed)
     return(thisScore)
   }
   
   # Add x points
   if(TYPE == "Add x points"){
     thisScore = sum(itemPercents * itemWeights) / sum(itemWeights)
-    thisScore = thisScore + (p1 / sum(itemWeights))
+    thisScore = thisScore + (as.numeric(p1) / sum(itemValues))
+    return(thisScore)
+  }
+  
+  # Out of x%
+  if(TYPE == "Out of x%"){
+    thisScore = sum(itemPercents * itemWeights) / sum(itemWeights)
+    thisScore = thisScore / as.numeric(p1)
     return(thisScore)
   }
   
   # Drop by response
-  # NOT IMPLEMENTED
   if(TYPE == "Drop by response"){
-    
+    useItems = itemScores != as.numeric(p1) # determine which items to use
+    thisScore = sum(itemPercents[useItems] * itemWeights[useItems]) / sum(itemWeights[useItems])
+    return(thisScore)
   }
   
   # x power
   if(TYPE == "X power"){
     rawScore = sum(itemPercents * itemWeights) / sum(itemWeights)
-    thisScore = rawScore ^ p1
+    thisScore = rawScore ^ as.numeric(p1)
     return(thisScore)
   }
  
   # x root 
   if(TYPE == "X root"){
     rawScore = sum(itemPercents * itemWeights) / sum(itemWeights)
-    thisScore = rawScore ^ (1 / p1)
+    thisScore = rawScore ^ (1 / as.numeric(p1))
     return(thisScore)
   }
 } # /function
