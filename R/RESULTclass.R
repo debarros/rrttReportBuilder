@@ -76,7 +76,7 @@ RESULT = R6Class(
       TopicScores = private$ItemResponses[,2:4]
       TopicScores[,TopicNames] = NA_real_
       for(i in TopicNames){
-        itemset = TopicAlignments[,i]
+        itemset = as.logical(TopicAlignments[,i])
         totalpoints = sum(TopicAlignments$Value[itemset])
         for(j in 1:nrow(TopicScores)){
           TopicScores[j,i] = sum(t(private$ItemResponseScores[j,TopicAlignments$ItemName[itemset]]))/totalpoints
@@ -86,7 +86,7 @@ RESULT = R6Class(
       self$setTopicSummary(TopicScores)
     },
     setTopicSummary = function(TopicScores){
-      private$TopicSummary = apply(TopicScores[,-c(1:3)], 2, mean)
+      private$TopicSummary = apply(TopicScores[,-c(1:3), drop = F], 2, mean)
     },
     setIRSquick = function(x){private$ItemResponseScores = x},
     setIRquick = function(x){private$ItemResponses = x},
