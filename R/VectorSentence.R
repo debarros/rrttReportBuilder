@@ -62,8 +62,14 @@
 VectorSentence = function(x, y = NA, OxfordComma = T, End = "and ", hyphenate = 3){
   
   #If y is not supplied, set it to be all true
-  if(length(y)==1){
+  if(length(y) == 1){
     if(is.na(y)){y = rep(T, times = length(x))}
+  }
+  
+  #If y has NA's, remove those positions from both x and y
+  if(sum(is.na(y)) > 0){
+    x = x[!is.na(y)]
+    y = y[!is.na(y)]
   }
   
   #If the set of elements to be strung together is small, deal with it right away
@@ -77,7 +83,7 @@ VectorSentence = function(x, y = NA, OxfordComma = T, End = "and ", hyphenate = 
   x3 = c(x2[1],head(x2,-1)) #make a vector of the elements of x2, shifted forward by 1 space
   
   #create a data.frame to be used in building the sentence
-  start = which(!(x2 == x3 +1))                          #find the elements s.t. the prior element comes right before it
+  start = which(!(x2 == x3 + 1))                          #find the elements s.t. the prior element comes right before it
   end = data.frame(end = c(tail(start,-1)-1,length(x2))) #find the last elements in consecutive runs
   elements = cbind(start, end)                           #make them into a data frame
   
