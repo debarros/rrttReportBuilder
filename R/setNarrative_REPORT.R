@@ -174,13 +174,13 @@ setNarrative.REPORT = function(report) {
             x = paste0(
               "    * Compared to ", desc, 
               ", your students did noticeably worse on ", 
-              VectorSentence(TopicComparisons$Topic, TopicComparisons$Lower))
+              VectorSentence(x = TopicComparisons$Topic, y = TopicComparisons$Lower))
             narrative = c(narrative, x)
           } # /if there are lower topics
         } # /if TopicComparisons not null 
       } # /if there are Topics
-    }
-  }
+    } # /for each comparison
+  } # /if there are comparisons
   
   # Add the closing line
   narrative = c(narrative,"", "Let me know if you need anything else.")

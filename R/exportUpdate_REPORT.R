@@ -1,6 +1,6 @@
 # exportUpdate_REPORT
 
-exportUpdate.REPORT = function(report, uploadFilePath) {
+exportUpdate.REPORT = function(uploadFilePath, report) {
       #get the existing scores and add an identifying code
       ExistingScores = read.csv(uploadFilePath, stringsAsFactors = F)
       ExistingScores$code = apply(X = ExistingScores, MARGIN = 1, FUN = paste0, collapse = "-")
