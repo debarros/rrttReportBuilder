@@ -4,7 +4,7 @@ applySpecialScoring.REPORT = function(report){
   
   # put badmessage call here
   
-  if(report$checkSpecScor()){ # if there is special scoring
+  if(report$checkSpecScor()){ # only proceed if there is special scoring
     
     StuScoring = report$checkStudScor()
     if(StuScoring){ # if there is student specific scoring
@@ -75,6 +75,23 @@ applySpecialScoring.REPORT = function(report){
               ItResp[stu,itemNames] = NA
             } # /if drop or full credit
             
+            # If this special scoring is Drop by response
+            if(SubsetScores[subst,]$`Subset function` == c("Drop by response")){
+              # set the update Item Respsonses flag
+              updateIRandIRS = TRUE 
+              # get the rule
+              x = SubsetScores[subst,]
+              # get the value to be dropped
+              p1 = x[1,grep(pattern = "parameter 1", x = colnames(x), ignore.case = T, value = T)]
+              # change the appropriate item responses and item response scores
+              for(i in itemNames){
+                if(ItRespSco[stu,i] == p1){
+                  ItRespSco[stu,i] = NA
+                  ItResp[stu,i] = NA
+                } # /for
+              } # /if
+            } # /if drop by reponse
+            
           } # /for each subset
           
           # calculate the test score
@@ -84,15 +101,32 @@ applySpecialScoring.REPORT = function(report){
             itemWeights = SubsetScores$`Score weight`,
             specialScoring = curSpecScor$getOverallSetup())
           
-        } else {
-          
+        } else { # if there are no subsets to use
+        
           #get the total test score from the items
           itemNames = colnames(itemValues)
           ItRespSco$score[stu] = 100 * curveScore(
             itemScores = ItRespSco[stu,itemNames],
             itemValues = itemValues[,itemNames],
-            itemWeights = itemWeights[,itemNames],
+            itemWeights = itemValues[,itemNames], # since this is an overall score, the items are weighted by their values
             specialScoring = curSpecScor$getOverallSetup())
+          
+          # If this special scoring is Drop by response
+          if(curSpecScor$getOverallSetup()$`Score function` == c("Drop by response")){
+            # set the update Item Respsonses flag
+            updateIRandIRS = TRUE 
+            # get the rule
+            x = curSpecScor$getOverallSetup()
+            # get the value to be dropped
+            p1 = x[1,grep(pattern = "parameter 1", x = colnames(x), ignore.case = T, value = T)]
+            # change the appropriate item responses and item response scores
+            for(i in itemNames){
+              if(ItRespSco[stu,i] == p1){
+                ItRespSco[stu,i] = NA
+                ItResp[stu,i] = NA
+              } # /for
+            } # /if
+          } # /if drop by reponse
           
         } # / if-else checkSubset
         
@@ -106,6 +140,7 @@ applySpecialScoring.REPORT = function(report){
       CurrentResult$setIRSquick(ItRespSco) # put the item response scores back in the result
       ItResp$score = ItRespSco$score # fix the scores in the Item Responses table
       CurrentResult$setIRquick(ItResp) # put the item responses back in the result
+      
     } # / for each section
     
     # check the Update Item Responses flag and update item responses and item response scores if necessary
