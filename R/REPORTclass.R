@@ -51,6 +51,7 @@ REPORT = R6Class(
     HasSpecialScoring = NULL, # logical that indicates whether the test has special scoring
     HasStudentScoring = NULL, # logical that indicates whether the special scoring is different for different students
     SpecialScoringTable = NULL, # data.frame showing what special scoring rule to use for each student
+    UpLdFileNames = NULL, # character with the names of the percentage and total points upload files
     HasTopics = NULL # logical that indicates whether the test has topic alignments
   ), # /private
   
@@ -62,7 +63,9 @@ REPORT = R6Class(
     setSources = function(report = self){ setSources.REPORT(report) }, 
     setTestName = function(report = self){ setTestName.REPORT(report) }, 
     setItemInfo = function(report = self){ setItemInfo.REPORT(report) }, 
-    enhanceItemInfo = function(report = self, useLocalNames = F){ enhanceItemInfo.REPORT(report, useLocalNames) }, 
+    enhanceItemInfo = function(report = self, useLocalNames = F, useLocalValues = F){
+      enhanceItemInfo.REPORT(report, useLocalNames, useLocalValues) 
+    }, 
     setTopicAlignments = function(d2, report = self){ setTopicAlignments.REPORT(d2, report) }, 
     addItemScores = function(report = self){ addItemScores.REPORT(report) },
     setUploadTab = function(report = self){ setUploadTab.REPORT(report) },
@@ -97,7 +100,9 @@ REPORT = R6Class(
     setComparison = function(report = self){ setComparison.REPORT(report) }, 
     setNarrative = function(report = self){ setNarrative.REPORT(report) },
     exportNarrative = function(report = self){ exportNarrative.REPORT(report) }, 
-    exportReport = function(report = self, filename = "scores.xlsx"){ exportReport.REPORT(report, filename) }, 
+    exportReport = function(report = self, filename = "scores.xlsx"){ 
+      exportReport.REPORT(report, filename) 
+    }, 
     setTopicScores = function(report = self){ setTopicScores.REPORT(report) }, 
     getTopicScores = function(){return(private$TopicScores)},
     setHandouts = function(report = self){ setHandouts.REPORT(report) }, 
@@ -111,7 +116,13 @@ REPORT = R6Class(
     checkTopics = function(){return(private$HasTopics)},
     checkSpecScor = function(){return(private$HasSpecialScoring)},
     checkStudScor = function(){return(private$HasStudentScoring)},
-    exportUpdate = function(report = self, uploadFilePath){ exportUpdate.REPORT(report, uploadFilePath) }
+    setUpLoadFiles = function(filenames = c("upload_percentages.csv", "upload_totalpoints.csv")){
+      private$UpLdFileNames = filenames
+    },
+    getUpLoadFiles = function(){return(private$UpLdFileNames)},
+    exportUpdate = function(uploadFilePath, report = self){ # called from exportReport
+      exportUpdate.REPORT(uploadFilePath, report) 
+    }
     
   ) # /public
 ) # /REPORT R6 class
