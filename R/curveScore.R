@@ -108,4 +108,13 @@ curveScore = function(itemScores, itemValues, itemWeights, specialScoring, looku
     thisScore = rawScore ^ (1 / as.numeric(p1))
     return(thisScore)
   }
+  
+  # decrement
+  if(TYPE == "Decrement"){
+    rawScore = sum(itemScores)
+    rawLost = sum(itemValues) - rawScore
+    pointsLost = as.numeric(p1) * rawLost
+    score = (100 - pointsLost) / 100
+  }
+  
 } # /function
