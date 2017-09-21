@@ -8,6 +8,7 @@ library(openxlsx)
 dBtools::UpdateDescription()
 
 
+
 DataLocation = "J:/tests/2017-2018/ELA/AP Language/week01 (2017-09-06) I Wish My Teacher Knew Essay"
 generateReport(DataLocation = DataLocation)
 
@@ -45,3 +46,10 @@ report$getResponseSet()
 
 
 report$getDataLocation()
+
+
+
+
+
+DescriptionLookup = read.csv("YearDescriptions.csv")
+devtools::use_data(DescriptionLookup, overwrite = T)
