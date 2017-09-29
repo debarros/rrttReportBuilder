@@ -7,7 +7,6 @@
 generateReport(DataLocation = choose.dir(default = "J:/tests/2016-2017/"),
   ComparisonFileName = "comparison and topic alignment.xlsx",
   ReportFileName = "scores.xlsx", TMS = "LinkIt", SMS = "PowerSchool",
-  useLocalValues = F, useLocalNames = F,
   UploadFilenames = c("upload_percentages.csv", "upload_totalpoints.csv"))
 }
 \arguments{
@@ -17,13 +16,9 @@ generateReport(DataLocation = choose.dir(default = "J:/tests/2016-2017/"),
 
 \item{ReportFileName}{Desired name of the output excel file}
 
-\item{TMS}{Name of the testing management system.  Options currently limited to Linkit.}
+\item{TMS}{Name of the testing management system.  Options currently limited to Linkit and ScantronAS.}
 
 \item{SMS}{Name of the student management system.  Options currently limited to PowerSchool.}
-
-\item{useLocalValues}{logical: should the item values in the test setup file be used?}
-
-\item{useLocalNames}{logical: should the item names in the test setup file be used?}
 
 \item{UploadFilenames}{character of upload filenames.  The first is for percentage scores and the second is for total points.}
 }

@@ -5,8 +5,6 @@
 #' @param ReportFileName Desired name of the output excel file
 #' @param TMS Name of the testing management system.  Options currently limited to Linkit and ScantronAS.
 #' @param SMS Name of the student management system.  Options currently limited to PowerSchool.
-#' @param useLocalValues logical: should the item values in the test setup file be used?
-#' @param useLocalNames logical: should the item names in the test setup file be used?
 #' @param UploadFilenames character of upload filenames.  The first is for percentage scores and the second is for total points.
 #' @return an object of class REPORT
 generateReport = function(DataLocation = choose.dir(default = "J:/tests/2016-2017/"),
