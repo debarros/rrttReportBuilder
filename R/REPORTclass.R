@@ -122,7 +122,8 @@ REPORT = R6Class(
     getUpLoadFiles = function(){return(private$UpLdFileNames)},
     exportUpdate = function(uploadFilePath, report = self){ # called from exportReport
       exportUpdate.REPORT(uploadFilePath, report) 
-    }
+    },
+    getTMS = function(){return(private$TMS)}
     
   ) # /public
 ) # /REPORT R6 class
