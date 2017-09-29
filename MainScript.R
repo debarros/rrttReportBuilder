@@ -7,49 +7,34 @@ library(openxlsx)
 
 dBtools::UpdateDescription()
 
-
-
-DataLocation = "J:/tests/2017-2018/ELA/AP Language/week01 (2017-09-06) I Wish My Teacher Knew Essay"
-generateReport(DataLocation = DataLocation)
-
+DataLocation = "C:/week04 (2017-09-26) U1 Numbers Variables Operations"
 ComparisonFileName = "comparison and topic alignment.xlsx"
 ReportFileName = "scores.xlsx"
-TMS = "LinkIt"
+TMS = "ScantronAS"
 SMS = "PowerSchool"
-useLocalValues = T
-useLocalNames = F
+UploadFilenames = c("upload_percentages.csv", "upload_totalpoints.csv")
 
-currentReport = generateReport(DataLocation = DataLocation)
+generateReport(DataLocation = DataLocation)
+
+generateReport(DataLocation = "J:/tests/2017-2018/Math/Alg 1/week04 (2017-09-26) U1 Numbers Variables Operations")
 
 report = currentReport
-
-UpdateDescription()
-
-report$checkTopics()
-report$getTopicAlignments()
-
-str(report$getItemInfo())
-
-result1 = report$.__enclos_env__$private$Results[[1]]
-sum(result1$getIR()[1,as.character(1:15)], na.rm = T)
-result1$getIRS()
-report$.__enclos_env__$private$ResponseSet
 report$getItemInfo()
-report$.__enclos_env__$private$Correlations
-report$getUploadTab()
-report$getResponses()
-report$getItemScores()
-report$.__enclos_env__$private$ItemResponseScores
-report$getResponseSet()
+str(report$getItemInfo())
+str(ItemInfo)
 
-155/165
+result1 = report$getResults()[[1]]
+ItemResp = result1$getItemResponses()
 
-
-report$getDataLocation()
-
-
-
-
+i = 1
 
 DescriptionLookup = read.csv("YearDescriptions.csv")
 devtools::use_data(DescriptionLookup, overwrite = T)
+
+thisSource = "C:/week04 (2017-09-26) U1 Numbers Variables Operations\\exports/Burgess_p8_itemresponses.csv"
+report$getDataLocation()
+thisSource = "Burgess_p8_itemresponses.csv"
+
+sourceLocation = "C:/week04 (2017-09-26) U1 Numbers Variables Operations\\exports/Burgess_p8_itemresponses.csv"
+
+itemNames = ItemInfo$ItemName
