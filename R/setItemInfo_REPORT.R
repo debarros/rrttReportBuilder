@@ -21,7 +21,7 @@ setItemInfo.REPORT = function(report) {
   ItemInfo$options = ItemInfo$`Value:` + 1 #default the number of options to what it should be for ER questions
   
   #set the number of options for MC questions
-  ItemInfo$options[ItemInfo$isMC] = substr(ItemInfo$`Type:`[ItemInfo$isMC], 3, nchar(ItemInfo$`Type:`[ItemInfo$isMC])) 
+  ItemInfo$options[ItemInfo$isMC] = as.integer(substr(ItemInfo$`Type:`[ItemInfo$isMC], 3, nchar(ItemInfo$`Type:`[ItemInfo$isMC])))
   ItemInfo$Type = "ER" #default the question type to ER
   ItemInfo$Type[ItemInfo$isMC] = "MC" #set the question type to MC for MC questions
 
