@@ -2,28 +2,38 @@
 
 setItemInfo.REPORT = function(report) {
   # put badmessage call here
-  ItemInfo = read.csv(report$.__enclos_env__$private$Sources[1], 
-                      skip = 4, 
-                      header = F, 
-                      nrows = 3, 
-                      stringsAsFactors = F)[,-(1:5)]  #get the basic item info
-  #fix the iteminfo data.frame setup
-  ItemInfo =  magrittr::set_rownames(
-    setNames(
-      as.data.frame(t(ItemInfo), stringsAsFactors = F), 
-      c("ItemName", "Value", "Answer")), 
-    NULL
-  ) 
-  #which items have weird values in the Answer field?
-  toFix = grepl(pattern = "[^a-zA-Z\\d\\s:]", x = ItemInfo$Answer) 
-  #Set those answers to just be the value of the respective questions
-  ItemInfo$Answer[toFix] = ItemInfo$Value[toFix] 
-  ItemInfo$Value = as.numeric(ItemInfo$Value) #Set the value column to be numeric
-  ItemInfo$ItemName = as.character(ItemInfo$ItemName) #set the item names to be character
-  ItemInfo$AverageScore = NA_real_  
+  
+  ItemInfo = openxlsx::read.xlsx(xlsxFile = report$getComparisonLocation(), 
+                                 sheet = "Topic Alignment", 
+                                 startRow = 2, 
+                                 colNames = F)
+  ItemInfo = ItemInfo[1:(which(is.na(ItemInfo[,3]))[1] - 1),3:ncol(ItemInfo)] #remove unnecessary columns and rows
+  ItemInfo = t(ItemInfo) #transpose it
+  colnames(ItemInfo) = ItemInfo[1,] #use the first row as the column names
+  ItemInfo = ItemInfo[-1,] #remove the first row
+  row.names(ItemInfo) = NULL #remove the row names
+  ItemInfo = as.data.frame(ItemInfo, stringsAsFactors = F) #convert it to a data.frame
+ 
+  report$setTopicAlignments(ItemInfo) #set the topic alignments
+ 
+  ItemInfo$isMC = grepl("mc",ItemInfo$`Type:`, ignore.case = T) #determine which questions are MC
+  ItemInfo$`Value:` = as.integer(ItemInfo$`Value:`) #convert the Value column to integer
+  ItemInfo$options = ItemInfo$`Value:` + 1 #default the number of options to what it should be for ER questions
+  
+  #set the number of options for MC questions
+  ItemInfo$options[ItemInfo$isMC] = substr(ItemInfo$`Type:`[ItemInfo$isMC], 3, nchar(ItemInfo$`Type:`[ItemInfo$isMC])) 
+  ItemInfo$Type = "ER" #default the question type to ER
+  ItemInfo$Type[ItemInfo$isMC] = "MC" #set the question type to MC for MC questions
+
+  colnames(ItemInfo) = c("Value", "FullType","Tolerance","Answer","ItemName","isMC","options","Type")
+  ItemInfo$AverageScore = NA_real_
   ItemInfo$Correlation = NA_real_
-  ItemInfo$Type = NA_character_
-  ItemInfo$options = NA_integer_
+  ItemInfo = ItemInfo[,c("ItemName","Value", "Answer", "AverageScore","Correlation","Type","options")]
+  
+  # Make the Answers for ER items be their values
+  toFix = which(is.na(ItemInfo$Answer))
+  ItemInfo$Answer[toFix] = ItemInfo$Value[toFix]
+  
   report$.__enclos_env__$private$ItemInfo = ItemInfo
   
-}
+} #/setItemInfo.REPORT
