@@ -18,6 +18,7 @@ REPORT = R6Class(
     TMS = NULL, #The Testing Management System
     DataLocation = NULL, #address of the folder for the test
     ComparisonLocation = NULL, #address and filename of the comparison and topic alignment
+    SourceFileNames = NULL, # character vectior with the filenames of the csv's
     Sources = NULL, #character vector with the locations of the csv's
     TestName = NULL, #atomic character with the name of the test
     ItemInfo = NULL, #data.frame with info about the items, will be used to build the breakdown tab
