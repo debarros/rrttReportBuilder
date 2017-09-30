@@ -15,6 +15,7 @@ setItemInfo.REPORT = function(report) {
   ItemInfo = as.data.frame(ItemInfo, stringsAsFactors = F) #convert it to a data.frame
  
   report$setTopicAlignments(ItemInfo) #set the topic alignments
+  ItemInfo = ItemInfo[,!(colnames(ItemInfo) %in% colnames(report$getTopicAlignments()))] #remove the topic alignments from the ItemInfo
  
   ItemInfo$isMC = grepl("mc",ItemInfo$`Type:`, ignore.case = T) #determine which questions are MC
   ItemInfo$`Value:` = as.integer(ItemInfo$`Value:`) #convert the Value column to integer
@@ -24,6 +25,7 @@ setItemInfo.REPORT = function(report) {
   ItemInfo$options[ItemInfo$isMC] = as.integer(substr(ItemInfo$`Type:`[ItemInfo$isMC], 3, nchar(ItemInfo$`Type:`[ItemInfo$isMC])))
   ItemInfo$Type = "ER" #default the question type to ER
   ItemInfo$Type[ItemInfo$isMC] = "MC" #set the question type to MC for MC questions
+  
 
   colnames(ItemInfo) = c("Value", "FullType","Tolerance","Answer","ItemName","isMC","options","Type")
   ItemInfo$AverageScore = NA_real_
