@@ -20,6 +20,7 @@ REPORT = R6Class(
     ComparisonLocation = NULL, #address and filename of the comparison and topic alignment
     SourceFileNames = NULL, # character vectior with the filenames of the csv's
     Sources = NULL, #character vector with the locations of the csv's
+    MissingSections = NULL, # character vector with the names of sections for which there is no data
     TestName = NULL, #atomic character with the name of the test
     ItemInfo = NULL, #data.frame with info about the items, will be used to build the breakdown tab
     UploadTab = NULL, #data.frame that holds the stuff that goes in the upload tab and upload_percentages export
@@ -124,7 +125,8 @@ REPORT = R6Class(
     exportUpdate = function(uploadFilePath, report = self){ # called from exportReport
       exportUpdate.REPORT(uploadFilePath, report) 
     },
-    getTMS = function(){return(private$TMS)}
+    getTMS = function(){return(private$TMS)},
+    getMissingSections = function(){return(private$MissingSections)}
     
   ) # /public
 ) # /REPORT R6 class
