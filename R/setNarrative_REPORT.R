@@ -6,7 +6,13 @@ setNarrative.REPORT = function(report) {
   ItemSummary = report$getItemSummary()
   
   #initialize the narrative
-  narrative = paste0("Here are your scores and analysis for **", report$getTestName(),"**.  ")
+  MissingSections = report$getMissingSections()
+  if(is.null(MissingSections)){
+    narrative = paste0("Here are your scores and analysis for **", report$getTestName(),"**.  ")  
+  } else {
+    narrative = paste0("Here are your initial scores and analysis for **", report$getTestName(),"**.  ",
+                       "We are still waiting on data for ", VectorSentence(x = MissingSections, hyphenate = 1))  
+  } # /if-else
   narrative = c(narrative,"", "* The score distribution ")
   
   # If there are check key items, add the line
