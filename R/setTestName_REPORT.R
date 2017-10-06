@@ -11,7 +11,10 @@ setTestName.REPORT = function(report) {
       if(i > length(report$.__enclos_env__$private$Sources)){
         stop("There is no data")
       }
-      testname = read.csv(report$.__enclos_env__$private$Sources[i], stringsAsFactors = F)[1,3]
+      x = read.csv(report$.__enclos_env__$private$Sources[i], stringsAsFactors = F)
+      if(!is.null(x)){
+        testname = x[1,3]  
+      }
     }
     report$.__enclos_env__$private$TestName = testname
   } else {
