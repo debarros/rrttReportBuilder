@@ -8,6 +8,37 @@ setItemInfo.REPORT = function(report) {
                                  startRow = 2, 
                                  colNames = F)
   ItemInfo = ItemInfo[1:(which(is.na(ItemInfo[,3]))[1] - 1),3:ncol(ItemInfo)] #remove unnecessary columns and rows
+  
+  errorMessage = character(0)
+  
+  if(any(is.na(ItemInfo[ItemInfo[,1] == "Question #:",]))){
+    if(sum(is.na(ItemInfo[ItemInfo[,1] == "Question #:",])) == 1){
+      errorMessage = c(errorMessage,paste0("Item number ",which(is.na(ItemInfo[ItemInfo[,1] == "Question #:",]))," needs a name."))
+    } else {
+      erroritems = VectorSentence(which(is.na(ItemInfo[ItemInfo[,1] == "Question #:",])))
+      errorMessage = c(errorMessage,paste0("Item numbers ",erroritems," need names."))  
+    }
+  }
+  if(any(is.na(ItemInfo[ItemInfo[,1] == "Value:",]))){
+    if(sum(is.na(ItemInfo[ItemInfo[,1] == "Value:",])) == 1){
+      errorMessage = c(errorMessage,paste0("Item number ",which(is.na(ItemInfo[ItemInfo[,1] == "Value:",]))," needs a value."))
+    } else {
+      erroritems = VectorSentence(which(is.na(ItemInfo[ItemInfo[,1] == "Value:",])))
+      errorMessage = c(errorMessage,paste0("Item numbers ", erroritems," need values."))  
+    }
+  }
+  if(any(is.na(ItemInfo[ItemInfo[,1] == "Type:",]))){
+    if(sum(any(is.na(ItemInfo[ItemInfo[,1] == "Type:",]))) == 1){
+      errorMessage = c(errorMessage,paste0("Item number ",which(is.na(ItemInfo[ItemInfo[,1] == "Type:",]))," needs a type."))
+    } else {
+      erroritems = VectorSentence(which(is.na(ItemInfo[ItemInfo[,1] == "Type:",])))
+      errorMessage = c(errorMessage,paste0("Item numbers ", erroritems," need types."))  
+    }
+  }
+  if(length(errorMessage) > 0){
+    stop(errorMessage)
+  }
+  
   ItemInfo = t(ItemInfo) #transpose it
   colnames(ItemInfo) = ItemInfo[1,] #use the first row as the column names
   ItemInfo = ItemInfo[-1,] #remove the first row
