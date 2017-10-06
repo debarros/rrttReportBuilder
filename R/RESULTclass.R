@@ -34,8 +34,13 @@ RESULT = R6Class(
         ItemResponses = ItemResponses[,c(which(colnames(ItemResponses)=="score"),which(colnames(ItemResponses)!="score"))] 
         private$ItemResponses = ItemResponses  
         
+        return(TRUE)
+        
       } else if (TMS == "ScantronAS"){
         ItemResponses = read.csv(sourceLocation, stringsAsFactors = F) #read the item response info
+        if(nrow(ItemResponses) == 1){ #if there is not data
+          return(FALSE)
+        }
         ItemResponses = ItemResponses[-nrow(ItemResponses),1:(ncol(ItemResponses)-3)]
         colnames(ItemResponses) = c("Student", "StudentID","Test.Name",itemNames)
         
@@ -50,6 +55,8 @@ RESULT = R6Class(
         # Reorder the columns
         ItemResponses = ItemResponses[,c("score","StudentID", "LastName", "FirstName", "TestDate","TotalPoints",itemNames)]
         private$ItemResponses = ItemResponses  
+        
+        return(TRUE)
         
       } else {
         stop(paste0("Unknown or unsupported TMS: ", TMS))
