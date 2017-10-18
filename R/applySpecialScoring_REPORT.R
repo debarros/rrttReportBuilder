@@ -25,8 +25,8 @@ applySpecialScoring.REPORT = function(report){
     for(res in 1:length(report$getResults())){ # for each section
       
       CurrentResult = report$getResults()[[res]]
-      ItRespSco = CurrentResult$getIRS()
-      ItResp = CurrentResult$getIR()
+      ItRespSco = CurrentResult$getItemResponseScores()
+      ItResp = CurrentResult$getItemResponses()
       
       for(stu in 1:nrow(ItRespSco)){ # for each student
         
