@@ -16,97 +16,28 @@ RESULT = R6Class(
     TopicSummary = NA, #data.frame representing one column from the Topic Chart Calculation tab and part of one row from the Topics tab
     DropScores = NA, #data.frame holding students' total points after dropping an item
     addr = paste0(getwd(),"/classes/RESULTclass/")
-  ), #private
+  ), # /private
   
   public = list(
+    
+    # Initialize method - new()
     initialize = function(SectionName){private$SectionName = SectionName},
     
-    setItemResponses = function(sourceLocation, itemNames, itemValues, TMS){
-      
-      if(TMS == "LinkIt"){
-        ItemResponses = read.csv(sourceLocation, skip = 13, header = F, stringsAsFactors = F) #read the item response info
-        colnames(ItemResponses) = c("StudentID", "LastName","FirstName","TestDate","TotalPoints",itemNames) #set the column names 
-        
-        # Set the basic score column.  Note that, if there is special scoring, that will be applied later.
-        ItemResponses$score = ItemResponses$TotalPoints/sum(itemValues)*100
-        
-        #put the score column first
-        ItemResponses = ItemResponses[,c(which(colnames(ItemResponses)=="score"),which(colnames(ItemResponses)!="score"))] 
-        private$ItemResponses = ItemResponses  
-        
-        return(TRUE)
-        
-      } else if (TMS == "ScantronAS"){
-        ItemResponses = read.csv(sourceLocation, stringsAsFactors = F) #read the item response info
-        if(nrow(ItemResponses) == 1){ #if there is not data
-          return(FALSE)
-        }
-        ItemResponses = ItemResponses[-nrow(ItemResponses),1:(ncol(ItemResponses)-3)]
-        colnames(ItemResponses) = c("Student", "StudentID","Test.Name",itemNames)
-        
-        # Split the full names into first and last names
-        commaSpot = regexpr(pattern = ",",text = ItemResponses$Student)
-        ItemResponses$LastName = substr(x = ItemResponses$Student, start = 1, stop = commaSpot - 1)
-        ItemResponses$FirstName = substr(x = ItemResponses$Student, start = commaSpot + 2, stop = nchar(ItemResponses$Student))
-        ItemResponses$TotalPoints = NA_integer_
-        ItemResponses$TestDate = NA_character_
-        ItemResponses$score = NA_real_
-        
-        # Reorder the columns
-        ItemResponses = ItemResponses[,c("score","StudentID", "LastName", "FirstName", "TestDate","TotalPoints",itemNames)]
-        private$ItemResponses = ItemResponses  
-        
-        return(TRUE)
-        
-      } else {
-        stop(paste0("Unknown or unsupported TMS: ", TMS))
-      } # /if-else
-      
-    }, # /setItemResponses method
-    
+    # Methods to set members
+    setItemResponses = function(sourceLocation, itemNames, itemValues, TMS, result = self){
+      setItemResponses.RESULT(sourceLocation, itemNames, itemValues, TMS, result)},
     setSectionName = function(x){private$SectionName= x},
+    setItemResponseScores = function(ItemInfo, TMS, result = self){
+      setItemResponseScores.RESULT(ItemInfo, TMS, result)},
+    setDropScores = function(ItemInfo, result = self){ # This is part of calculating the item correlations
+      setDropScores.RESULT(ItemInfo, result)},
+    setSummary = function(x){private$Summary= x},
+    setTopicScores = function(TopicAlignments, ItemInfo, result = self){
+      setTopicScores.RESULT(TopicAlignments, ItemInfo, result)},
+    setTopicSummary = function(TopicScores){
+      private$TopicSummary = apply(TopicScores[,-c(1:3), drop = F], 2, mean)},
     
-    setItemResponseScores = function(ItemInfo, TMS){
-      ItemResp = private$ItemResponses
-      #create a data.frame to hold the item scores
-      ItemResponseScores = setNames(as.data.frame(
-        array(data = NA_integer_, dim = dim(ItemResp))),
-        colnames(ItemResp)) 
-      ItemResponseScores[,1:6] = ItemResp[,1:6] #pull in the student info from the results data.table
-      
-      #Calculate scores for each response on each item
-      for(i in 1:nrow(ItemInfo)){
-        if(ItemInfo$Type[i] == "MC"){
-          ItemResponseScores[,ItemInfo$ItemName[i]] = ItemInfo$Value[i]*(ItemResp[,ItemInfo$ItemName[i]] == ItemInfo$Answer[i])
-        } else {
-          ItemResponseScores[,ItemInfo$ItemName[i]] = ItemResp[,ItemInfo$ItemName[i]]
-        }
-      }
-      
-      # If this is a TMS that doesn't include total points in the exports, add it now
-      if(TMS %in% c("ScantronAS")){
-        ItemResponseScores$TotalPoints = apply(X = ItemResponseScores[,ItemInfo$ItemName], MARGIN = 1, FUN = sum)
-        ItemResponseScores$score = ItemResponseScores$TotalPoints/sum(ItemInfo$Value)*100
-        ItemResp$TotalPoints = ItemResponseScores$TotalPoints
-        ItemResp$score = ItemResponseScores$score
-        private$ItemResponses = ItemResp
-      }
-      
-      private$ItemResponseScores = ItemResponseScores
-      
-    },
-    
-    setDropScores = function(ItemInfo){ # This is part of calculating the item correlations
-      #Set up a dataframe to hold the scores of each students with each item dropped and then calculate those scores
-      DropScores = private$ItemResponseScores 
-      for(i in 1:nrow(DropScores)){
-        for(j in ItemInfo$ItemName){
-          DropScores[i,j] = DropScores$TotalPoints[i] - private$ItemResponseScores[i,j]
-        }
-      }
-      private$DropScores = DropScores
-    },
-    
+    # Methods to return members
     getItemResponses = function(){return(private$ItemResponses)},
     getSectionName = function(){return(private$SectionName)},
     getItemResponseScores = function(){return(private$ItemResponseScores)},
@@ -115,30 +46,12 @@ RESULT = R6Class(
     getTopicSummary = function(){return(private$TopicSummary)},
     getDropScores = function(){return(private$DropScores)},
     
-    
-    setSummary = function(x){private$Summary= x},
-    setTopicScores = function(TopicAlignments, ItemInfo){
-      # Does this section need na.rm?
-      TopicNames = colnames(TopicAlignments)[-1]
-      TopicAlignments$Value = ItemInfo$Value
-      TopicScores = private$ItemResponses[,2:4]
-      TopicScores[,TopicNames] = NA_real_
-      for(i in TopicNames){
-        itemset = as.logical(TopicAlignments[,i])
-        totalpoints = sum(TopicAlignments$Value[itemset])
-        for(j in 1:nrow(TopicScores)){
-          TopicScores[j,i] = sum(t(private$ItemResponseScores[j,TopicAlignments$ItemName[itemset]]))/totalpoints
-        }
-      }
-      private$TopicScores = TopicScores
-      self$setTopicSummary(TopicScores)
-    },
-    setTopicSummary = function(TopicScores){
-      private$TopicSummary = apply(TopicScores[,-c(1:3), drop = F], 2, mean)
-    },
+    # Methods to quick set members
     setIRSquick = function(x){private$ItemResponseScores = x},
     setIRquick = function(x){private$ItemResponses = x},
-    getIR = function(x){return(private$ItemResponses)},
-    getIRS = function(x){return(private$ItemResponseScores)}
-  ) #public
+    setDSquick = function(x){private$DropScores = x},
+    setTSquick = function(x){private$TopicScores = x}
+    
+  ) # /public
+  
 )
