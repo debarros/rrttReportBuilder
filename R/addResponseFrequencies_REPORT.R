@@ -55,7 +55,12 @@ addResponseFrequencies.REPORT = function(report) {
   basecolumn = ncol(ItemInfo)                       # How many columns does ItemInfo have already?
   ItemInfo[,responseSet] = ""                       # Initialize columns for response frequencies
   for(i in 1:nrow(ItemInfo)){                       # For each item
-    curRespSet = responseSetByType[[ItemInfo$Type[i]]]
+    if(ItemInfo$Type[i] %in% c("ER", "MC")){
+      curRespSet = ItemResponseOptions[[i]]
+    } else {
+      curRespSet = responseSetByType[[ItemInfo$Type[i]]]  
+    }
+    
     for(j in 1:length(curRespSet)){   # For each possible option for that item type category,
       currentResponse = curRespSet[j] # Grab the response
       ItemInfo[i,j+basecolumn] = sum(ItemResponses[,ItemInfo$ItemName[i], with = F] == currentResponse, na.rm = T) # Get the frequency
