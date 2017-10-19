@@ -22,6 +22,7 @@ addResponseFrequencies.REPORT = function(report) {
     } else if(ItemInfo$Type[i] == "FI"){
       currentOptions = sort(unlist(unique(ItemResponses[,colnames(ItemResponses) == ItemInfo$ItemName[i], with = F])))
     } # /if-else
+    currentOptions = currentOptions[currentOptions != "--"]
     ItemResponseOptions[[i]] = currentOptions
   } # /for
   
@@ -54,9 +55,10 @@ addResponseFrequencies.REPORT = function(report) {
   basecolumn = ncol(ItemInfo)                       # How many columns does ItemInfo have already?
   ItemInfo[,responseSet] = ""                       # Initialize columns for response frequencies
   for(i in 1:nrow(ItemInfo)){                       # For each item
-    for(j in 1:length(ItemResponseOptions[[i]])){   # For each possible option for that item,
-      currentResponse = ItemResponseOptions[[i]][j] # Grab the response
-      ItemInfo[i,j+basecolumn] = sum(ItemResponses[,ItemInfo$ItemName[i]] == currentResponse, na.rm = T) # Get the frequency
+    curRespSet = responseSetByType[[ItemInfo$Type[i]]]
+    for(j in 1:length(curRespSet)){   # For each possible option for that item type category,
+      currentResponse = curRespSet[j] # Grab the response
+      ItemInfo[i,j+basecolumn] = sum(ItemResponses[,ItemInfo$ItemName[i], with = F] == currentResponse, na.rm = T) # Get the frequency
     }
   }
   
