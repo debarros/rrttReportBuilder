@@ -1,14 +1,15 @@
 # exportReport_REPORT
 
 exportReport.REPORT = function(filename, template, report) {
-  # put badmessage call here
+  # put badmessage call here ####
   
-  # check to see if the report has been run before
+  # check to see if the report has been run before ####
   uploadFilePath = paste0(report$getDataLocation(),"\\",report$getUpLoadFiles()[1])
   if(file.exists(uploadFilePath)){
     report$exportUpdate(uploadFilePath)
   }
   
+  # Load the template ####
   # This next part creates a slight delay
   if(is.null(template)){
     wb1 = loadWorkbook2(file = system.file("extdata","template", package = "rrttReportBuilder"), isUnzipped = T)  
@@ -17,7 +18,7 @@ exportReport.REPORT = function(filename, template, report) {
   } # /if-else
   
   
-  # For each class section, write the student responses to the Responses tab
+  # For each class section, write the student responses to the Responses tab ####
   for(i in 1:length(report$getResults())){
     currentResult = report$getResults()[i]
     openxlsx::writeData(wb = wb1, 
@@ -32,7 +33,7 @@ exportReport.REPORT = function(filename, template, report) {
                         startRow = 100*(i-1) + 2)
   } # /for
   
-  # For each class section, write the student item response scores to the ItemScores tab
+  # For each class section, write the student item response scores to the ItemScores tab ####
   for(i in 1:length(report$getResults())){
     currentResult = report$getResults()[i]
     openxlsx::writeData(wb = wb1, 
@@ -47,6 +48,7 @@ exportReport.REPORT = function(filename, template, report) {
                         startRow = 100*(i-1) + 2)
   } # /for
   
+  # Write the ItemInfo, Summary, and Upload tabs ####
   openxlsx::writeData(wb = wb1, 
                       sheet = "ItemInfo", 
                       x = report$getItemInfo())
@@ -63,7 +65,7 @@ exportReport.REPORT = function(filename, template, report) {
                       x = report$getUploadTab(), 
                       startRow = 1)
   
-  # If there are topics, write data to the relevant tabs
+  # If there are topics, write data to the relevant tabs ####
   if(report$checkTopics()){
     openxlsx::writeData(wb = wb1, 
                         sheet = "TopicAlignments", 
@@ -91,6 +93,7 @@ exportReport.REPORT = function(filename, template, report) {
     } # /for each section
   } # /if there are topics
   
+  # Write the Item_Summary tab and raw handouts tab ####
   ItemSummary = data.frame(report$getNarrative())
   ItemSummary = ItemSummary[4:(nrow(ItemSummary)-2),,drop=F]
   ItemSummary = ItemSummary[!(ItemSummary[,1] %in% c("* Boxplots", "* Topics")),,drop=F]
@@ -105,7 +108,7 @@ exportReport.REPORT = function(filename, template, report) {
                       startRow = 1)
   
   
-  # If there are comparisons, write data to the comparison tab
+  # If there are comparisons, write data to the comparison tab ####
   numberOfComparisons = length(report$getComparison())
   if(numberOfComparisons > 0){
     
@@ -149,6 +152,17 @@ exportReport.REPORT = function(filename, template, report) {
     } # /for each comparion
   } # /if # of comparison > 0
   
+  
+  # Write the responseSet to the Breakdown tab and do some formatting ####
+  openxlsx::writeData(wb = wb1, sheet = "Breakdown", x = t(report$getResponseSet()), 
+                      startCol = 7, startRow = 3, colNames = F)
+  removeColWidths(wb = wb1, sheet = "Breakdown", cols = 7:47)
+  setColWidths(wb = wb1, sheet = "Breakdown", cols = 7:47, widths = "auto")
+  
+  
+  # Output the scores workbook ####
   # This next line creates a long delay
   openxlsx::saveWorkbook(wb1, paste0(report$getDataLocation(),"\\",filename), overwrite = TRUE)
+  
+
 } # /function
