@@ -7,7 +7,8 @@
 generateReport(DataLocation = choose.dir(default = "J:/tests/2016-2017/"),
   ComparisonFileName = "comparison and topic alignment.xlsx",
   ReportFileName = "scores.xlsx", TMS = "LinkIt", SMS = "PowerSchool",
-  UploadFilenames = c("upload_percentages.csv", "upload_totalpoints.csv"))
+  UploadFilenames = c("upload_percentages.csv", "upload_totalpoints.csv"),
+  template = NULL)
 }
 \arguments{
 \item{DataLocation}{a folder path}

@@ -11,7 +11,8 @@ generateReport = function(DataLocation = choose.dir(default = "J:/tests/2016-201
                           ComparisonFileName = "comparison and topic alignment.xlsx",
                           ReportFileName = "scores.xlsx",
                           TMS = "LinkIt", SMS = "PowerSchool",
-                          UploadFilenames = c("upload_percentages.csv", "upload_totalpoints.csv")){
+                          UploadFilenames = c("upload_percentages.csv", "upload_totalpoints.csv"),
+                          template = NULL){
   currentReport = REPORT$new(TMS = TMS) #initiate a new report
   currentReport$setUpLoadFiles(UploadFilenames) # set the names of the upload files
   currentReport$setDataLocation(DataLocation) # set the folder for the test
@@ -35,7 +36,7 @@ generateReport = function(DataLocation = choose.dir(default = "J:/tests/2016-201
   currentReport$setTopicScores()
   currentReport$setHandouts()
   currentReport$exportNarrative() #save the html file with the narrative
-  currentReport$exportReport(filename = ReportFileName) #save the xlsx score report file
+  currentReport$exportReport(filename = ReportFileName, template = template) #save the xlsx score report file
   currentReport$exportUploads() #save the CSV's for uploading grades
   return(currentReport)
 } # /function

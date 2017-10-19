@@ -1,55 +1,67 @@
-##Needs to be properly commented ^_^
+# addResponseFrequencies_REPORT.R
 
 addResponseFrequencies.REPORT = function(report) {
-  badmessage = ""
-  if(length(report$.__enclos_env__$private$Results) == 0){badmessage = paste0(badmessage, "Need Results first.  ")}
-  if(is.null(report$.__enclos_env__$private$ComparisonLocation)){ badmessage = paste0(badmessage, "Need Comparison Location first.  ")}
-  if(is.null(report$.__enclos_env__$private$ItemInfo)){ badmessage = paste0(badmessage, "Need Item Info first.  ")}
-  if(nchar(badmessage) > 0){
-    return(badmessage)
-  } else {
-    ItemResponses = report$getResponses()
-    ItemInfo = report$getItemInfo()
-    
-    #Set default values for the number of letter options and number of point options
-    topletter = 0
-    toppoint = 0
-    
-    #Find the max number of letter and point options in the test
-    if("MC" %in% ItemInfo$Type){topletter = max(ItemInfo$options, na.rm = T)}
-    if("ER" %in% ItemInfo$Type){toppoint = max(ItemInfo$Value[ItemInfo$Type == "ER"], na.rm = T)} 
-    
-    # Find the max number of response columns needed and the number 
-    # of columns that will represent both numbers and letters
-    totalset = max(topletter, toppoint+1, na.rm = T)
-    overlapset = min(topletter, toppoint+1, na.rm = T)
-    
-    #Build the set of response column names
-    if("MC" %in% ItemInfo$Type){
-      responseSet = paste0(
-        c(LETTERS[1:topletter], rep("", times = totalset - topletter)),
-        c(rep("/", times = overlapset), rep("", times = totalset - overlapset)),
-        c(as.character(0:toppoint), rep("", times = totalset - (toppoint+1) )))  
-    } else {
-      responseSet = paste0(
-        c(as.character(0:toppoint), rep("", times = totalset - (toppoint+1) )))  
+  # put badmessage call here
+  
+  # Grab the data that will be needed for this part
+  ItemResponses = report$getResponses()
+  ItemInfo = report$getItemInfo()
+  
+  # For each item, determine the response set
+  ItemResponseOptions = vector(mode = "list", length = nrow(ItemInfo))
+  names(ItemResponseOptions) = ItemInfo$ItemName
+  for(i in 1:nrow(ItemInfo)){
+    if(ItemInfo$Type[i] == "MC"){
+      currentOptions = LETTERS[1:ItemInfo$options[i]]
+    } else if(ItemInfo$Type[i] == "ER"){
+      currentOptions = as.character(0:ItemInfo$Value[i])
+    } else if(ItemInfo$Type[i] == "WH"){
+      currentOptions = sort(unlist(unique(ItemResponses[,colnames(ItemResponses) == ItemInfo$ItemName[i], with = F])))
+    } else if(ItemInfo$Type[i] == "FL"){
+      currentOptions = sort(unlist(unique(ItemResponses[,colnames(ItemResponses) == ItemInfo$ItemName[i], with = F])))
+    } else if(ItemInfo$Type[i] == "FI"){
+      currentOptions = sort(unlist(unique(ItemResponses[,colnames(ItemResponses) == ItemInfo$ItemName[i], with = F])))
+    } # /if-else
+    ItemResponseOptions[[i]] = currentOptions
+  } # /for
+  
+  
+  # Determine the unique set of item types
+  responseSetByType = vector(mode = "list", length = length(unique(ItemInfo$Type)))
+  names(responseSetByType) = unique(ItemInfo$Type)
+  
+  # For each type, determine the possible options
+  for(i in 1:length(responseSetByType)){
+    allresponseoptions = unlist(ItemResponseOptions[ItemInfo$Type == names(responseSetByType)[i]])
+    responseSetByType[[i]] = sort(unique(allresponseoptions))
+  } # /for
+  
+  # Initialize the responseSet vector 
+  responseSet = rep("", times = max(lengths(responseSetByType)))
+  
+   
+  for(i in 1:length(responseSetByType)){                                 # For each element in responseSetByType,
+    for(j in 1:length(responseSetByType[[i]])){                          # For each entry in that vector, 
+      if(nchar(responseSet[j]) > 0){                                     # if there is aleady something there
+        responseSet[j] = paste0(responseSet[j], "/")                     # append a slash
+      }
+      responseSet[j] = paste0(responseSet[j], responseSetByType[[i]][j]) # append the response option
+    } # /for each response option for this type
+  } # /for each type of response
+  
+  
+  # Add frequency columns to ItemInfo and load the response frequencies
+  basecolumn = ncol(ItemInfo)                       # How many columns does ItemInfo have already?
+  ItemInfo[,responseSet] = ""                       # Initialize columns for response frequencies
+  for(i in 1:nrow(ItemInfo)){                       # For each item
+    for(j in 1:length(ItemResponseOptions[[i]])){   # For each possible option for that item,
+      currentResponse = ItemResponseOptions[[i]][j] # Grab the response
+      ItemInfo[i,j+basecolumn] = sum(ItemResponses[,ItemInfo$ItemName[i]] == currentResponse, na.rm = T) # Get the frequency
     }
-    
-    basecolumn = ncol(ItemInfo) #How many columns does ItemInfo have already?
-    report$.__enclos_env__$private$ItemInfo[,responseSet] = "" #Initialize those columns
-    
-    #This nested loop should be rewritten using lapply or something
-    for(i in 1:nrow(report$.__enclos_env__$private$ItemInfo)){ #for every item
-      for(j in 1:report$.__enclos_env__$private$ItemInfo$options[i]){ #for every possible response for that item
-        #if it's an ER item, count how many times that point level was awarded
-        if(report$.__enclos_env__$private$ItemInfo$Type[i] == "ER"){ 
-          report$.__enclos_env__$private$ItemInfo[i,j+basecolumn] = sum(ItemResponses[,report$.__enclos_env__$private$ItemInfo$ItemName[i], with = F] == j-1, na.rm = T)
-        } else { #if it's an MC item, count how many times that letter was used
-          report$.__enclos_env__$private$ItemInfo[i,j+basecolumn] = sum(
-            ItemResponses[,report$.__enclos_env__$private$ItemInfo$ItemName[i], with = F] == LETTERS[j], na.rm = T)
-        } # /if-else
-      } # /for each possible response
-    } # /for each item
-    report$.__enclos_env__$private$ResponseSet = responseSet
   }
-}
+  
+  report$setItemInfoQuick(ItemInfo)                       # store the ItemInfo
+  report$setResponseSetQuick(responseSet)                 # store the responseSet
+  report$setItemResponseOptionsQuick(ItemResponseOptions) # store the ItemResponseOptions list
+  
+} # /addResponseFrequencies.REPORT

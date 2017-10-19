@@ -9,8 +9,8 @@ setItemInfo.REPORT = function(report) {
                                  colNames = F)
   ItemInfo = ItemInfo[1:(which(is.na(ItemInfo[,3]))[1] - 1),3:ncol(ItemInfo)] #remove unnecessary columns and rows
   
+  # Check for missing info.  If there is any, halt and throw an error.
   errorMessage = character(0)
-  
   if(any(is.na(ItemInfo[ItemInfo[,1] == "Question #:",]))){
     if(sum(is.na(ItemInfo[ItemInfo[,1] == "Question #:",])) == 1){
       errorMessage = c(errorMessage,paste0("Item number ",which(is.na(ItemInfo[ItemInfo[,1] == "Question #:",]))," needs a name."))
@@ -39,34 +39,42 @@ setItemInfo.REPORT = function(report) {
     stop(errorMessage)
   }
   
-  ItemInfo = t(ItemInfo) #transpose it
-  colnames(ItemInfo) = ItemInfo[1,] #use the first row as the column names
-  ItemInfo = ItemInfo[-1,] #remove the first row
-  row.names(ItemInfo) = NULL #remove the row names
-  ItemInfo = as.data.frame(ItemInfo, stringsAsFactors = F) #convert it to a data.frame
+  # Begin to organize the ItemInfo
+  ItemInfo = t(ItemInfo)                                   # transpose it
+  colnames(ItemInfo) = ItemInfo[1,]                        # use the first row as the column names
+  ItemInfo = ItemInfo[-1,]                                 # remove the first row
+  row.names(ItemInfo) = NULL                               # remove the row names
+  ItemInfo = as.data.frame(ItemInfo, stringsAsFactors = F) # convert it to a data.frame
  
+  # Topic Alignments
   report$setTopicAlignments(ItemInfo) #set the topic alignments
-  ItemInfo = ItemInfo[,!(colnames(ItemInfo) %in% colnames(report$getTopicAlignments()))] #remove the topic alignments from the ItemInfo
+  ItemInfo = ItemInfo[,!(colnames(ItemInfo) %in% colnames(report$getTopicAlignments()))] # remove the topic alignments from the ItemInfo
  
-  ItemInfo$isMC = grepl("mc",ItemInfo$`Type:`, ignore.case = T) #determine which questions are MC
-  ItemInfo$`Value:` = as.integer(ItemInfo$`Value:`) #convert the Value column to integer
-  ItemInfo$options = ItemInfo$`Value:` + 1 #default the number of options to what it should be for ER questions
+  # Type, Value, and Options
+  ItemInfo$Type = toupper(substr(x = ItemInfo$`Type:`, start = 1, stop = 2))
+  ItemInfo$`Value:` = as.integer(ItemInfo$`Value:`) # convert the Value column to integer
+  ItemInfo$options = ItemInfo$`Value:` + 1 # default the number of options to what it should be for ER questions
   
-  #set the number of options for MC questions
-  ItemInfo$options[ItemInfo$isMC] = as.integer(substr(ItemInfo$`Type:`[ItemInfo$isMC], 3, nchar(ItemInfo$`Type:`[ItemInfo$isMC])))
-  ItemInfo$Type = "ER" #default the question type to ER
-  ItemInfo$Type[ItemInfo$isMC] = "MC" #set the question type to MC for MC questions
   
-
-  colnames(ItemInfo) = c("Value", "FullType","Tolerance","Answer","ItemName","isMC","options","Type")
+  badTypes = ItemInfo$Type[!(ItemInfo$Type %in% report$getItemTypeCategories())]
+  if(length(badTypes) > 0){
+    stop(paste0("The following item types are not acceptable: ", VectorSentence(badTypes),"."))
+  }
+  
+  # set the number of options for MC questions
+  isMC = c(ItemInfo$Type == "MC")
+  ItemInfo$options[isMC] = as.integer(substr(x = ItemInfo$`Type:`[isMC], start = 3, stop = nchar(ItemInfo$`Type:`[isMC])))
+  
+  # Make the Answers for ER items be their values
+  isER = which(is.na(ItemInfo$Answer))
+  ItemInfo$Answer[isER] = ItemInfo$Value[isER]
+  
+  # Organize the item info to have the correct columns in the correct order with the correct names
+  colnames(ItemInfo) = c("Value", "FullType","Tolerance","Answer","ItemName","Type","options")
   ItemInfo$AverageScore = NA_real_
   ItemInfo$Correlation = NA_real_
   ItemInfo = ItemInfo[,c("ItemName","Value", "Answer", "AverageScore","Correlation","Type","options")]
   
-  # Make the Answers for ER items be their values
-  toFix = which(is.na(ItemInfo$Answer))
-  ItemInfo$Answer[toFix] = ItemInfo$Value[toFix]
+  report$setItemInfoQuick(ItemInfo)
   
-  report$.__enclos_env__$private$ItemInfo = ItemInfo
-  
-} #/setItemInfo.REPORT
+} # /setItemInfo.REPORT
