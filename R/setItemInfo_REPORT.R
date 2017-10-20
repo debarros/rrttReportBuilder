@@ -35,7 +35,7 @@ setItemInfo.REPORT = function(report) {
       errorMessage = c(errorMessage,paste0("Item numbers ", erroritems," need types."))  
     }
   }
-  if(length(errorMessage) > 0){
+  if(length(errorMessage) > 0){ # if there is an error message, halt and report it
     stop(errorMessage)
   }
   
@@ -50,11 +50,11 @@ setItemInfo.REPORT = function(report) {
   report$setTopicAlignments(ItemInfo) #set the topic alignments
   ItemInfo = ItemInfo[,!(colnames(ItemInfo) %in% colnames(report$getTopicAlignments()))] # remove the topic alignments from the ItemInfo
  
-  # Type, Value, and Options
-  ItemInfo$Type = toupper(substr(x = ItemInfo$`Type:`, start = 1, stop = 2))
-  ItemInfo$`Value:` = as.integer(ItemInfo$`Value:`) # convert the Value column to integer
-  ItemInfo$options = ItemInfo$`Value:` + 1 # default the number of options to what it should be for ER questions
-  
+  # Type, Value, Options, and Answers
+  ItemInfo$Type = toupper(substr(x = ItemInfo$`Type:`, 1, 2)) # determine the item type category
+  ItemInfo$`Value:` = as.integer(ItemInfo$`Value:`)           # convert the Value column to integer
+  ItemInfo$options = ItemInfo$`Value:` + 1                    # default the number of options to what it should be for ER questions
+  ItemInfo$`Answer:` = toupper(ItemInfo$`Answer:`)            # convert alpha answers to upper case
   
   badTypes = ItemInfo$Type[!(ItemInfo$Type %in% report$getItemTypeCategories())]
   if(length(badTypes) > 0){
