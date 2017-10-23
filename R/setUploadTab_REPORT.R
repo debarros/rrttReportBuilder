@@ -5,9 +5,9 @@ setUploadTab.REPORT = function(report) {
   UploadTab = data.frame(StudentID = ItemResponses$StudentID)
   UploadTab$StudentName = paste0(ItemResponses$LastName, ", ",ItemResponses$FirstName)
   UploadTab$Percentage = round(ItemResponses$score, digits = 2)
-  report$.__enclos_env__$private$UploadTab = UploadTab
+  report$setUploadTabQuick(UploadTab)
   
   TotalPoints = UploadTab[,c(1,2)]
   TotalPoints$TotalPoints = ItemResponses$TotalPoints
-  report$.__enclos_env__$private$UploadTotalPoints = TotalPoints
+  report$setUploadTotalPointsQuick(TotalPoints)
 }
