@@ -10,14 +10,14 @@ COMPARISON = R6Class(
   classname = "COMPARISON", 
   
   private = list(
-    Description = "last year", #description of the relationship to the prior year test
-    Summary = list(), #info in the header of the Overall Comparison tab for 1 test
-    ItemComparisons = NULL, #data.frame showing the item correspondences and scores in prior year (lower part of Overall Comparison tab) and whether this year was higher or lower
-    TopicComparisons = NULL, #data.frame showing the prior year scores on each of the topics and whether this year was higher or lowee
-    Growth = NULL, #current year average - prior year average
-    Ttest = NULL, #value of the t test for mean differences using the df adjustment for unequal variances
-    Pvalue = NULL, #p value associated with the t test stat
-    Significance = NULL #description of the signficance of the t test
+    Description = "last year", # description of the relationship to the prior year test
+    Growth = NULL,           # current year average - prior year average (or NULL if no overal comparison is wanted)
+    ItemComparisons = NULL,  # data.frame showing the item correspondences and scores in prior year (lower part of Overall Comparison tab) and whether this year was higher or lower
+    Pvalue = NULL,           # p value associated with the t test stat
+    Significance = NULL,     # description of the signficance of the t test
+    Summary = list(),        # info in the header of the Overall Comparison tab for 1 test
+    TopicComparisons = NULL, # data.frame showing the prior year scores on each of the topics and whether this year was higher or lowee
+    Ttest = NULL             # value of the t test for mean differences using the df adjustment for unequal variances
   ), #private
   
   public = list(
@@ -28,7 +28,7 @@ COMPARISON = R6Class(
       VAL = as.list(VAL)
       names(VAL) = NAM      
       private$Summary= VAL
-      },
+    },
     
     setItemComparisons = function(x){private$ItemComparisons= x},
     setTopicComparisons = function(x){private$TopicComparisons= x},
