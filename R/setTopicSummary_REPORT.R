@@ -20,9 +20,10 @@ setTopicSummary.REPORT = function(report) {
       TopicNames)
     
     for(i in 1:length(report$getResults())){
-      report$getResults()[[i]]$setTopicScores(report$getTopicAlignments(),report$getItemInfo())
-      TopicScores[[i]] = report$getResults()[[i]]$getTopicScores()
-      TopicSummary[,names(report$getResults())[i]] = report$getResults()[[i]]$getTopicSummary()
+      currentResult = report$getResults()[[i]]
+      currentResult$setTopicScores(report$getTopicAlignments(),report$getItemInfo())
+      TopicScores[[i]] = currentResult$getTopicScores()
+      TopicSummary[,names(report$getResults())[i]] = currentResult$getTopicSummary()
     } # /for
     
     TopicScores = data.table::rbindlist(TopicScores)
