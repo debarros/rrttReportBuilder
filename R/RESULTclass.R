@@ -35,7 +35,7 @@ RESULT = R6Class(
     setTopicScores = function(TopicAlignments, ItemInfo, result = self){
       setTopicScores.RESULT(TopicAlignments, ItemInfo, result)},
     setTopicSummary = function(TopicScores){
-      private$TopicSummary = apply(TopicScores[,-c(1:3), drop = F], 2, mean)},
+      private$TopicSummary = apply(TopicScores[,-c(1:3), drop = F], 2, mean, na.rm = T)},
     
     # Methods to return members
     getItemResponses = function(){return(private$ItemResponses)},
