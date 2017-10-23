@@ -120,11 +120,15 @@ REPORT = R6Class(
     getUploadTotalPoints = function(){return(private$UploadTotalPoints)},
     
     # Methods to quick set members
+    setComparisonQuick = function(x){private$Comparison = x},
     setItemInfoQuick = function(x){private$ItemInfo = x},
     setItemResponseOptionsQuick = function(x){private$ItemResponseOptions = x},
     setItemResponseScoresQuick = function(x){private$ItemResponseScores = x},
     setItemScoresQuick = function(x){private$ItemScores = x},
     setResponseSetQuick = function(x){private$ResponseSet = x},
+    setUploadTabQuick = function(x){private$UploadTab = x},
+    setUploadTotalPointsQuick = function(x){private$UploadTotalPoints = x},
+    setNarrativeQuick = function(x){private$Narrative = x},
     
     # Export Methods
     exportNarrative = function(report = self){ exportNarrative.REPORT(report) }, 
