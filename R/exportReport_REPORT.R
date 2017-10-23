@@ -19,18 +19,18 @@ exportReport.REPORT = function(filename, template, report) {
   
   
   # For each class section, write the student responses to the Responses tab ####
-  for(i in 1:length(report$getResults())){
-    currentResult = report$getResults()[i]
+  for(res in 1:length(report$getResults())){
+    currentResult = report$getResults()[res]
     openxlsx::writeData(wb = wb1, 
                         sheet = "Responses", 
                         x = names(currentResult), 
                         startCol = 1, 
-                        startRow = 100*(i-1) + 1)
+                        startRow = 100*(res-1) + 1)
     openxlsx::writeData(wb = wb1, 
                         sheet = "Responses", 
                         x = currentResult[[1]]$getItemResponses(), 
                         startCol = 1, 
-                        startRow = 100*(i-1) + 2)
+                        startRow = 100*(res-1) + 2)
   } # /for
   
   # For each class section, write the student item response scores to the ItemScores tab ####
@@ -87,7 +87,7 @@ exportReport.REPORT = function(filename, template, report) {
                           startRow = 100*(i-1) + 1)
       openxlsx::writeData(wb = wb1, 
                           sheet = "TopicScores", 
-                          x = currentResult[[i]]$getTopicScores(), 
+                          x = currentResult[[1]]$getTopicScores(), 
                           startCol = 1, 
                           startRow = 100*(i-1) + 2)
     } # /for each section
