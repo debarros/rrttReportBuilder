@@ -29,7 +29,7 @@ setItemResponseScores.RESULT = function(ItemInfo, TMS, result){
   
   # If this is a TMS that doesn't include total points in the exports, add it now
   if(TMS %in% c("ScantronAS")){
-    ItemResponseScores$TotalPoints = apply(X = ItemResponseScores[,ItemInfo$ItemName], MARGIN = 1, FUN = sum)
+    ItemResponseScores$TotalPoints = apply(X = ItemResponseScores[,ItemInfo$ItemName], MARGIN = 1, FUN = sum, na.rm = T)
     ItemResponseScores$score = ItemResponseScores$TotalPoints/sum(ItemInfo$Value)*100
     ItemResp$TotalPoints = ItemResponseScores$TotalPoints
     ItemResp$score = ItemResponseScores$score
