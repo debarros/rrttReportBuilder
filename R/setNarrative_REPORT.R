@@ -123,21 +123,26 @@ setNarrative.REPORT = function(report) {
       }
       desc = thisComp$getDescription()
       growth = thisComp$getGrowth()
-      if(growth > 0){
-        growthDirection = "higher"
+      if(!is.null(growth)){ # if an overall comparison is needed, create it
+        if(growth > 0){
+          growthDirection = "higher"
+        } else {
+          growthDirection = "lower"
+        }
+        growth = abs(round(growth))
+        if(growth == 1){
+          growthDirection = paste0(" point ", growthDirection)
+        } else {
+          growthDirection = paste0(" points ", growthDirection)
+        }
+        x = paste0(
+          "* Compared to ", desc, " your students scored about ", 
+          growth, growthDirection, " on average.  This is ", 
+          thisComp$getSignificance())
       } else {
-        growthDirection = "lower"
+        # if there is no overal comparson, 
+        x = paste0("* Comparison to ", desc, ": ")
       }
-      growth = abs(round(growth))
-      if(growth == 1){
-        growthDirection = paste0(" point ", growthDirection)
-      } else {
-        growthDirection = paste0(" points ", growthDirection)
-      }
-      x = paste0(
-        "* Compared to ", desc, " your students scored about ", 
-        growth, growthDirection, " on average.  This is ", 
-        thisComp$getSignificance())
       narrative = c(narrative, x)
       
       if(sum(ItemComparisons$Higher, na.rm = T) > 0){
