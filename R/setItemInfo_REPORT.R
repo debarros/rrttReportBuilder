@@ -45,6 +45,7 @@ setItemInfo.REPORT = function(report) {
   ItemInfo = ItemInfo[-1,]                                 # remove the first row
   row.names(ItemInfo) = NULL                               # remove the row names
   ItemInfo = as.data.frame(ItemInfo, stringsAsFactors = F) # convert it to a data.frame
+  ItemInfo$`Answer:` = stringr::str_replace_all(ItemInfo$`Answer:`, fixed(" "), "") # remove whitespace from the answer key
  
   # Topic Alignments
   report$setTopicAlignments(ItemInfo) #set the topic alignments
