@@ -22,6 +22,8 @@ generateReport(DataLocation = choose.dir(default = "J:/tests/2016-2017/"),
 \item{SMS}{Name of the student management system.  Options currently limited to PowerSchool.}
 
 \item{UploadFilenames}{character of upload filenames.  The first is for percentage scores and the second is for total points.}
+
+\item{template}{alternate template file}
 }
 \value{
 an object of class REPORT

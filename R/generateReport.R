@@ -6,6 +6,7 @@
 #' @param TMS Name of the testing management system.  Options currently limited to Linkit and ScantronAS.
 #' @param SMS Name of the student management system.  Options currently limited to PowerSchool.
 #' @param UploadFilenames character of upload filenames.  The first is for percentage scores and the second is for total points.
+#' @param template alternate template file
 #' @return an object of class REPORT
 generateReport = function(DataLocation = choose.dir(default = "J:/tests/2016-2017/"),
                           ComparisonFileName = "comparison and topic alignment.xlsx",
