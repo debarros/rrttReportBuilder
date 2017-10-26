@@ -8,14 +8,20 @@ setItemSummary.REPORT = function(report) {
   
   # Grab the item info
   ItemInfo = report$getItemInfo()
+  RelatedCutoffProportion = report$getRelatedCutoffProportion()
+  DCP = report$getDifficultCutoffParams()
+  DistractorCutoffProportion = report$getDistractorCutoffProportion()
+  ResponseSet = report$getResponseSet()
+  OverThinkCutoff = report$getOverThinkCutoff()
+  EasyCutoff = report$getEasyCutoff()
+  ChaffRules = report$getChaffRules()
   
   # set the parameters
-  DCP = report$.__enclos_env__$private$DifficultCutoffParams
   DifficultCutoff = min(DCP$Lower, max(DCP$Upper, quantile(ItemInfo$AverageScore, DCP$Proportion, na.rm = T), na.rm = T), na.rm = T)
   
   # find the 1-RelatedCutoffProportion quantile of the item correlations
-  RelatedCutoff = quantile(ItemInfo$Correlation, 1 - report$.__enclos_env__$private$RelatedCutoffProportion, na.rm = T)   
-  DistractorCutoffCount = nrow(ItemInfo) * report$.__enclos_env__$private$DistractorCutoffProportion
+  RelatedCutoff = quantile(ItemInfo$Correlation, 1 - RelatedCutoffProportion, na.rm = T)   
+  DistractorCutoffCount = nrow(ItemInfo) * DistractorCutoffProportion
   
   #set up the ItemSummary data.frame
   ItemSummary = data.frame(ItemName = ItemInfo$ItemName, stringsAsFactors = F) 
@@ -26,14 +32,14 @@ setItemSummary.REPORT = function(report) {
   ItemSummary$PowerDistrators = FALSE
   for(i in 1:nrow(ItemSummary)){
     if(ItemInfo$Type[i] == "MC"){
-      wrongSet = grep(pattern = ItemInfo$Answer[i], x = report$getResponseSet(), value = T, invert = T) 
+      wrongSet = grep(pattern = ItemInfo$Answer[i], x = ResponseSet, value = T, invert = T) 
       ItemSummary$PowerDistrators[i] = any(ItemInfo[i,wrongSet] > DistractorCutoffCount)
     }
   }
   ItemSummary$PowerDistrators[is.na(ItemSummary$PowerDistrators)] = FALSE
   
   # Overthinking: items where Correlation < OverThinkCutoff
-  ItemSummary$OverThinking = ItemInfo$Correlation <  report$.__enclos_env__$private$OverThinkCutoff
+  ItemSummary$OverThinking = ItemInfo$Correlation <  OverThinkCutoff
   ItemSummary$OverThinking[is.na(ItemSummary$OverThinking)] = FALSE
   # completely dropped items will still show a correlation of 0, but should not be marked as OverThinking
   ItemSummary$OverThinking[is.na(ItemInfo$AverageScore)] = FALSE  
@@ -43,14 +49,13 @@ setItemSummary.REPORT = function(report) {
   ItemSummary$Difficult[is.na(ItemSummary$Difficult)] = FALSE
   
   # Easy: items where average score >= EasyCutoff
-  ItemSummary$Easy = ItemInfo$AverageScore >= report$.__enclos_env__$private$EasyCutoff
+  ItemSummary$Easy = ItemInfo$AverageScore >= EasyCutoff
   ItemSummary$Easy[is.na(ItemSummary$Easy)] = FALSE
   
   # Wheat from chaff: items that fit one of the ChaffRules 
   # Each rule has the form score < ChaffRules$score and correlation > ChaffRules$correlation
   # this should be altered to not be a loop
   ItemSummary$WheatFromChaff = 0
-  ChaffRules = report$.__enclos_env__$private$ChaffRules
   for(i in 1:nrow(ChaffRules)){
     add2chaff = (ItemInfo$AverageScore < ChaffRules$score[i]) & (ItemInfo$Correlation > ChaffRules$correlation[i])
     ItemSummary$WheatFromChaff = ItemSummary$WheatFromChaff + add2chaff
@@ -66,5 +71,5 @@ setItemSummary.REPORT = function(report) {
   ItemSummary$CheckKey = ItemInfo$Type == "MC" & (ItemInfo$AverageScore == 0 | (ItemSummary$Difficult & ItemSummary$OverThinking))
   ItemSummary$CheckKey[is.na(ItemSummary$CheckKey)] = FALSE
   
-  report$.__enclos_env__$private$ItemSummary = ItemSummary
+  report$setItemScoresQuick(ItemSummary)
 } # /function

@@ -3,12 +3,15 @@
 setResults.REPORT = function(report) {
   
   Sources = report$getSources()
-  nsources = length(Sources)
   ItemInfo = report$getItemInfo()
   TMS = report$getTMS()
+  sourcenames = report$getSourceFileNames()
+  
+  nsources = length(Sources)
+  missingSections = NULL
   
   if(TMS == "ScantronAS"){
-    sourcenames = report$.__enclos_env__$private$SourceFileNames
+    
     SectionNames = strsplit(x = sourcenames, split = "_")
     for(i in 1:length(sourcenames)){
       x = SectionNames[[i]]
@@ -29,9 +32,7 @@ setResults.REPORT = function(report) {
     } # for each source/section
     missingSections = SectionNames[!hasData]
     missingSections = unlist(missingSections)
-    
-    report$.__enclos_env__$private$MissingSections = missingSections
-    report$.__enclos_env__$private$Results = results[hasData]
+    results = results[hasData]
     
   } else if(TMS == "LinkIt"){
     #set up list to hold the response sets for the various sections
@@ -47,10 +48,12 @@ setResults.REPORT = function(report) {
       results[[i]] = thisResult #put the response info in the list
       names(results)[i] = SectionName #set the element name in the list to be the name of the section
     }
-    report$.__enclos_env__$private$Results = results
-    
+
   } else {
     stop(paste0("Unknown or unsupported TMS: ", TMS))
   } # /if-else
+  
+  report$setMissingSectionsQuick(missingSections)
+  report$setResultsQuick(results)
   
 } # /setResults.REPORT function
