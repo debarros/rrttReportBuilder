@@ -1,10 +1,11 @@
 # setSources_REPORT
 
 setSources.REPORT = function(report) {
-  if(is.null(report$.__enclos_env__$private$DataLocation)){
+  DataLocation = report$getDataLocation()
+  if(is.null(DataLocation)){
     return("Need a data location first.")
   } else {
-    report$.__enclos_env__$private$SourceFileNames = list.files(paste0(report$.__enclos_env__$private$DataLocation,"\\exports"))
-    report$.__enclos_env__$private$Sources = list.files(paste0(report$.__enclos_env__$private$DataLocation,"\\exports"), full.names = T)
+    report$setSourceFileNamesQuick(list.files(paste0(DataLocation,"\\exports")))
+    report$setSourcesQuick(list.files(paste0(DataLocation,"\\exports"), full.names = T))
   } # /if-else
-} #/setSources.REPORT function
+} # /setSources.REPORT function

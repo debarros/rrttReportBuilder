@@ -1,27 +1,29 @@
 
 
 updateIRandIRS.REPORT = function(report){
-  
+  Results = report$getResults()
+  ItemInfo = report$getItemInfo()
   #establish a list that will hold the Item Response Scores data.frames
-  ItReScores = vector(mode = "list", length = length(report$.__enclos_env__$private$Results))
+  ItReScores = vector(mode = "list", length = length(Results))
+  
   
   # Load the item response scores for each section into the list
-  for(i in 1:length(report$.__enclos_env__$private$Results)){
-    ItReScores[[i]] = report$.__enclos_env__$private$Results[[i]]$getItemResponseScores()
+  for(i in 1:length(Results)){
+    currentResult = Results[[i]]
+    ItReScores[[i]] = currentResult$getItemResponseScores()
   }
   
   # Make a single data.table with all of the item response scores from all of the sections
   ItReScores = data.table::rbindlist(ItReScores) 
   
   # Calculate the average score for each question
-  for(i in 1:nrow(report$.__enclos_env__$private$ItemInfo)){
-    report$.__enclos_env__$private$ItemInfo$AverageScore[i] = mean(
-      ItReScores[[report$.__enclos_env__$private$ItemInfo$ItemName[i]]], na.rm = T)/report$.__enclos_env__$private$ItemInfo$Value[i]
+  for(i in 1:nrow(ItemInfo)){
+    ItemInfo$AverageScore[i] = mean(ItReScores[[ItemInfo$ItemName[i]]], na.rm = T)/ItemInfo$Value[i]
   }
-  report$.__enclos_env__$private$ItemScores = report$.__enclos_env__$private$ItemInfo$AverageScore
-  report$.__enclos_env__$private$ItemResponseScores = ItReScores
   
+  # Store the results
+  report$setItemInfoQuick(ItemInfo)
+  report$setItemScoresQuick(ItemInfo$AverageScore)
+  report$setItemResponseScoresQuick(ItReScores)
   
-  
-  
-}
+} # /function

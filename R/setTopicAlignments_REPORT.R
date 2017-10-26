@@ -1,16 +1,22 @@
 # setTopicAlignments_REPORT
 
 setTopicAlignments.REPORT = function(d2, report) {
-      if(ncol(d2) > 5){ #check to see if there are topics at all
-        report$.__enclos_env__$private$HasTopics = T
-        Topics = d2[,5:ncol(d2)] #set up a data.frame to hold topic info
-        colnames(Topics)[1] = "ItemName" #set the name of the first column
-        for(i in 2:ncol(Topics)){
-          Topics[,i] = as.logical(as.numeric(Topics[,i]))
-        } # /for
-        report$.__enclos_env__$private$TopicAlignments = Topics
-      } else {
-        report$.__enclos_env__$private$HasTopics = F
-        report$.__enclos_env__$private$TopicAlignments = NULL
-      } # /if-else
-}
+  
+  if(ncol(d2) > 5){                           # check to see if there are topics at all
+    HasTopics = T
+    TopicAlignments = d2[,5:ncol(d2)]         # set up a data.frame to hold topic info
+    colnames(TopicAlignments)[1] = "ItemName" # set the name of the first column
+    for(i in 2:ncol(TopicAlignments)){        # for each topic, set the alignments
+      TopicAlignments[,i] = as.logical(as.numeric(TopicAlignments[,i]))
+    } # /for
+    
+  } else {                     # If there are no topics
+    HasTopics = F
+    TopicAlignments = NULL
+  } # /if-else
+  
+  # Store info
+  report$setHasTopicsQuick(HasTopics)
+  report$setTopicAlignmentsQuick(TopicAlignments)
+  
+} # /function
