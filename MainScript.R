@@ -3,9 +3,11 @@ library(rrttReportBuilder)
 library(dBtools)
 library(roxygen2)
 library(openxlsx)
-
-
+library(data.table)
+library(stringr)
+library(R6)
 dBtools::UpdateDescription()
+
 
 
 DataLocation = "C:/week04 (2017-09-26) U1 Numbers Variables Operations"
@@ -14,15 +16,20 @@ ReportFileName = "scores.xlsx"
 TMS = "ScantronAS"
 SMS = "PowerSchool"
 UploadFilenames = c("upload_percentages.csv", "upload_totalpoints.csv")
+template = NULL
+
 
 generateReport(DataLocation = DataLocation, TMS = TMS)
+generateReport(DataLocation = DataLocation, TMS = TMS, template = template)
 
 devtools::install_github()
 
 report = currentReport
-result = report$getResults()[[1]]
+result = report$getResults()[[4]]
+result = currentResult
 report$getResults()
-x = report$getItemInfo()
+ItemInfo = report$getItemInfo()
+report$getTopicSummary()
 
 nchar(x$ItemName)
 
@@ -50,3 +57,9 @@ itemNames = ItemInfo$ItemName
 
 x = report$getResults()
 str(x, max.level = 1)
+
+
+result$getSectionName()
+result$getSummary()
+result$getItemResponses()
+result$getItemResponseScores()
