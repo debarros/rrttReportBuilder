@@ -42,7 +42,7 @@ REPORT = R6Class(
     ItemResponseScores = NULL,  # data.table with the score for every student on every item
     ItemScores = NULL,          # AverageScore column from the ItemInfo
     ResponseSet = NULL,         # character vector hold the names of the different response frequencies columns
-
+    
     # Report components
     Comparison = NULL,        # a list of objects of class COMPARISON
     Handouts = NULL,          # data.frame containing the information necessary to build the Handouts tab simply
@@ -91,10 +91,14 @@ REPORT = R6Class(
       private$UpLdFileNames = filenames},
     
     # Methods to return members
+    getChaffRules = function(){return(private$ChaffRules)},
     getComparison = function(){return(private$Comparison)},
     getComparisonLocation = function(){return(private$ComparisonLocation)},
     getCorrelations = function(){return(private$Correlations)},
     getDataLocation = function(){return(private$DataLocation)},
+    getDifficultCutoffParams = function(){return(private$DifficultCutoffParams)},
+    getDistractorCutoffProportion = function(){return(private$DistractorCutoffProportion)},
+    getEasyCutoff = function(){return(private$EasyCutoff)}
     getHandouts = function(){return(private$Handouts)},
     getItemInfo = function(){return(private$ItemInfo)},
     getItemResponseScores = function(){return(private$ItemResponseScores)},
@@ -103,10 +107,13 @@ REPORT = R6Class(
     getItemTypeCategories = function(){return(private$ItemTypeCategories)},
     getMissingSections = function(){return(private$MissingSections)},
     getNarrative = function(){return(private$Narrative)},
+    getOverThinkCutoff = function(){return(private$OverThinkCutoff)},
     getPassingScore = function(){return(private$PassingScore)},
+    getRelatedCutoffProportion = function(){return(private$RelatedCutoffProportion)},
     getResponses = function(report = self){ return(getResponses.REPORT(report)) }, 
     getResponseSet = function(){return(private$ResponseSet)},
     getResults = function(){return(private$Results)},
+    getSourceFileNames = function(){return(private$SourceFileNames)},
     getSources = function(){return(private$Sources)},
     getSpecialScoring = function(){private$SpecialScoring},
     getSpecialScoringTable = function(){return(private$SpecialScoringTable)},
@@ -122,20 +129,26 @@ REPORT = R6Class(
     
     # Methods to quick set members
     setComparisonQuick = function(x){private$Comparison = x},
+    setCorrelationsQuick = function(x){private$Correlations = x},
+    setDropScoresQuick = function(x){private$DropScores = x},
     setItemInfoQuick = function(x){private$ItemInfo = x},
     setItemResponseOptionsQuick = function(x){private$ItemResponseOptions = x},
     setItemResponseScoresQuick = function(x){private$ItemResponseScores = x},
     setItemScoresQuick = function(x){private$ItemScores = x},
     setHandoutsQuick = function(x){private$Handouts = x},
     setHasTopicsQuick = function(x){private$HasTopics = x},
+    setMissingSectionsQuick = function(x){private$MissingSections = x},
     setNarrativeQuick = function(x){private$Narrative = x},
     setResponseSetQuick = function(x){private$ResponseSet = x},
+    setResultsQuick = function(x){private$Results = x},
+    setSpecialScoring = function(x){private$SpecialScoring = x},
     setSourceFileNamesQuick = function(x){private$SourceFileNames = x},
     setSourcesQuick = function(x){private$Sources = x},
     setSummaryQuick = function(x){private$Summary = x},
     setTestNameQuick = function(x){private$TestName = x},
     setTopicAlignmentsQuick = function(x){private$TopicAlignments = x},
     setTopicScoresQuick = function(x){private$TopicScores = x},
+    setTopicSummaryQuick = function(x){private$TopicSummary = x}, 
     setUploadTabQuick = function(x){private$UploadTab = x},
     setUploadTotalPointsQuick = function(x){private$UploadTotalPoints = x},
     
