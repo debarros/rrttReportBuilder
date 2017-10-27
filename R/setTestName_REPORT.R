@@ -22,7 +22,7 @@ setTestName.REPORT = function(report) {
     
   } else if(report$getTMS() == "ScantronAS"){ # If the TMS is ScantronAS,
     i = 0                                     # Set the counter to 0.
-    while(is.na(testname)){                   # Until a test name is found,
+    while(is.na(TestName)){                   # Until a test name is found,
       i = i+1                                 # increment the counter
       if(i > length(Sources)){                # If the sources have all be checked,
         stop("There is no data")              # halt and report an error.
