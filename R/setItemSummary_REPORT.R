@@ -30,10 +30,17 @@ setItemSummary.REPORT = function(report) {
   # at least DistractorCutoffProportion percent of students.
   # This should be altered to not be a loop.
   ItemSummary$PowerDistrators = FALSE
-  for(i in 1:nrow(ItemSummary)){
-    if(ItemInfo$Type[i] == "MC"){
-      wrongSet = grep(pattern = ItemInfo$Answer[i], x = ResponseSet, value = T, invert = T) 
-      ItemSummary$PowerDistrators[i] = any(ItemInfo[i,wrongSet] > DistractorCutoffCount)
+  for(i in 1:nrow(ItemSummary)){                                             # For each item, 
+    if(ItemInfo$Type[i] == "MC"){                                            # If the item is MC,
+      answerset = ItemInfo$Answer[i]                                         # Get the answer for this item
+      answerset = stringr::str_split(string = answerset, pattern = ",")[[1]] # Get all answers for this item (usually just 1)
+      wrongSet = ResponseSet                                                 # Initialize the wrongSet as the entire ResponseSet
+      for(ans in answerset){                                                 # For each correct answer
+        wrongSet = grep(pattern = ans, x = wrongSet, value = T, invert = T)  # Remove matching elements from the wrongSet
+      }
+      distractorCounts = as.integer(unlist(ItemInfo[i,wrongSet]))            # Count the times each wrong answer occurs
+      distractorTF = distractorCounts > DistractorCutoffCount                # Get a vector of whether each response is a powerful distractor
+      ItemSummary$PowerDistrators[i] = any(distractorTF, na.rm = T)          # if any are, indicate that this item has one
     }
   }
   ItemSummary$PowerDistrators[is.na(ItemSummary$PowerDistrators)] = FALSE
@@ -71,5 +78,5 @@ setItemSummary.REPORT = function(report) {
   ItemSummary$CheckKey = ItemInfo$Type == "MC" & (ItemInfo$AverageScore == 0 | (ItemSummary$Difficult & ItemSummary$OverThinking))
   ItemSummary$CheckKey[is.na(ItemSummary$CheckKey)] = FALSE
   
-  report$setItemScoresQuick(ItemSummary)
+  report$setItemSummaryQuick(ItemSummary)
 } # /function
