@@ -74,8 +74,8 @@ loadSpecialScoring.REPORT = function(report){
   } # /if there is special scoring
   
   report$setSpecialScoring(SpecialScoring)
-  report$setHasSpecialScoring(HasSpecialScoring)
-  report$setHasStudentScoring(HasStudentScoring)
-  report$setSpecialScoringTable(StudentRuleTable)
+  report$setHasSpecialScoringQuick(HasSpecialScoring)
+  report$setHasStudentScoringQuick(HasStudentScoring)
+  report$setSpecialScoringTableQuick(StudentRuleTable)
   
 } # /function
