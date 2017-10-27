@@ -13,7 +13,7 @@ addItemScores.REPORT = function(report) {
   # Calculate the item response scores for each section and load them in the list
   for(i in 1:length(report$getResults())){
     currentResult = report$getResults()[[i]]
-    currentResult$setItemResponseScores(ItemInfo = report$getItemInfo(), TMS = TMS)
+    currentResult$setItemResponseScores(ItemInfo = ItemInfo, TMS = TMS)
     ItReScores[[i]] = currentResult$getItemResponseScores()
   } # /for each result
   
