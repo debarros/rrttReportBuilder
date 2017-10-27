@@ -6,6 +6,8 @@ library(openxlsx)
 library(data.table)
 library(stringr)
 library(R6)
+
+
 dBtools::UpdateDescription()
 
 
@@ -29,6 +31,8 @@ result = report$getResults()[[4]]
 result = currentResult
 report$getResults()
 ItemInfo = report$getItemInfo()
+
+report$getItemSummary()
 report$getTopicSummary()
 
 nchar(x$ItemName)
