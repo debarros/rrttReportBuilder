@@ -156,13 +156,13 @@ exportReport.REPORT = function(filename, template, report) {
   # Write the responseSet to the Breakdown tab and do some formatting ####
   openxlsx::writeData(wb = wb1, sheet = "Breakdown", x = t(report$getResponseSet()), 
                       startCol = 7, startRow = 3, colNames = F)
-  removeColWidths(wb = wb1, sheet = "Breakdown", cols = 7:47)
-  setColWidths(wb = wb1, sheet = "Breakdown", cols = 7:47, widths = "auto")
+  openxlsx::removeColWidths(wb = wb1, sheet = "Breakdown", cols = 7:47)
+  openxlsx::setColWidths(wb = wb1, sheet = "Breakdown", cols = 7:47, widths = "auto")
   
   
   # Output the scores workbook ####
   # This next line creates a long delay
   openxlsx::saveWorkbook(wb1, paste0(report$getDataLocation(),"\\",filename), overwrite = TRUE)
   
-
+  
 } # /function
