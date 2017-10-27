@@ -15,7 +15,7 @@ setItemResponseScores.RESULT = function(ItemInfo, TMS, result){
   # Note: For gridded response items with tolerance, this section will have to be edited
   for(i in 1:nrow(ItemInfo)){
     if(ItemInfo$Type[i] == "MC"){
-      ItemResponseScores[,ItemInfo$ItemName[i]] = ItemInfo$Value[i]*(ItemResp[,ItemInfo$ItemName[i]] == ItemInfo$Answer[i])
+      ItemResponseScores[,ItemInfo$ItemName[i]] = ItemInfo$Value[i]*(ItemResp[,ItemInfo$ItemName[i]] %in% strsplit(ItemInfo$Answer[i], split = ",")[[1]])
     } else if(ItemInfo$Type[i] == "ER"){
       ItemResponseScores[,ItemInfo$ItemName[i]] = ItemResp[,ItemInfo$ItemName[i]]
     } else if(ItemInfo$Type[i] == "WH"){
