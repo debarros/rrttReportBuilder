@@ -1,9 +1,11 @@
 Package: rrttReportBuilder
 Type: Package
 Title: Report Builder for Rapid Return To Teacher
-Version: 0.0.0.9011
-Date: 2017-10-23
-Authors@R: person("Paul", "de Barros", email = "pj.debarros@gmail.com", role = c("aut", "cre"))
+Version: 0.0.0.9012
+Date: 2017-10-27
+Authors@R: c(
+    person("Paul", "de Barros", email = "pj.debarros@gmail.com", role = c("aut", "cre")),
+    person("Alan", "Thorne", email = "abthornejr@gmail.com", role = "aut"))
 Description: Build Excel reports using data from a testing management system
 License: GPL-3
 Imports:
