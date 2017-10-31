@@ -4,6 +4,7 @@
 #' @param itemValues a vector or a 1 row data frame containing whole number max scores for a set of items
 #' @param itemWeights a vector or a 1 row data frame containing whole number weights for a set of items
 #' @param specialScoring a 1 row data frame containing a scoring rule
+#' @param lookup a names list of data.frames, each with a score lookup table in it
 #' @return numeric of length 1 representing the curved score (generally on a scale of 0 to 1)
 #' @examples
 #' # Sample Data 1
@@ -50,8 +51,14 @@ curveScore = function(itemScores, itemValues, itemWeights, specialScoring, looku
   
   # Lookup score / Regents
   if(TYPE %in% c("Lookup score", "Regents curve")){
-    # error if no lookup provided
-    thisScore = lookup[lookup[,1] == sum(itsemScores),2]
+    currentLookup = lookup[[p1]] # Get the lookup table associated with this particular scoring rule
+    if(is.null(currentLookup)){
+      stop(paste0("Special scoring requires a lookup table on a tab named ", p1, "."))
+    }
+    thisScore = currentLookup[currentLookup[,1] == sum(itemScores),2]
+    if(is.na(thisScore)){
+      stop(paste0("The lookup table on the tab named ", p1, " is missing a row for the raw score ", sum(itemScores), "."))
+    }
     return(thisScore)
   }
   

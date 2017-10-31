@@ -68,6 +68,13 @@ loadSpecialScoring.REPORT = function(report){
           rowNames = T, colNames = F, rows = 25:30, cols = 2:3)), 
         stringsAsFactors = F))
       
+      
+      # Fifth element: if there are any lookup tables needed, load them.
+      if(CurrentSpecial$checkLookups()){
+        CurrentSpecial$setLookups(ComparisonLocation)
+      }
+      
+      # Store the current SpecialScoring in the list
       SpecialScoring[[i]] = CurrentSpecial
       
     } # /for each special scoring tab

@@ -27,6 +27,7 @@ generateReport(DataLocation = DataLocation, TMS = TMS, template = template)
 devtools::install_github()
 
 report = currentReport
+scoring = CurrentSpecial
 result = report$getResults()[[4]]
 result = currentResult
 report$getResults()

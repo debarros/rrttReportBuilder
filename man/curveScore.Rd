@@ -14,6 +14,8 @@ curveScore(itemScores, itemValues, itemWeights, specialScoring, lookup = NULL)
 \item{itemWeights}{a vector or a 1 row data frame containing whole number weights for a set of items}
 
 \item{specialScoring}{a 1 row data frame containing a scoring rule}
+
+\item{lookup}{a names list of data.frames, each with a score lookup table in it}
 }
 \value{
 numeric of length 1 representing the curved score (generally on a scale of 0 to 1)
