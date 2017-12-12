@@ -43,7 +43,7 @@ SCORING = R6Class(
     checkLookups = function(){
       ret = FALSE
       overallFunctions = unlist(private$OverallSetup$`Score function`)
-      subsetFunctions = unlist(private$SubsetSetup$`Score function`)
+      subsetFunctions = unlist(private$SubsetSetup$`Subset function`)
       allFunctions = c(overallFunctions, subsetFunctions)
       if(length(intersect(private$LookupFunctions, allFunctions)) > 0){
         ret = TRUE
