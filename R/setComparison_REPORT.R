@@ -1,67 +1,81 @@
 # setComparison_REPORT
 
 setComparison.REPORT = function(report) {
-  d2 = openxlsx::read.xlsx(xlsxFile = report$getComparisonLocation(), sheet = "Overall Comparison", startRow = 2, colNames = F)
+  
+  # pull the necessary stuff from the report
+  HasTopics = report$checkTopics()
+  ItemScores = report$getItemScores()
+  TopicSummary = report$getTopicSummary()
+  Summary = report$getSummary()
+  ComparisonLocation = report$getComparisonLocation()
+  
+  # Create the comparison header
+  d2 = openxlsx::read.xlsx(xlsxFile = ComparisonLocation, sheet = "Overall Comparison", startRow = 2, colNames = F)
   CompHeader = d2[1:8,-1]
   row.names(CompHeader) = CompHeader[,1]
   CompHeader = CompHeader[,2*(1:(ncol(CompHeader)/2))]
   CompHeader = CompHeader[1:nrow(CompHeader),apply(X = !is.na(CompHeader), MARGIN = 2, FUN = any), drop = FALSE]
-  if(ncol(CompHeader)>0){
-    Comparisons = vector(mode = "list", length = ncol(CompHeader))
-    
-    d3 = openxlsx::read.xlsx(xlsxFile = report$getComparisonLocation(), 
+  
+  
+  if(ncol(CompHeader)>0){                                           # If there are any comparisons
+    Comparisons = vector(mode = "list", length = ncol(CompHeader))  # Create a list to hold them
+    d3 = openxlsx::read.xlsx(xlsxFile = ComparisonLocation,         # Grab the topic comparison info
                              sheet = "Topic Comparison", 
-                             startRow = 4, 
-                             colNames = T)
+                             startRow = 4, colNames = T)
     
-    ItemScores = report$getItemScores()
-    TopicSummary = report$getTopicSummary()
-    Summary = report$getSummary()
-    
-    for(i in 1:ncol(CompHeader)){
+    for(i in 1:ncol(CompHeader)){ # For each comparison,
       
-      Comparisons[[i]] = COMPARISON$new()
-      Comparisons[[i]]$setDescription(DescriptionLookup$Description[DescriptionLookup$Year == CompHeader[5,i]])
-      Comparisons[[i]]$setSummary(CompHeader[,i], row.names(CompHeader))
-      ItemComparisons = magrittr::set_colnames(
+      Comparisons[[i]] = COMPARISON$new()                                         # Set up the comparison object
+      Comparisons[[i]]$setDescription(                                            # Last year, 2 yrs ago, etc
+        DescriptionLookup$Description[DescriptionLookup$Year == CompHeader[5,i]])  
+      Comparisons[[i]]$setSummary(CompHeader[,i], row.names(CompHeader))          # Set the comparison summary
+      
+      # Item Comparisons
+      ItemComparisons = magrittr::set_colnames(                                   # Set up the item comparisons                        
         d2[-c(1:9),c(1,(2*i),(1+2*i))],
         c("This test item", "Prior test item","Prior test score"))
-      ItemComparisons$`Prior test score` = as.numeric(ItemComparisons$`Prior test score`)
-      ItemComparisons$Higher = ItemScores > ItemComparisons[,3] + 0.1
-      #if there is no comparison for that item, mark as FALSE
-      ItemComparisons$Higher[is.na(ItemComparisons$Higher)] = F 
-      ItemComparisons$Lower =  ItemScores < ItemComparisons[,3] - 0.1
-      #if there is no comparison for that item, mark as FALSE
-      ItemComparisons$Lower[is.na(ItemComparisons$Lower)] = F 
-      Comparisons[[i]]$setItemComparisons(ItemComparisons)
       
-      # If there are topics and there is a topic comparison:
-      if(report$checkTopics()){
-        if(nrow(d3) != 0){
-          TopicComparisons = d3[,c(1,i+1)]
-          TopicComparisons$Higher = TopicSummary$`All Classes` > TopicComparisons[,2] + 0.1
-          TopicComparisons$Lower = TopicSummary$`All Classes` < TopicComparisons[,2] - 0.1
-          Comparisons[[i]]$setTopicComparisons(TopicComparisons)
-        } # /if
-      } # /if
+      # Check whether the entries in the Prior test score column can be converted to numeric
+      PriorTestScores.original = ItemComparisons$`Prior test score`
+      PriorTestScores.numeric = suppressWarnings(as.numeric(PriorTestScores.original))
+      if(any(!is.na(PriorTestScores.original[is.na(PriorTestScores.numeric)]))){             # If any values get converted to NA's, stop.
+        stop(paste0("Error!  Comparison ",i," has prior test item scores that are not numbers."))
+      }
       
-      # If there is an overall comparison:
-      if(!is.na(CompHeader[1,i])){ 
-        #use t.test2 here
-        tTestSummary = t.test2(
-          m1 = Summary$Average, 
-          m2 = as.numeric(CompHeader[1,i]), 
-          s1 = Summary$SD, 
-          s2 = as.numeric(CompHeader[2,i]), 
-          n1 = Summary$N, 
-          n2 = as.numeric(CompHeader[3,i])
-        )
-        Comparisons[[i]]$setGrowth(tTestSummary$`Difference of means`)
-        Comparisons[[i]]$setTtest(tTestSummary$t)
-        Comparisons[[i]]$setPvalue(tTestSummary$`p-value`)
-        significance = "not a significant difference, and is probably due to chance."
-        if(tTestSummary$`p-value`<0.1){
-          significance = "a somewhat significant difference, and could be due to chance."
+      ItemComparisons$`Prior test score` = PriorTestScores.numeric     # Convert the prior test item scores to numeric
+      ItemComparisons$Higher = ItemScores > ItemComparisons[,3] + 0.1  # Determine which items are noticeably higher this time
+      ItemComparisons$Higher[is.na(ItemComparisons$Higher)] = F        # If there is no comparison for that item, mark as FALSE
+      ItemComparisons$Lower =  ItemScores < ItemComparisons[,3] - 0.1  # Determine which items are noticeably lower this time
+      ItemComparisons$Lower[is.na(ItemComparisons$Lower)] = F          # If there is no comparison for that item, mark as FALSE
+      Comparisons[[i]]$setItemComparisons(ItemComparisons)             # Load the item comparisons into the comparison object
+      
+      
+      # Topic Comparisons
+      if(HasTopics){                                                                        # If there are topics
+        if(nrow(d3) != 0){                                                                  # If there is a topic comparison
+          TopicComparisons = d3[,c(1,i+1)]                                                  # Get the topic comparison info
+          TopicComparisons$Higher = TopicSummary$`All Classes` > TopicComparisons[,2] + 0.1 # Identify noticeably higher topics
+          TopicComparisons$Lower = TopicSummary$`All Classes` < TopicComparisons[,2] - 0.1  # Identify noticeably lower topics
+          Comparisons[[i]]$setTopicComparisons(TopicComparisons)                            # Load topic comparison into comparison object
+        } # /if there is topic comparison data
+      } # /if there are topics
+      
+      
+      # Overall Comparison
+      if(!is.na(CompHeader[1,i])){          # If there is an overall comparison
+        tTestSummary = t.test2(             # Do a t test to see if the mean difference is significant
+          m1 = Summary$Average, m2 = as.numeric(CompHeader[1,i]), 
+          s1 = Summary$SD,      s2 = as.numeric(CompHeader[2,i]), 
+          n1 = Summary$N,       n2 = as.numeric(CompHeader[3,i])
+        ) # /t.test2
+        Comparisons[[i]]$setGrowth(tTestSummary$`Difference of means`)  # Load the growth score into the comparison object
+        Comparisons[[i]]$setTtest(tTestSummary$t)                       # Load the t score into the comparison object 
+        Comparisons[[i]]$setPvalue(tTestSummary$`p-value`)              # Load the p-value into the comparison object
+        
+        # Significance
+        significance = "not a significant difference, and is probably due to chance."         # Default the significance to the lowest level
+        if(tTestSummary$`p-value`<0.1){                                                       # If there was a signficant difference,
+          significance = "a somewhat significant difference, and could be due to chance."     # Make a note of it
         }
         if(tTestSummary$`p-value`<0.05){
           significance = "a very significant difference, and is unlikely to be due to chance."
@@ -69,9 +83,11 @@ setComparison.REPORT = function(report) {
         if(tTestSummary$`p-value`<0.01){
           significance = "an extremely significant difference, and could not be due to chance."
         }
-        Comparisons[[i]]$setSignificance(significance)
+        Comparisons[[i]]$setSignificance(significance)   # Load the significance description into the comparison object
       } # /if there is an overall comparison
     } # /for each comparison
-    report$setComparisonQuick(Comparisons)
+    
+    report$setComparisonQuick(Comparisons) # Load the list of comparisons into the report object
+    
   } # /if there are comparisons
 } # /function
