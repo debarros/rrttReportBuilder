@@ -14,30 +14,33 @@ generateReport = function(DataLocation = choose.dir(default = "J:/tests/2016-201
                           TMS = "LinkIt", SMS = "PowerSchool",
                           UploadFilenames = c("upload_percentages.csv", "upload_totalpoints.csv"),
                           template = NULL){
-  currentReport = REPORT$new(TMS = TMS) #initiate a new report
+  
+  currentReport = REPORT$new(TMS = TMS)         # initiate a new report
   currentReport$setUpLoadFiles(UploadFilenames) # set the names of the upload files
-  currentReport$setDataLocation(DataLocation) # set the folder for the test
-  currentReport$setSources() #identify all the csv's in the exports subfolder
+  currentReport$setDataLocation(DataLocation)   # set the folder for the test
+  currentReport$setSources()                    # identify all the csv's in the exports subfolder
   currentReport$setTestName()
   currentReport$setComparisonFileName(ComparisonFileName)
   currentReport$setComparisonLocation(paste0(DataLocation, "\\", ComparisonFileName))
   currentReport$setItemInfo()
-  currentReport$setResults()  #Get the actual results
+  currentReport$setResults()             # Get the actual results
   currentReport$addItemScores()
-  currentReport$loadSpecialScoring()  # Load special scoring rules
-  currentReport$applySpecialScoring()  # Apply special scoring rules
-  currentReport$addCorrelations() # add item correlations to ItemInfo and to Correlations
+  currentReport$loadSpecialScoring()     # Load special scoring rules
+  currentReport$applySpecialScoring()    # Apply special scoring rules
+  currentReport$addCorrelations()        # add item correlations to ItemInfo and to Correlations
   currentReport$addResponseFrequencies() # add ReponseSet and add response frequencies to ItemInfo
   currentReport$setUploadTab()
   currentReport$setSummary()
   currentReport$setTopicSummary()
-  currentReport$setItemSummary() # easy, difficult, powerful distractors, wheat from chaff, check key, overthinking, highly related
+  currentReport$setItemSummary()         # easy, difficult, powerful distractors, wheat from chaff, check key, overthinking, highly related
   currentReport$setComparison()
   currentReport$setNarrative()
   currentReport$setTopicScores()
   currentReport$setHandouts()
-  currentReport$exportNarrative() #save the html file with the narrative
-  currentReport$exportReport(filename = ReportFileName, template = template) #save the xlsx score report file
-  currentReport$exportUploads() #save the CSV's for uploading grades
+  currentReport$exportNarrative()                                            # save the html file with the narrative
+  currentReport$exportReport(filename = ReportFileName, template = template) # save the xlsx score report file
+  currentReport$exportUploads()                                              # save the CSV's for uploading grades
+  
   return(currentReport)
+  
 } # /function
