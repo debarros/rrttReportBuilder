@@ -4,7 +4,7 @@
 #' @param itemValues a vector or a 1 row data frame containing whole number max scores for a set of items
 #' @param itemWeights a vector or a 1 row data frame containing whole number weights for a set of items
 #' @param specialScoring a 1 row data frame containing a scoring rule
-#' @param lookup a names list of data.frames, each with a score lookup table in it
+#' @param lookup a named list of data.frames, each with a score lookup table in it
 #' @return numeric of length 1 representing the curved score (generally on a scale of 0 to 1)
 #' @examples
 #' # Sample Data 1
@@ -16,6 +16,13 @@
 #' 
 #' # Test Run 1
 #' curveScore(itemScores, itemValues, itemWeights, specialScoring)
+#' 
+#' # Sample Data 2
+#' specScor2 = data.frame(t(c("Polynomial", ".0005", "2.15", "-2.09", ".92", NA)), stringsAsFactors = F)
+#' names(specScor2) = c("function",paste0("parameter ",1:5))
+#' 
+#' # Test Run 2
+#' curveScore(itemScores, itemValues, itemWeights, specScor2)
 curveScore = function(itemScores, itemValues, itemWeights, specialScoring, lookup = NULL){
   
   # TYPE is a character of length 1 indicating the function to use on the score
@@ -108,7 +115,7 @@ curveScore = function(itemScores, itemValues, itemWeights, specialScoring, looku
     thisScore = rawScore ^ as.numeric(p1)
     return(thisScore)
   }
- 
+  
   # x root 
   if(TYPE == "X root"){
     rawScore = sum(itemPercents * itemWeights) / sum(itemWeights)
@@ -121,7 +128,20 @@ curveScore = function(itemScores, itemValues, itemWeights, specialScoring, looku
     rawScore = sum(itemScores)
     rawLost = sum(itemValues) - rawScore
     pointsLost = as.numeric(p1) * rawLost
-    score = (100 - pointsLost) / 100
+    thisScore = (100 - pointsLost) / 100
+    return(thisScore)
   }
+  
+  # polynomial
+  if(TYPE == "Polynomial"){
+    coeffs = as.numeric(c(p2, p3, p4, p5))                        # get the coefficients
+    degree = sum(!is.na(coeffs))                                  # determine the highest degree term
+    rawScore = sum(itemPercents * itemWeights) / sum(itemWeights) # get the raw score as a percentage
+    thisScore = as.numeric(p1)                                    # initialize the score as the constant coefficient
+    for(i in 1:degree){                                           # add the other terms
+      thisScore = thisScore + (rawScore^i)*coeffs[i]
+    }
+    return(thisScore)                      # return the score
+  } # /polynomial
   
 } # /function

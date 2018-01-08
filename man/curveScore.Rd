@@ -15,7 +15,7 @@ curveScore(itemScores, itemValues, itemWeights, specialScoring, lookup = NULL)
 
 \item{specialScoring}{a 1 row data frame containing a scoring rule}
 
-\item{lookup}{a names list of data.frames, each with a score lookup table in it}
+\item{lookup}{a named list of data.frames, each with a score lookup table in it}
 }
 \value{
 numeric of length 1 representing the curved score (generally on a scale of 0 to 1)
@@ -33,4 +33,11 @@ names(specialScoring) = c("function",paste0("parameter ",1:5))
 
 # Test Run 1
 curveScore(itemScores, itemValues, itemWeights, specialScoring)
+
+# Sample Data 2
+specScor2 = data.frame(t(c("Polynomial", ".0005", "2.15", "-2.09", ".92", NA)), stringsAsFactors = F)
+names(specScor2) = c("function",paste0("parameter ",1:5))
+
+# Test Run 2
+curveScore(itemScores, itemValues, itemWeights, specScor2)
 }
