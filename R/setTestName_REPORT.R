@@ -7,8 +7,8 @@
 setTestName.REPORT = function(report) {
 
   # pull the needed info from the report
-  TMS = report$getTMS()
-  Sources = report$getSources()
+  TMS = report$getTMS()         # name of the testing management system
+  Sources = report$getSources() # file paths to source data
   
   # Initialize the TestName
   TestName = NA_character_
@@ -20,7 +20,7 @@ setTestName.REPORT = function(report) {
                         stringsAsFactors = F)
     TestName = TestName[1,2]                  # Get the test name
     
-  } else if(report$getTMS() == "ScantronAS"){ # If the TMS is ScantronAS,
+  } else if(TMS == "ScantronAS"){             # If the TMS is ScantronAS,
     i = 0                                     # Set the counter to 0.
     while(is.na(TestName)){                   # Until a test name is found,
       i = i+1                                 # increment the counter
@@ -33,6 +33,12 @@ setTestName.REPORT = function(report) {
         TestName = x[1,3]                     # grab the test name
       } # /if there is data in the source file
     } # /while 
+    
+  } else if(TMS == "ASAP"){                   # If the TMS is the Level 1 ASAP system for regents data,
+    TestName = read.csv(Sources[1],           # Read the first source file
+                        stringsAsFactors = F)
+    TestName = TestName[1,6]                  # Get the test name
+    
   } else {                                    # If the TMS is not one of the known ones, 
     stop(paste0("Unknown TMS: ",TMS))         # halt and throw an error
   } # /if-else

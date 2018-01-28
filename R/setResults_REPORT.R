@@ -2,11 +2,13 @@
 
 setResults.REPORT = function(report) {
   
-  Sources = report$getSources()
-  ItemInfo = report$getItemInfo()
-  TMS = report$getTMS()
-  sourcenames = report$getSourceFileNames()
+  # Get the relevant parts of the report object
+  Sources = report$getSources()             # file paths to csvs with item response data
+  ItemInfo = report$getItemInfo()           # data.frame with info about items
+  TMS = report$getTMS()                     # name of the testing management system
+  sourcenames = report$getSourceFileNames() # names of the sourse data files (for determining section names)
   
+  # Initialize a couple of variables
   nsources = length(Sources)
   missingSections = NULL
   
@@ -39,16 +41,35 @@ setResults.REPORT = function(report) {
     results = vector(mode = "list", length = nsources) 
     #add names to the list so they can be set later
     names(results) = paste0("a", 1:nsources) 
-    for (i in 1:nsources){  #for each source/section
-      SectionName = read.csv(file = Sources[i], 
-                             skip = 1, header = F, nrows = 1, 
-                             stringsAsFactors = F)[1,2] #get the section name
+    for (i in 1:nsources){                                # for each source/section
+      SectionName = read.csv(file = Sources[i], skip = 1, # get the section name
+                             header = F, nrows = 1, 
+                             stringsAsFactors = F)
+      SectionName = SectionName[1,2]
       thisResult = RESULT$new(SectionName)
       thisResult$setItemResponses(Sources[i], ItemInfo$ItemName, ItemInfo$Value, TMS)
-      results[[i]] = thisResult #put the response info in the list
-      names(results)[i] = SectionName #set the element name in the list to be the name of the section
-    }
+      results[[i]] = thisResult       # put the response info in the list
+      names(results)[i] = SectionName # set the element name in the list to be the name of the section
+    } # /for each source/section
 
+  } else if(TMS == "ASAP"){
+    
+    SectionNames = substr(sourcenames, 1, nchar(sourcenames) - 4)
+    results = vector(mode = "list", length = nsources)            # set up list to hold the response sets for the various sections
+    names(results) = paste0("a", 1:nsources)                      # add names to the list so they can be set later
+    
+    for (i in 1:nsources){                 # for each source/section
+      thisSource = sourcenames[i]
+      SectionName = SectionNames[[i]]
+      thisResult = RESULT$new(SectionName)
+      sourceLocation = Sources[i]
+      itemNames = ItemInfo$ItemName
+      itemValues = ItemInfo$Value
+      thisResult$setItemResponses(sourceLocation, itemNames, itemValues, TMS)
+      results[[i]] = thisResult            # put the response info in the list
+      names(results)[i] = SectionName      # set the element name in the list to be the name of the section
+    } # /for each source/section
+    
   } else {
     stop(paste0("Unknown or unsupported TMS: ", TMS))
   } # /if-else

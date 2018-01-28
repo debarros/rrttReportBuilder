@@ -9,7 +9,7 @@ setItemResponseScores.RESULT = function(ItemInfo, TMS, result){
   ItemResponseScores = setNames(as.data.frame(
     array(data = NA_integer_, dim = dim(ItemResp))),
     colnames(ItemResp)) 
-  ItemResponseScores[,1:6] = ItemResp[,1:6] #pull in the student info from the results data.table
+  ItemResponseScores[,1:6] = ItemResp[,1:6]          # pull in the student info from the results data.table
   
   # Calculate scores for each response on each item
   # Note: For gridded response items with tolerance, this section will have to be edited
@@ -28,7 +28,7 @@ setItemResponseScores.RESULT = function(ItemInfo, TMS, result){
   } # /for
   
   # If this is a TMS that doesn't include total points in the exports, add it now
-  if(TMS %in% c("ScantronAS")){
+  if(TMS %in% c("ScantronAS", "ASAP")){
     ItemResponseScores$TotalPoints = apply(X = ItemResponseScores[,ItemInfo$ItemName], MARGIN = 1, FUN = sum, na.rm = T)
     ItemResponseScores$score = ItemResponseScores$TotalPoints/sum(ItemInfo$Value)*100
     ItemResp$TotalPoints = ItemResponseScores$TotalPoints

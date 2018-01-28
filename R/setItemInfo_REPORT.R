@@ -3,11 +3,11 @@
 setItemInfo.REPORT = function(report) {
   # put badmessage call here
   
-  ItemInfo = openxlsx::read.xlsx(xlsxFile = report$getComparisonLocation(), 
-                                 sheet = "Topic Alignment", 
-                                 startRow = 2, 
-                                 colNames = F)
-  ItemInfo = ItemInfo[1:(which(is.na(ItemInfo[,3]))[1] - 1),3:ncol(ItemInfo)] #remove unnecessary columns and rows
+  CompLoc = report$getComparisonLocation()
+  ItemInfo = openxlsx::read.xlsx(
+    xlsxFile = CompLoc, sheet = "Topic Alignment", 
+    startRow = 2, colNames = F)
+  ItemInfo = ItemInfo[1:(which(is.na(ItemInfo[,3]))[1] - 1),3:ncol(ItemInfo)] # remove unnecessary columns and rows
   
   # Check for missing info.  If there is any, halt and throw an error.
   errorMessage = character(0)
@@ -48,11 +48,11 @@ setItemInfo.REPORT = function(report) {
   ItemInfo$`Answer:` = stringr::str_replace_all(           # remove whitespace from the answer key
     string = ItemInfo$`Answer:`, 
     pattern = stringr::fixed(" "), replacement = "") 
- 
+  
   # Topic Alignments
-  report$setTopicAlignments(ItemInfo) #set the topic alignments
+  report$setTopicAlignments(ItemInfo)    # set the topic alignments
   ItemInfo = ItemInfo[,!(colnames(ItemInfo) %in% colnames(report$getTopicAlignments()))] # remove the topic alignments from the ItemInfo
- 
+  
   # Type, Value, Options, and Answers
   ItemInfo$Type = toupper(substr(x = ItemInfo$`Type:`, 1, 2)) # determine the item type category
   ItemInfo$`Value:` = as.integer(ItemInfo$`Value:`)           # convert the Value column to integer
