@@ -12,7 +12,7 @@ dBtools::UpdateDescription()
 
 
 
-DataLocation = "C:/week04 (2017-09-26) U1 Numbers Variables Operations"
+DataLocation = "//stuthin2/Data/tests/2017-2018/Humanities/H2/week18 (2018-01-10) Combined Midterm"
 ComparisonFileName = "comparison and topic alignment.xlsx"
 ReportFileName = "scores.xlsx"
 TMS = "ScantronAS"
@@ -28,6 +28,7 @@ devtools::install_github()
 
 report = currentReport
 scoring = CurrentSpecial
+curSpecScor
 result = report$getResults()[[4]]
 result = currentResult
 report$getResults()
