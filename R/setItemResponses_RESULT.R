@@ -3,8 +3,8 @@
 setItemResponses.RESULT = function(sourceLocation, itemNames, itemValues, TMS, result){
   
   if(TMS == "LinkIt"){
-    ItemResponses = read.csv(sourceLocation, skip = 13, header = F, stringsAsFactors = F) #read the item response info
-    colnames(ItemResponses) = c("StudentID", "LastName","FirstName","TestDate","TotalPoints",itemNames) #set the column names 
+    ItemResponses = read.csv(sourceLocation, skip = 13, header = F, stringsAsFactors = F)               # read the item response info
+    colnames(ItemResponses) = c("StudentID", "LastName","FirstName","TestDate","TotalPoints",itemNames) # set the column names 
     
     # Set the basic score column.  Note that, if there is special scoring, that will be applied later.
     ItemResponses$score = ItemResponses$TotalPoints/sum(itemValues)*100
@@ -12,11 +12,10 @@ setItemResponses.RESULT = function(sourceLocation, itemNames, itemValues, TMS, r
     #put the score column first
     ItemResponses = ItemResponses[,c(which(colnames(ItemResponses)=="score"),which(colnames(ItemResponses)!="score"))] 
 
+    
   } else if (TMS == "ScantronAS"){
-    ItemResponses = read.csv(sourceLocation, stringsAsFactors = F) #read the item response info
-    if(nrow(ItemResponses) == 1){ #if there is not data
-      return(FALSE)
-    }
+    ItemResponses = read.csv(sourceLocation, stringsAsFactors = F)                # read the item response info
+    if(nrow(ItemResponses) == 1){ return(FALSE) }                                 # if there is not data, return FALSE
     ItemResponses = ItemResponses[-nrow(ItemResponses),1:(ncol(ItemResponses)-3)]
     colnames(ItemResponses) = c("Student", "StudentID","Test.Name",itemNames)
     
@@ -30,6 +29,7 @@ setItemResponses.RESULT = function(sourceLocation, itemNames, itemValues, TMS, r
     
     # Reorder the columns
     ItemResponses = ItemResponses[,c("score","StudentID", "LastName", "FirstName", "TestDate","TotalPoints",itemNames)]
+    
     
   } else if (TMS == "ASAP"){
     ItemResponses = read.csv(sourceLocation, stringsAsFactors = F) # read the item response info
@@ -47,6 +47,7 @@ setItemResponses.RESULT = function(sourceLocation, itemNames, itemValues, TMS, r
     # Reorder the columns
     ItemResponses = ItemResponses[,c("score","StudentID", "LastName", "FirstName", "TestDate","TotalPoints",itemNames)]
 
+    
   } else {
     stop(paste0("Unknown or unsupported TMS: ", TMS))
   } # /if-else based on TMS
