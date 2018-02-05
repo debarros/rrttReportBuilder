@@ -5,14 +5,14 @@ applySpecialScoring.REPORT = function(report){
   # put badmessage call here
   
   # pull necessary info from the report
-  HasSpecScor = report$checkSpecScor()
-  HasStuScor = report$checkStudScor()
-  StuScoRules = report$getSpecialScoringTable()
+  HasSpecScor =    report$checkSpecScor()
+  HasStuScor =     report$checkStudScor()
+  StuScoRules =    report$getSpecialScoringTable()
   SpecialScoring = report$getSpecialScoring()
-  ItemInfo = report$getItemInfo()[,c("ItemName","Value")]
-  Results = report$getResults()
-  nResults = length(Results)
-  itemValues = as.data.frame(t(ItemInfo$Value))
+  ItemInfo =       report$getItemInfo()[,c("ItemName","Value")]
+  Results =        report$getResults()
+  nResults =       length(Results)
+  itemValues =     as.data.frame(t(ItemInfo$Value))
   colnames(itemValues) = ItemInfo$ItemName
   
   if(HasSpecScor){          # only proceed if there is special scoring
@@ -47,10 +47,12 @@ applySpecialScoring.REPORT = function(report){
             itemNames = SubsetAlign$Item[SubsetAlign$Subset == subsetName] # get the names of the items to use in this subset
             
             # calculate the current subset score
-            SubsetScores$SubsetScore[subst] = curveScore(
-              itemScores = ItRespSco[stu,itemNames], itemValues = itemValues[,itemNames],
-              itemWeights = itemWeights[,itemNames], specialScoring = SubsetScores[subst,],
-              lookup = curSpecScor$getLookups())
+            itemScores = ItRespSco[stu,itemNames]
+            itemVals = itemValues[,itemNames]
+            itemWts = itemWeights[,itemNames]
+            specScor = SubsetScores[subst,]
+            lookup = curSpecScor$getLookups()
+            SubsetScores$SubsetScore[subst] = curveScore(itemScores, itemVals, itemWts, specScor, lookup)
             
             if(curFunction %in% c("Drop", "Full credit")){             # If this special scoring is Drop or Full Credit
               updateIRandIRS = TRUE                                    # set the update Item Respsonses flag
@@ -73,22 +75,25 @@ applySpecialScoring.REPORT = function(report){
           } # /for each subset
           
           # Use the subset score to calculate the test score
-          ItRespSco$score[stu] = 100 * curveScore(
-            itemScores = SubsetScores$SubsetScore,     itemValues = rep.int(1,nrow(SubsetScores)),
-            itemWeights = SubsetScores$`Score weight`, specialScoring = curSpecScor$getOverallSetup(),
-            lookup = curSpecScor$getLookups())
+          itemScores = SubsetScores$SubsetScore
+          itemVals = rep.int(1,nrow(SubsetScores))
+          itemWts = SubsetScores$`Score weight`
+          specScor = curSpecScor$getOverallSetup()
+          lookup = curSpecScor$getLookups()
+          subsetnames = SubsetScores$Subset
+          ItRespSco$score[stu] = 100 * curveScore(itemScores, itemVals, itemWts, specScor, lookup, subsetnames)
           
         } else { # If there are no subsets to use, 
           
           #get the total test score from the items
           curFunction = curSpecScor$getOverallSetup()$`Score function`
           itemNames = colnames(itemValues)
-          ItRespSco$score[stu] = 100 * curveScore(
-            itemScores = ItRespSco[stu,itemNames], 
-            itemValues = itemValues[,itemNames],
-            itemWeights = itemValues[,itemNames],                    # since this is an overall score, items are weighted by their values
-            specialScoring = curSpecScor$getOverallSetup(), 
-            lookup = curSpecScor$getLookups())
+          itemScores = ItRespSco[stu,itemNames]
+          itemVals = itemValues[,itemNames]
+          itemWts = itemValues[,itemNames]                    # since this is an overall score, items are weighted by their values
+          specScor = curSpecScor$getOverallSetup()
+          lookup = curSpecScor$getLookups()
+          ItRespSco$score[stu] = 100 * curveScore(itemScores, itemVals, itemWts, specScor, lookup)
           
           if(curFunction == c("Drop by response")){                  # If this special scoring is Drop by response
             updateIRandIRS = TRUE                                    # set the update Item Respsonses flag
@@ -105,7 +110,7 @@ applySpecialScoring.REPORT = function(report){
         } # / if-else checkSubset
         
         # In case any of the student's item response scores changed (due to dropped or full credit items),
-        # Recalculate the total points, and put it the Item Responses and Item Response Scores
+        # recalculate the total points and put it the Item Responses and Item Response Scores
         ItRespSco$TotalPoints[stu] = sum(ItRespSco[stu,ItemInfo$ItemName], na.rm = TRUE)
         ItResp$TotalPoints[stu] = ItRespSco$TotalPoints[stu]
         

@@ -9,4 +9,4 @@ exportUploads.REPORT = function(report) {
     x = report$getUploadTotalPoints(), 
     file = paste0(report$getDataLocation(),"\\","upload_totalpoints.csv"), 
     row.names = F)
-}
+} # /function

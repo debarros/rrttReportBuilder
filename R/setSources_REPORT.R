@@ -1,11 +1,12 @@
 # setSources_REPORT
 
 setSources.REPORT = function(report) {
+  
+  # pull the necessary stuff from the report
   DataLocation = report$getDataLocation()
-  if(is.null(DataLocation)){
-    return("Need a data location first.")
-  } else {
-    report$setSourceFileNamesQuick(list.files(paste0(DataLocation,"\\exports")))
-    report$setSourcesQuick(list.files(paste0(DataLocation,"\\exports"), full.names = T))
-  } # /if-else
+  
+  # set the relevant members of the report object
+  report$setSourceFileNamesQuick(list.files(paste0(DataLocation,"\\exports")))
+  report$setSourcesQuick(list.files(paste0(DataLocation,"\\exports"), full.names = T))
+  
 } # /setSources.REPORT function

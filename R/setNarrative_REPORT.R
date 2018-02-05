@@ -3,18 +3,18 @@
 setNarrative.REPORT = function(report) {
   
   # pull needed info from the report
-  ItemSummary = report$getItemSummary()
+  ItemSummary =     report$getItemSummary()
   MissingSections = report$getMissingSections()
-  TestName = report$getTestName()
-  Results = report$getResults()
-  HasTopics = report$checkTopics()
-  allComps = report$getComparison()
+  TestName =        report$getTestName()
+  Results =         report$getResults()
+  HasTopics =       report$checkTopics()
+  allComps =        report$getComparison()
   
   #initialize the narrative
   if(is.null(MissingSections)){
     narrative = paste0("Here are your scores and analysis for **", TestName, "**.  ")  
   } else {
-    narrative = paste0("Here are your initial scores and analysis for **", TestName,"**.  ",
+    narrative = paste0("Here are your initial scores and analysis for **", TestName, "**.  ",
                        "We are still waiting on data for ", VectorSentence(x = MissingSections, hyphenate = 1))  
   } # /if-else
   narrative = c(narrative,"", "* The score distribution ")
@@ -26,7 +26,7 @@ setNarrative.REPORT = function(report) {
     if(sum(ItemSummary$CheckKey, na.rm = T) > 1){
       x = paste0(x,"s")
     } 
-    x = paste0(x,": ", VectorSentence(ItemSummary$ItemName,ItemSummary$CheckKey), "**")
+    x = paste0(x, ": ", VectorSentence(ItemSummary$ItemName,ItemSummary$CheckKey), "**")
     narrative = c(narrative, x)
   }
   
@@ -68,7 +68,7 @@ setNarrative.REPORT = function(report) {
     if(sum(ItemSummary$Difficult, na.rm = T) > 1){
       x = paste0(x, "s")
     } 
-    x = paste0(x, " very difficult: ",VectorSentence(ItemSummary$ItemName, ItemSummary$Difficult), ".")
+    x = paste0(x, " very difficult: ", VectorSentence(ItemSummary$ItemName, ItemSummary$Difficult), ".")
     narrative = c(narrative, x)
   } # /if there are difficult items
   
@@ -79,7 +79,7 @@ setNarrative.REPORT = function(report) {
     if(sum(ItemSummary$Easy, na.rm = T) > 1){
       x = paste0(x, "s")
     } 
-    x = paste0(x, " very easy: ",VectorSentence(ItemSummary$ItemName, ItemSummary$Easy), ".")
+    x = paste0(x, " very easy: ", VectorSentence(ItemSummary$ItemName, ItemSummary$Easy), ".")
     narrative = c(narrative, x)
   } # /if there are easy items
   
@@ -87,7 +87,7 @@ setNarrative.REPORT = function(report) {
   # If there are wheat from chaff items, add the line
   if(sum(ItemSummary$WheatFromChaff, na.rm = T) > 0){
     a = "  Those are very difficult, but the best students get them right."
-    x = paste0("* ",VectorSentence(ItemSummary$ItemName, ItemSummary$WheatFromChaff))
+    x = paste0("* ", VectorSentence(ItemSummary$ItemName, ItemSummary$WheatFromChaff))
     if(sum(ItemSummary$WheatFromChaff, na.rm = T) > 1){
       x = paste0(x, " might be wheat from chaff questions.", a)
     } else {
@@ -159,7 +159,7 @@ setNarrative.REPORT = function(report) {
         if(sum(ItemComparisons$Higher, na.rm = T) > 1){
           x = paste0(x, "s")
         }
-        x = paste0(x, " ",VectorSentence(ItemComparisons$`This test item`, ItemComparisons$Higher))
+        x = paste0(x, " ", VectorSentence(ItemComparisons$`This test item`, ItemComparisons$Higher))
         narrative = c(narrative, x)
       }
       
@@ -168,7 +168,7 @@ setNarrative.REPORT = function(report) {
         if(sum(ItemComparisons$Lower, na.rm = T) > 1){
           x = paste0(x, "s")
         }
-        x = paste0(x, " ",VectorSentence(ItemComparisons$`This test item`, ItemComparisons$Lower))
+        x = paste0(x, " ", VectorSentence(ItemComparisons$`This test item`, ItemComparisons$Lower))
         narrative = c(narrative, x)
       }
       
@@ -177,12 +177,12 @@ setNarrative.REPORT = function(report) {
         if(!is.null(TopicComparisons)){
           if(sum(TopicComparisons$Higher, na.rm = T) > 0){
             x = paste0("    * Compared to ", desc, ", your students did noticeably better on ", 
-                       VectorSentence(TopicComparisons$Topic, TopicComparisons$Higher))
+                       VectorSentence(TopicComparisons$Topic, TopicComparisons$Higher, hyphenate = 0))
             narrative = c(narrative, x)
           } # /if there are higher topics
           if(sum(TopicComparisons$Lower, na.rm = T) > 0){
             x = paste0("    * Compared to ", desc, ", your students did noticeably worse on ", 
-                       VectorSentence(x = TopicComparisons$Topic, y = TopicComparisons$Lower))
+                       VectorSentence(TopicComparisons$Topic, TopicComparisons$Lower, hyphenate = 0))
             narrative = c(narrative, x)
           } # /if there are lower topics
           

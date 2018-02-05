@@ -61,7 +61,7 @@ setItemInfo.REPORT = function(report) {
   
   badTypes = ItemInfo$Type[!(ItemInfo$Type %in% report$getItemTypeCategories())]
   if(length(badTypes) > 0){
-    stop(paste0("The following item types are not acceptable: ", VectorSentence(badTypes),"."))
+    stop(paste0("The following item types are not acceptable: ", VectorSentence(badTypes, hyphenate = 0), "."))
   }
   
   # set the number of options for MC questions
@@ -73,10 +73,10 @@ setItemInfo.REPORT = function(report) {
   ItemInfo$Answer[isER] = ItemInfo$Value[isER]
   
   # Organize the item info to have the correct columns in the correct order with the correct names
-  colnames(ItemInfo) = c("Value", "FullType","Tolerance","Answer","ItemName","Type","options")
+  colnames(ItemInfo) = c("Value", "FullType", "Tolerance", "Answer", "ItemName", "Type", "options")
   ItemInfo$AverageScore = NA_real_
   ItemInfo$Correlation = NA_real_
-  ItemInfo = ItemInfo[,c("ItemName","Value", "Answer", "AverageScore","Correlation","Type","options")]
+  ItemInfo = ItemInfo[,c("ItemName", "Value", "Answer", "AverageScore", "Correlation", "Type", "options")]
   
   report$setItemInfoQuick(ItemInfo)
   

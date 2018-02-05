@@ -2,6 +2,10 @@
 
 setTopicAlignments.REPORT = function(d2, report) {
   
+  # Initialize HasTopics and Topic Alignments
+  HasTopics = F
+  TopicAlignments = NULL
+  
   if(ncol(d2) > 5){                           # check to see if there are topics at all
     HasTopics = T
     TopicAlignments = d2[,5:ncol(d2)]         # set up a data.frame to hold topic info
@@ -9,11 +13,7 @@ setTopicAlignments.REPORT = function(d2, report) {
     for(i in 2:ncol(TopicAlignments)){        # for each topic, set the alignments
       TopicAlignments[,i] = as.logical(as.numeric(TopicAlignments[,i]))
     } # /for
-    
-  } else {                     # If there are no topics
-    HasTopics = F
-    TopicAlignments = NULL
-  } # /if-else
+  } # /if
   
   # Store info
   report$setHasTopicsQuick(HasTopics)

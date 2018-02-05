@@ -3,10 +3,10 @@
 setComparison.REPORT = function(report) {
   
   # pull the necessary stuff from the report
-  HasTopics = report$checkTopics()
-  ItemScores = report$getItemScores()
-  TopicSummary = report$getTopicSummary()
-  Summary = report$getSummary()
+  HasTopics =          report$checkTopics()
+  ItemScores =         report$getItemScores()
+  TopicSummary =       report$getTopicSummary()
+  Summary =            report$getSummary()
   ComparisonLocation = report$getComparisonLocation()
   
   # Create the comparison header
@@ -14,10 +14,11 @@ setComparison.REPORT = function(report) {
   CompHeader = d2[1:8,-1]
   row.names(CompHeader) = CompHeader[,1]
   CompHeader = CompHeader[,2*(1:(ncol(CompHeader)/2))]
-  CompHeader = CompHeader[1:nrow(CompHeader),apply(X = !is.na(CompHeader), MARGIN = 2, FUN = any), drop = FALSE]
+  CompHeader = CompHeader[1:nrow(CompHeader), 
+                          apply(X = !is.na(CompHeader), MARGIN = 2, FUN = any), 
+                          drop = FALSE]
   
-  
-  if(ncol(CompHeader)>0){                                           # If there are any comparisons
+  if(ncol(CompHeader) > 0){                                         # If there are any comparisons
     Comparisons = vector(mode = "list", length = ncol(CompHeader))  # Create a list to hold them
     d3 = openxlsx::read.xlsx(xlsxFile = ComparisonLocation,         # Grab the topic comparison info
                              sheet = "Topic Comparison", 
@@ -32,14 +33,14 @@ setComparison.REPORT = function(report) {
       
       # Item Comparisons
       ItemComparisons = magrittr::set_colnames(                                   # Set up the item comparisons                        
-        d2[-c(1:9),c(1,(2*i),(1+2*i))],
-        c("This test item", "Prior test item","Prior test score"))
+        d2[-c(1:9), c(1,(2*i), (1+2*i))],
+        c("This test item", "Prior test item", "Prior test score"))
       
       # Check whether the entries in the Prior test score column can be converted to numeric
       PriorTestScores.original = ItemComparisons$`Prior test score`
       PriorTestScores.numeric = suppressWarnings(as.numeric(PriorTestScores.original))
       if(any(!is.na(PriorTestScores.original[is.na(PriorTestScores.numeric)]))){             # If any values get converted to NA's, stop.
-        stop(paste0("Error!  Comparison ",i," has prior test item scores that are not numbers."))
+        stop(paste0("Error!  Comparison ", i ," has prior test item scores that are not numbers."))
       }
       
       ItemComparisons$`Prior test score` = PriorTestScores.numeric     # Convert the prior test item scores to numeric

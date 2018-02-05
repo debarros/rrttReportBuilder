@@ -2,7 +2,7 @@
 
 setItemResponseScores.RESULT = function(ItemInfo, TMS, result){
   
-  # Get the relevant data
+  # Get the relevant data from the result
   ItemResp = result$getItemResponses()
   
   # Create a data.frame to hold the item scores
@@ -15,13 +15,18 @@ setItemResponseScores.RESULT = function(ItemInfo, TMS, result){
   # Note: For gridded response items with tolerance, this section will have to be edited
   for(i in 1:nrow(ItemInfo)){
     if(ItemInfo$Type[i] == "MC"){
-      ItemResponseScores[,ItemInfo$ItemName[i]] = ItemInfo$Value[i]*(ItemResp[,ItemInfo$ItemName[i]] %in% strsplit(ItemInfo$Answer[i], split = ",")[[1]])
+      AnswerSet = strsplit(ItemInfo$Answer[i], split = ",")[[1]]
+      ItemResponseScores[,ItemInfo$ItemName[i]] = ItemInfo$Value[i]*(ItemResp[,ItemInfo$ItemName[i]] %in% AnswerSet)
+      
     } else if(ItemInfo$Type[i] == "ER"){
       ItemResponseScores[,ItemInfo$ItemName[i]] = ItemResp[,ItemInfo$ItemName[i]]
+      
     } else if(ItemInfo$Type[i] == "WH"){
       ItemResponseScores[,ItemInfo$ItemName[i]] = ItemInfo$Value[i]*(ItemResp[,ItemInfo$ItemName[i]] == ItemInfo$Answer[i])
+      
     } else if(ItemInfo$Type[i] == "FL"){
       ItemResponseScores[,ItemInfo$ItemName[i]] = ItemInfo$Value[i]*(ItemResp[,ItemInfo$ItemName[i]] == ItemInfo$Answer[i])
+      
     } else if(ItemInfo$Type[i] == "FI"){
       ItemResponseScores[,ItemInfo$ItemName[i]] = ItemInfo$Value[i]*(ItemResp[,ItemInfo$ItemName[i]] == ItemInfo$Answer[i])
     }
@@ -34,7 +39,8 @@ setItemResponseScores.RESULT = function(ItemInfo, TMS, result){
     ItemResp$TotalPoints = ItemResponseScores$TotalPoints
     ItemResp$score = ItemResponseScores$score
     result$setIRquick(ItemResp)
-  }
+  } # /if
   
   result$setIRSquick(ItemResponseScores)
+  
 } # /function

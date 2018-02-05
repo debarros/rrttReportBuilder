@@ -1,14 +1,16 @@
 # addCorrelations_REPORT
 
 addCorrelations.REPORT = function(report) {
-  Results = report$getResults()
-  ItemInfo = report$getItemInfo()
+  
+  # pull the needed stuff from the report
+  Results =            report$getResults()
+  ItemInfo =           report$getItemInfo()
   ItemResponseScores = report$getItemResponseScores()
   
-  #establish a list that will hold the DropScores data.frames
+  # establish a list that will hold the DropScores data.frames
   DropScores = vector(mode = "list", length = length(Results))
   
-  #calculate the drop scores for each section and load them in the list
+  # calculate the drop scores for each section and load them in the list
   for(i in 1:length(Results)){
     currentResult = Results[[i]]
     currentResult$setDropScores(ItemInfo)
@@ -35,7 +37,9 @@ addCorrelations.REPORT = function(report) {
     }
   }
   
-  report$setItemInfoQuick(ItemInfo)                                      #put the ItemInfo back
+  # put the ItemInfo and whatnot back in the report
+  report$setItemInfoQuick(ItemInfo)                                      
   report$setCorrelationsQuick(ItemInfo$Correlation)
   report$setDropScoresQuick(DropScores)
+  
 } # /function

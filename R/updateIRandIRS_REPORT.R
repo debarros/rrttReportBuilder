@@ -1,11 +1,13 @@
-
+# updateIRandIRS_REPORT.R
 
 updateIRandIRS.REPORT = function(report){
+  
+  # pull the necessary stuff from the report
   Results = report$getResults()
   ItemInfo = report$getItemInfo()
+  
   #establish a list that will hold the Item Response Scores data.frames
   ItReScores = vector(mode = "list", length = length(Results))
-  
   
   # Load the item response scores for each section into the list
   for(i in 1:length(Results)){

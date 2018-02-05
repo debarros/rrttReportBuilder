@@ -1,8 +1,11 @@
 # Load Special Scoring
 
 loadSpecialScoring.REPORT = function(report){
+  
+  # pull the needed info from the report
   ComparisonLocation = report$getComparisonLocation()
   
+  # initialize variables
   HasSpecialScoring = F
   HasStudentScoring = F
   SpecialScoring = NULL
@@ -67,7 +70,6 @@ loadSpecialScoring.REPORT = function(report){
           xlsxFile = ComparisonLocation, sheet = names(SpecialScoring)[i], 
           rowNames = T, colNames = F, rows = 25:30, cols = 2:3)), 
         stringsAsFactors = F))
-      
       
       # Fifth element: if there are any lookup tables needed, load them.
       if(CurrentSpecial$checkLookups()){

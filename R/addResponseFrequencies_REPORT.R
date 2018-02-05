@@ -5,16 +5,28 @@ addResponseFrequencies.REPORT = function(report) {
   
   # Grab the data that will be needed for this part
   ItemResponses = report$getResponses()
-  ItemInfo = report$getItemInfo()
+  ItemInfo =      report$getItemInfo()
+  TMS =           report$getTMS()
+  testName =      report$getTestName()
   
   # For each item, determine the response set
+  # This currently assumes that, for multiple choice questions, responses are letters in alphabetical order, starting with A
   ItemResponseOptions = vector(mode = "list", length = nrow(ItemInfo))
   names(ItemResponseOptions) = ItemInfo$ItemName
   for(i in 1:nrow(ItemInfo)){
     if(ItemInfo$Type[i] == "MC"){
-      currentOptions = LETTERS[1:ItemInfo$options[i]]
+      if(TMS == "ASAP"){                                       # This is a terrible piece of code that should be replaced
+        currentOptions = as.character(1:ItemInfo$options[i])
+      } else {
+        currentOptions = LETTERS[1:ItemInfo$options[i]]  
+      }
     } else if(ItemInfo$Type[i] == "ER"){
       currentOptions = as.character(0:ItemInfo$Value[i])
+      if(TMS == "ASAP"){
+        if(grepl("global", testName, ignore.case = T) | grepl("US History", testName, ignore.case = T)){
+          currentOptions = as.character(seq(from = 0, to = 5, by = .5))
+        }
+      }
     } else if(ItemInfo$Type[i] == "WH"){
       currentOptions = sort(unlist(unique(ItemResponses[,colnames(ItemResponses) == ItemInfo$ItemName[i], with = F])))
     } else if(ItemInfo$Type[i] == "FL"){
@@ -34,7 +46,14 @@ addResponseFrequencies.REPORT = function(report) {
   # For each type, determine the possible options
   for(i in 1:length(responseSetByType)){
     allresponseoptions = unlist(ItemResponseOptions[ItemInfo$Type == names(responseSetByType)[i]])
-    responseSetByType[[i]] = sort(unique(allresponseoptions))
+    uniqueResponseOptions = unique(allresponseoptions)
+    uniqueResponseOptions.numeric = suppressWarnings(as.numeric(uniqueResponseOptions))
+    if(any(is.na(uniqueResponseOptions.numeric))){                                       # if any options are not numbers,
+      responsesToUse = sort(uniqueResponseOptions)                                       # sort alphabetically
+    } else {                                                                             # if all options are numbers,
+      responsesToUse = as.character(sort(uniqueResponseOptions.numeric))                 # sort numerically
+    }
+    responseSetByType[[i]] = responsesToUse
   } # /for
   
   # Initialize the responseSet vector 

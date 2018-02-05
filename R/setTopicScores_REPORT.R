@@ -2,9 +2,11 @@
 
 setTopicScores.REPORT = function(report) {
   
+  # pull the necessary stuff from the report
   HasTopics = report$checkTopics()
   Results = report$getResults()
   
+  # initialize the topic scores object
   TopicScores = NULL
   
   if(HasTopics){

@@ -6,15 +6,15 @@ setItemSummary.REPORT = function(report) {
   
   # put badmessage call here
   
-  # Grab the item info
-  ItemInfo = report$getItemInfo()
-  RelatedCutoffProportion = report$getRelatedCutoffProportion()
-  DCP = report$getDifficultCutoffParams()
+  # Grab the item info and whatnot from the report
+  ItemInfo =                   report$getItemInfo()
+  RelatedCutoffProportion =    report$getRelatedCutoffProportion()
+  DCP =                        report$getDifficultCutoffParams()
   DistractorCutoffProportion = report$getDistractorCutoffProportion()
-  ResponseSet = report$getResponseSet()
-  OverThinkCutoff = report$getOverThinkCutoff()
-  EasyCutoff = report$getEasyCutoff()
-  ChaffRules = report$getChaffRules()
+  ResponseSet =                report$getResponseSet()
+  OverThinkCutoff =            report$getOverThinkCutoff()
+  EasyCutoff =                 report$getEasyCutoff()
+  ChaffRules =                 report$getChaffRules()
   
   # set the parameters
   DifficultCutoff = min(DCP$Lower, max(DCP$Upper, quantile(ItemInfo$AverageScore, DCP$Proportion, na.rm = T), na.rm = T), na.rm = T)
@@ -79,4 +79,5 @@ setItemSummary.REPORT = function(report) {
   ItemSummary$CheckKey[is.na(ItemSummary$CheckKey)] = FALSE
   
   report$setItemSummaryQuick(ItemSummary)
+  
 } # /function

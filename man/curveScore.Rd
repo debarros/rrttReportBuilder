@@ -4,18 +4,21 @@
 \alias{curveScore}
 \title{Curve a Score}
 \usage{
-curveScore(itemScores, itemValues, itemWeights, specialScoring, lookup = NULL)
+curveScore(itemScores, itemVals, itemWts, specScor, lookup = NULL,
+  subsetnames = NULL)
 }
 \arguments{
 \item{itemScores}{a vector or a 1 row data frame containing whole number scores for a set of items}
 
-\item{itemValues}{a vector or a 1 row data frame containing whole number max scores for a set of items}
+\item{itemVals}{a vector or a 1 row data frame containing whole number max scores for a set of items}
 
-\item{itemWeights}{a vector or a 1 row data frame containing whole number weights for a set of items}
+\item{itemWts}{a vector or a 1 row data frame containing whole number weights for a set of items}
 
-\item{specialScoring}{a 1 row data frame containing a scoring rule}
+\item{specScor}{a 1 row data frame containing a scoring rule}
 
 \item{lookup}{a named list of data.frames, each with a score lookup table in it}
+
+\item{subsetnames}{a vector of names of the subsets in the same order as the item parameters}
 }
 \value{
 numeric of length 1 representing the curved score (generally on a scale of 0 to 1)
@@ -26,18 +29,18 @@ Apply special scoring rule to a set of item scores to get an overall score
 \examples{
 # Sample Data 1
 itemScores = c(1,2,1,1,2)
-itemValues = c(2,2,2,2,3)
-itemWeights = c(2,2,2,2,3)
-specialScoring = data.frame(t(c("Extra Credit items", "9",NA,NA,NA,NA)), stringsAsFactors = F)
-names(specialScoring) = c("function",paste0("parameter ",1:5))
+itemVals = c(2,2,2,2,3)
+itemWts = c(2,2,2,2,3)
+specScor = data.frame(t(c("Extra Credit items", "9",NA,NA,NA,NA)), stringsAsFactors = F)
+names(specScor) = c("function",paste0("parameter ",1:5))
 
 # Test Run 1
-curveScore(itemScores, itemValues, itemWeights, specialScoring)
+curveScore(itemScores, itemVals, itemWts, specScor)
 
 # Sample Data 2
 specScor2 = data.frame(t(c("Polynomial", ".0005", "2.15", "-2.09", ".92", NA)), stringsAsFactors = F)
 names(specScor2) = c("function",paste0("parameter ",1:5))
 
 # Test Run 2
-curveScore(itemScores, itemValues, itemWeights, specScor2)
+curveScore(itemScores, itemVals, itemWts, specScor2)
 }

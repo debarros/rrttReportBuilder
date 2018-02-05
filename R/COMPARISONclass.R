@@ -10,6 +10,7 @@ COMPARISON = R6Class(
   classname = "COMPARISON", 
   
   private = list(
+    
     Description = "last year", # description of the relationship to the prior year test
     Growth = NULL,           # current year average - prior year average (or NULL if no overal comparison is wanted)
     ItemComparisons = NULL,  # data.frame showing the item correspondences and scores in prior year (lower part of Overall Comparison tab) and whether this year was higher or lower
@@ -18,9 +19,11 @@ COMPARISON = R6Class(
     Summary = list(),        # info in the header of the Overall Comparison tab for 1 test
     TopicComparisons = NULL, # data.frame showing the prior year scores on each of the topics and whether this year was higher or lowee
     Ttest = NULL             # value of the t test for mean differences using the df adjustment for unequal variances
-  ), #private
+    
+  ), # /private
   
   public = list(
+    
     initialize = function(){},
     setDescription = function(x){private$Description= x},
     
@@ -45,6 +48,7 @@ COMPARISON = R6Class(
     getTtest = function(){return(private$Ttest)},
     getPvalue = function(){return(private$Pvalue)},
     getSignificance = function(){return(private$Significance)}
-  ) #public
+    
+  ) # /public
   
-)
+) # /COMPARISON class

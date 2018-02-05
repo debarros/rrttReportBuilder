@@ -3,10 +3,10 @@
 addItemScores.REPORT = function(report) {
   # put badmessage call here
   
-  # Pull the necessary info
+  # Pull the necessary info from the report
   ItemInfo = report$getItemInfo()
-  TMS = report$getTMS()
-  results = report$getResults()
+  TMS =      report$getTMS()
+  results =  report$getResults()
   
   # Establish a list that will hold the Item Response Scores data.frames
   ItReScores = vector(mode = "list", length = length(results))

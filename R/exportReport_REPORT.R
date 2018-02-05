@@ -1,10 +1,27 @@
 # exportReport_REPORT
 
 exportReport.REPORT = function(filename, template, report) {
-  # put badmessage call here ####
   
+  # put badmessage call here ####
+
+  # pull the needed stuff from the report ####
+  DataLocation =    report$getDataLocation()
+  UploadFiles =     report$getUpLoadFiles()
+  Results =         report$getResults()
+  nResults =        length(Results)
+  ItemInfo =        report$getItemInfo()
+  Summary =         report$getSummary()
+  UploadTab =       report$getUploadTab()
+  TopicAlignments = report$getTopicAlignments()
+  TopicSummary =    report$getTopicSummary()
+  HasTopics =       report$checkTopics()
+  Narrative =       report$getNarrative()
+  Handouts =        report$getHandouts()
+  Comparisons =     report$getComparison()
+  ResponseSet =     report$getResponseSet()
+    
   # check to see if the report has been run before ####
-  uploadFilePath = paste0(report$getDataLocation(),"\\",report$getUpLoadFiles()[1])
+  uploadFilePath = paste0(DataLocation, "\\", UpLoadFiles[1])
   if(file.exists(uploadFilePath)){
     report$exportUpdate(uploadFilePath)
   }
@@ -12,15 +29,15 @@ exportReport.REPORT = function(filename, template, report) {
   # Load the template ####
   # This next part creates a slight delay
   if(is.null(template)){
-    wb1 = loadWorkbook2(file = system.file("extdata","template", package = "rrttReportBuilder"), isUnzipped = T)  
+    wb1 = loadWorkbook2(file = system.file("extdata", "template", package = "rrttReportBuilder"), isUnzipped = T)  
   } else {
     wb1 = loadWorkbook2(file = template, isUnzipped = F)
   } # /if-else
   
   
   # For each class section, write the student responses to the Responses tab ####
-  for(res in 1:length(report$getResults())){
-    currentResult = report$getResults()[res]
+  for(res in 1:nResults){
+    currentResult = Results[res]
     openxlsx::writeData(wb = wb1, 
                         sheet = "Responses", 
                         x = names(currentResult), 
@@ -33,9 +50,10 @@ exportReport.REPORT = function(filename, template, report) {
                         startRow = 100*(res-1) + 2)
   } # /for
   
+  
   # For each class section, write the student item response scores to the ItemScores tab ####
-  for(i in 1:length(report$getResults())){
-    currentResult = report$getResults()[i]
+  for(i in 1:nResults){
+    currentResult = Results[i]
     openxlsx::writeData(wb = wb1, 
                         sheet = "ItemScores", 
                         x = names(currentResult), 
@@ -48,38 +66,40 @@ exportReport.REPORT = function(filename, template, report) {
                         startRow = 100*(i-1) + 2)
   } # /for
   
+  
   # Write the ItemInfo, Summary, and Upload tabs ####
   openxlsx::writeData(wb = wb1, 
                       sheet = "ItemInfo", 
-                      x = report$getItemInfo())
+                      x = ItemInfo)
   openxlsx::writeData(wb = wb1, 
                       sheet = "Summary", 
-                      x = data.frame(report$getSummary()), 
+                      x = data.frame(Summary), 
                       startRow = 1)
   openxlsx::writeData(wb = wb1, 
                       sheet = "Summary", 
-                      x = names(report$getResults()), 
+                      x = names(Results), 
                       startRow = 3)
   openxlsx::writeData(wb = wb1, 
                       sheet = "Upload", 
-                      x = report$getUploadTab(), 
+                      x = UploadTab, 
                       startRow = 1)
   
+  
   # If there are topics, write data to the relevant tabs ####
-  if(report$checkTopics()){
+  if(HasTopics){
     openxlsx::writeData(wb = wb1, 
                         sheet = "TopicAlignments", 
-                        x = report$getTopicAlignments(), 
+                        x = TopicAlignments, 
                         startRow = 1)
     openxlsx::writeData(wb = wb1, 
                         sheet = "TopicSummary", 
-                        x = report$getTopicSummary(), 
+                        x = TopicSummary, 
                         startRow = 1, 
                         rowNames = T)
     
     # Write the student topic scores one section at a time
-    for(i in 1:length(report$getResults())){
-      currentResult = report$getResults()[i]
+    for(i in 1:nResults){
+      currentResult = Results[i]
       openxlsx::writeData(wb = wb1, 
                           sheet = "TopicScores", 
                           x = names(currentResult), 
@@ -93,10 +113,11 @@ exportReport.REPORT = function(filename, template, report) {
     } # /for each section
   } # /if there are topics
   
+  
   # Write the Item_Summary tab and raw handouts tab ####
-  ItemSummary = data.frame(report$getNarrative())
-  ItemSummary = ItemSummary[4:(nrow(ItemSummary)-2),,drop=F]
-  ItemSummary = ItemSummary[!(ItemSummary[,1] %in% c("* Boxplots", "* Topics")),,drop=F]
+  ItemSummary = data.frame(Narrative)
+  ItemSummary = ItemSummary[4:(nrow(ItemSummary)-2), , drop = F]
+  ItemSummary = ItemSummary[!(ItemSummary[,1] %in% c("* Boxplots", "* Topics")), , drop = F]
   openxlsx::writeData(wb = wb1, 
                       sheet = "Item_Summary", 
                       x = ItemSummary, 
@@ -104,18 +125,20 @@ exportReport.REPORT = function(filename, template, report) {
                       colNames = F)
   openxlsx::writeData(wb = wb1, 
                       sheet = "Raw Handout Data", 
-                      x = report$getHandouts(), 
+                      x = Handouts, 
                       startRow = 1)
   
   
   # If there are comparisons, write data to the comparison tab ####
-  numberOfComparisons = length(report$getComparison())
+  numberOfComparisons = length(Comparison)
   if(numberOfComparisons > 0){
     
     for(i in numberOfComparisons:1){
       colShift = 14*(numberOfComparisons - i)
-      currentComparison = report$getComparison()[[i]]
+      currentComparison = Comparison[[i]]
       CompSummary = currentComparison$getSummary()
+      Items = currentComparison$getItemComparisons()
+      
       openxlsx::writeData(wb = wb1, sheet = "Comparison", x = as.numeric(CompSummary$Total), 
                           startCol = 3 + colShift, startRow = 4)
       openxlsx::writeData(wb = wb1, sheet = "Comparison", x = as.numeric(CompSummary$sd), 
@@ -130,10 +153,8 @@ exportReport.REPORT = function(filename, template, report) {
                           startCol = 11 + colShift, startRow = 5)
       openxlsx::writeData(wb = wb1, sheet = "Comparison", x = CompSummary$`Compari-bility:`, 
                           startCol = 11 + colShift, startRow = 6)
-      openxlsx::writeData(wb = wb1, sheet = "Comparison", 
-                          x = as.numeric(currentComparison$getGrowth()), 
+      openxlsx::writeData(wb = wb1, sheet = "Comparison", x = as.numeric(currentComparison$getGrowth()), 
                           startCol = 3 + colShift, startRow = 8)
-      Items = currentComparison$getItemComparisons()
       openxlsx::writeData(wb = wb1, sheet = "Comparison", x = Items$`Prior test item`, 
                           startCol = 1 + colShift, startRow = 14, colNames = F)
       openxlsx::writeData(wb = wb1, sheet = "Comparison", x = Items$`Prior test score`, 
@@ -142,7 +163,7 @@ exportReport.REPORT = function(filename, template, report) {
                           startCol = 3 + colShift, startRow = 9)
       
       # If there are both topics and comparisons, write topic comparison data to the comparison tab
-      if(report$checkTopics()){
+      if(HasTopics){
         Topics = currentComparison$getTopicComparisons()
         if(!is.null(Topics)){
           openxlsx::writeData(wb = wb1, sheet = "Comparison", x = Topics$Average.score, 
@@ -154,7 +175,7 @@ exportReport.REPORT = function(filename, template, report) {
   
   
   # Write the responseSet to the Breakdown tab and do some formatting ####
-  openxlsx::writeData(wb = wb1, sheet = "Breakdown", x = t(report$getResponseSet()), 
+  openxlsx::writeData(wb = wb1, sheet = "Breakdown", x = t(ResponseSet), 
                       startCol = 7, startRow = 3, colNames = F)
   openxlsx::removeColWidths(wb = wb1, sheet = "Breakdown", cols = 7:47)
   openxlsx::setColWidths(wb = wb1, sheet = "Breakdown", cols = 7:47, widths = "auto")
@@ -162,7 +183,7 @@ exportReport.REPORT = function(filename, template, report) {
   
   # Output the scores workbook ####
   # This next line creates a long delay
-  openxlsx::saveWorkbook(wb1, paste0(report$getDataLocation(),"\\",filename), overwrite = TRUE)
+  openxlsx::saveWorkbook(wb1, paste0(DataLocation, "\\", filename), overwrite = TRUE)
   
   
 } # /function

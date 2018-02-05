@@ -1,12 +1,15 @@
 # setSummary_REPORT
 
 setSummary.REPORT = function(report) {
+  
+  # pull the relevant parts of the report
   UploadTab = report$getUploadTab()
   nResults = length(report$getResults())
   ItemInfo = report$getItemInfo()
   PassingScore = report$getPassingScore()
   TestName = report$getTestName()
   
+  # build the summary
   Summarize = vector(mode = "list")
   Summarize$Average = mean(UploadTab$Percentage, na.rm = T)
   Summarize$Median = median(UploadTab$Percentage, na.rm = T)
@@ -23,5 +26,8 @@ setSummary.REPORT = function(report) {
   Summarize$TestName = TestName
   Summarize$Sections = nResults
   Summarize$Items = nrow(ItemInfo)
+  
+  # Add the summare to the report
   report$setSummaryQuick(Summarize)
+  
 } # /setSummary.REPORT function
