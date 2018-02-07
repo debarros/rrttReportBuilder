@@ -21,7 +21,7 @@ exportReport.REPORT = function(filename, template, report) {
   ResponseSet =     report$getResponseSet()
     
   # check to see if the report has been run before ####
-  uploadFilePath = paste0(DataLocation, "\\", UpLoadFiles[1])
+  uploadFilePath = paste0(DataLocation, "\\", UploadFiles[1])
   if(file.exists(uploadFilePath)){
     report$exportUpdate(uploadFilePath)
   }
@@ -130,12 +130,12 @@ exportReport.REPORT = function(filename, template, report) {
   
   
   # If there are comparisons, write data to the comparison tab ####
-  numberOfComparisons = length(Comparison)
+  numberOfComparisons = length(Comparisons)
   if(numberOfComparisons > 0){
     
     for(i in numberOfComparisons:1){
       colShift = 14*(numberOfComparisons - i)
-      currentComparison = Comparison[[i]]
+      currentComparison = Comparisons[[i]]
       CompSummary = currentComparison$getSummary()
       Items = currentComparison$getItemComparisons()
       
