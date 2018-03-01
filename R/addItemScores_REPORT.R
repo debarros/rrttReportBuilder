@@ -1,7 +1,11 @@
 # addItemScores_REPORT
 
-addItemScores.REPORT = function(report) {
+addItemScores.REPORT = function(report, messageLevel = 0) {
   # put badmessage call here
+  
+  if(messageLevel > 0){
+    message("Running addItemScores.REPORT")
+  }
   
   # Pull the necessary info from the report
   ItemInfo = report$getItemInfo()
@@ -13,8 +17,11 @@ addItemScores.REPORT = function(report) {
   
   # Calculate the item response scores for each section and load them in the list
   for(i in 1:length(results)){
+    if(messageLevel > 1){
+      message(paste0("Calculating item response scores for result", i))
+    } 
     currentResult = results[[i]]
-    currentResult$setItemResponseScores(ItemInfo = ItemInfo, TMS = TMS)
+    currentResult$setItemResponseScores(ItemInfo = ItemInfo, TMS = TMS, messageLevel = messageLevel - 1)
     ItReScores[[i]] = currentResult$getItemResponseScores()
   } # /for each result
   

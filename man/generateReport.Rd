@@ -8,7 +8,7 @@ generateReport(DataLocation = choose.dir(default = "J:/tests/2016-2017/"),
   ComparisonFileName = "comparison and topic alignment.xlsx",
   ReportFileName = "scores.xlsx", TMS = "LinkIt", SMS = "PowerSchool",
   UploadFilenames = c("upload_percentages.csv", "upload_totalpoints.csv"),
-  template = NULL)
+  template = NULL, messageLevel = 0)
 }
 \arguments{
 \item{DataLocation}{a folder path}
@@ -24,6 +24,8 @@ generateReport(DataLocation = choose.dir(default = "J:/tests/2016-2017/"),
 \item{UploadFilenames}{character of upload filenames.  The first is for percentage scores and the second is for total points.}
 
 \item{template}{alternate template file}
+
+\item{messageLevel}{integer - level of messages to print}
 }
 \value{
 an object of class REPORT
