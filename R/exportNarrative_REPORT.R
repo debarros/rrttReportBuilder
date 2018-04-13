@@ -1,6 +1,6 @@
 # exportNarrative_REPORT
 
-exportNarrative.REPORT = function(report) {
+exportNarrative.REPORT = function(report, messageLevel = 0) {
   
   # pull the necessary stuff from the report
   DataLocation = report$getDataLocation()

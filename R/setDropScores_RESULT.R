@@ -1,6 +1,6 @@
 # setDropScores_RESULT.R
 
-setDropScores.RESULT = function(ItemInfo, result){
+setDropScores.RESULT = function(ItemInfo, result, messageLevel = 0){
   
   # Get item response scores
   ItemResponseScores = result$getItemResponseScores()

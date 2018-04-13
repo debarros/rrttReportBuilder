@@ -1,6 +1,6 @@
 # setSummary_REPORT
 
-setSummary.REPORT = function(report) {
+setSummary.REPORT = function(report, messageLevel = 0) {
   
   # pull the relevant parts of the report
   UploadTab = report$getUploadTab()

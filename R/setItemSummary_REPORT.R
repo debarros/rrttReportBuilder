@@ -2,7 +2,7 @@
 # Note: Throughout, there is code to convert NA to FALSE
 # This is because items that have no information should not be included in a category
 
-setItemSummary.REPORT = function(report) {
+setItemSummary.REPORT = function(report, messageLevel = 0) {
   
   # put badmessage call here
   

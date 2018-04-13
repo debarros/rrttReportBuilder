@@ -1,6 +1,6 @@
 # exportUploads_REPORT
 
-exportUploads.REPORT = function(report) {
+exportUploads.REPORT = function(report, messageLevel = 0) {
   write.csv(
     x = report$getUploadTab(), 
     file = paste0(report$getDataLocation(),"\\","upload_percentages.csv"), 

@@ -1,6 +1,6 @@
 # setItemResponses_RESULT.R
 
-setItemResponses.RESULT = function(sourceLocation, itemNames, itemValues, TMS, result){
+setItemResponses.RESULT = function(sourceLocation, itemNames, itemValues, TMS, result, messageLevel = 0){
   
   ret = TRUE           # initialize the return value
   ItemResponses = NULL # initialize the item responses object

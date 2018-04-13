@@ -1,6 +1,6 @@
 # setHandouts_REPORT
 
-setHandouts.REPORT = function(report) {
+setHandouts.REPORT = function(report, messageLevel = 0) {
   
   # pull the needed info from the report
   ItemInfo =           report$getItemInfo()

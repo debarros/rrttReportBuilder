@@ -1,6 +1,6 @@
 # addCorrelations_REPORT
 
-addCorrelations.REPORT = function(report) {
+addCorrelations.REPORT = function(report, messageLevel = 0) {
   
   # pull the needed stuff from the report
   Results =            report$getResults()

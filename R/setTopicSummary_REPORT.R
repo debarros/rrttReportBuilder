@@ -1,6 +1,6 @@
 # setTopicSummary_REPORT
 
-setTopicSummary.REPORT = function(report) {
+setTopicSummary.REPORT = function(report, messageLevel = 0) {
   
   #put badmessage call here
   

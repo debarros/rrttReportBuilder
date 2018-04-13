@@ -6,7 +6,7 @@
 # n1, n2: the same sizes
 # m0: the null value for the difference in means to be tested for. Default is 0. 
 # equal.variance: whether or not to assume equal variance. Default is FALSE. 
-t.test2 <- function(m1, m2, s1, s2, n1, n2, m0 = 0, equal.variance = FALSE){
+t.test2 <- function(m1, m2, s1, s2, n1, n2, m0 = 0, equal.variance = FALSE, messageLevel = 0){
   
   if(equal.variance == FALSE){
     se <- sqrt( (s1^2/n1) + (s2^2/n2) )

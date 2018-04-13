@@ -1,6 +1,6 @@
 # setTopicAlignments_REPORT
 
-setTopicAlignments.REPORT = function(d2, report) {
+setTopicAlignments.REPORT = function(d2, report, messageLevel = 0) {
   
   # Initialize HasTopics and Topic Alignments
   HasTopics = F

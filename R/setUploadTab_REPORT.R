@@ -1,6 +1,6 @@
 # setUploadTab_REPORT
 
-setUploadTab.REPORT = function(report) {
+setUploadTab.REPORT = function(report, messageLevel = 0) {
   
   # Pull the necessary components from the report
   ItemResponses = as.data.frame(report$getResponses())

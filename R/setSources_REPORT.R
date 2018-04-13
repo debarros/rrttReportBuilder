@@ -1,6 +1,6 @@
 # setSources_REPORT
 
-setSources.REPORT = function(report) {
+setSources.REPORT = function(report, messageLevel = 0) {
   
   # pull the necessary stuff from the report
   DataLocation = report$getDataLocation()

@@ -1,6 +1,6 @@
 # setTopicScores_RESULT.R
 
-setTopicScores.RESULT = function(TopicAlignments, ItemInfo, result){
+setTopicScores.RESULT = function(TopicAlignments, ItemInfo, result, messageLevel = 0){
   # Does this section need na.rm?
   
   ItemResponseScores = result$getItemResponseScores()

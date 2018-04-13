@@ -1,6 +1,6 @@
 # updateIRandIRS_REPORT.R
 
-updateIRandIRS.REPORT = function(report){
+updateIRandIRS.REPORT = function(report, messageLevel = 0){
   
   # pull the necessary stuff from the report
   Results = report$getResults()

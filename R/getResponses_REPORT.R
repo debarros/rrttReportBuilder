@@ -1,6 +1,6 @@
 # getResponses_REPORT
 
-getResponses.REPORT = function(report) {
+getResponses.REPORT = function(report, messageLevel = 0) {
   
   # pull the needed info from the report
   Results = report$getResults()

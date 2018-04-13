@@ -4,7 +4,7 @@
 # 1) Try each source to get the test name, and exit with the test name when it is found
 # 2) Exit with an error if all the source files have been checked already
 
-setTestName.REPORT = function(report) {
+setTestName.REPORT = function(report, messageLevel = 0) {
 
   # pull the needed info from the report
   TMS = report$getTMS()         # name of the testing management system

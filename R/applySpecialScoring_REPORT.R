@@ -1,6 +1,6 @@
 # Special Scoring
 
-applySpecialScoring.REPORT = function(report){
+applySpecialScoring.REPORT = function(report, messageLevel = 0){
   
   # put badmessage call here
   

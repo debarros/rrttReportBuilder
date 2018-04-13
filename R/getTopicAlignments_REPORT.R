@@ -1,6 +1,6 @@
 # getTopicAlignments_REPORT
 
-getTopicAlignments.REPORT = function(report) {
+getTopicAlignments.REPORT = function(report, messageLevel = 0) {
   
   # pull the needed stuff from the report
   HasTopics =        report$checkTopics()

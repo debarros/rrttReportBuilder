@@ -1,6 +1,6 @@
 # exportUpdate_REPORT
 
-exportUpdate.REPORT = function(uploadFilePath, report) {
+exportUpdate.REPORT = function(uploadFilePath, report, messageLevel = 0) {
   
   # pull necessary stuff from the report
   AllScores = report$getUploadTab()

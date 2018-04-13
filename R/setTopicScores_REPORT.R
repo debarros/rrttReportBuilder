@@ -1,6 +1,6 @@
 # setTopicScores_REPORT
 
-setTopicScores.REPORT = function(report) {
+setTopicScores.REPORT = function(report, messageLevel = 0) {
   
   # pull the necessary stuff from the report
   HasTopics = report$checkTopics()

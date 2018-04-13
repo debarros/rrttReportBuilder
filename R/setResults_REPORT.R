@@ -1,6 +1,6 @@
 # setResults_REPORT
 
-setResults.REPORT = function(report) {
+setResults.REPORT = function(report, messageLevel = 0) {
   
   # Get the relevant parts of the report object
   Sources = report$getSources()             # file paths to csvs with item response data

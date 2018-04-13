@@ -1,6 +1,6 @@
 # Load Special Scoring
 
-loadSpecialScoring.REPORT = function(report){
+loadSpecialScoring.REPORT = function(report, messageLevel = 0){
   
   # pull the needed info from the report
   ComparisonLocation = report$getComparisonLocation()

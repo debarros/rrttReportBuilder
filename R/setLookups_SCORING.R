@@ -1,6 +1,6 @@
 # setLookups_SCORING.R
 
-setLookups.SCORING = function(ComparisonLocation, scoring){
+setLookups.SCORING = function(ComparisonLocation, scoring, messageLevel = 0){
  
   OvFuncs = scoring$getOverallSetup()       # Get all the scoring functions used in the overall setup on this test
   SubFuncs = scoring$getSubsetSetup()       # Get all the scoring functions used in the subset setup on this test

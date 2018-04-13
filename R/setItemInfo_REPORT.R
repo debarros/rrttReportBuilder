@@ -1,6 +1,6 @@
 # setItemInfo_REPORT.R
 
-setItemInfo.REPORT = function(report) {
+setItemInfo.REPORT = function(report, messageLevel = 0) {
   # put badmessage call here
   
   CompLoc = report$getComparisonLocation()

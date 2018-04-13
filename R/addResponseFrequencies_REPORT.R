@@ -1,6 +1,6 @@
 # addResponseFrequencies_REPORT.R
 
-addResponseFrequencies.REPORT = function(report) {
+addResponseFrequencies.REPORT = function(report, messageLevel = 0) {
   # put badmessage call here
   
   # Grab the data that will be needed for this part
