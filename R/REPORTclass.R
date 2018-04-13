@@ -1,6 +1,6 @@
 #REPORTclass.R
 
-#An instance of this class holds everything necessary for a score report on a single test
+# An instance of this class holds everything necessary for a score report on a single test
 
 # need a reason to use setPassingScore - where is this encoded?  How is the call triggered?
 
@@ -17,13 +17,21 @@ REPORT = R6Class(
     OverThinkCutoff = 0.1,                            # cutoff correlation for determining whether an item is an overthinker
     RelatedCutoffProportion = 0.2,                    # target proportion of items to count as highly related
     PassingScore = 0.7,                               # passing score for the test
-    #     rules for determining whether an item is Wheat From Chaff
-    ChaffRules = data.frame(score = c(.3, .4), correlation = c(.3, .5)), 
-    #     lower bound, upper bound, and target proportion for criterion for determining whether an item is difficult
-    DifficultCutoffParams = list("Lower" = 0.4, "Upper" = 0.5, "Proportion" = 0.2), 
+    ComparisonCutoffs = list("Item.H" =  0.1,         # cutoffs for determining noticeable differences in comparisons
+                             "Item.L" =  0.1,
+                             "Topic.H" = 0.1,
+                             "Topic.L" = 0.1),
+    ChaffRules = data.frame(score = c(.3, .4),        # rules for determining whether an item is Wheat From Chaff
+                            correlation = c(.3, .5)), 
+    DifficultCutoffParams = list("Lower" =      0.4,  # bounds and target proportion for criterion for determining whether an item is difficult
+                                 "Upper" =      0.5, 
+                                 "Proportion" = 0.2),
+    SignificanceCutoffs = list("extremely" = .01,     # cutoffs for determining levels of significance for p values
+                               "very" =      .05,
+                               "somewhat" =  .10),
     
     # General properties
-    ComparisonFileName = "comparison and topic alignment.xlsx", #test setup info filename (no file path)
+    ComparisonFileName = "comparison and topic alignment.xlsx", # test setup info filename (no file path)
     ComparisonLocation = NULL, # address and filename of the comparison and topic alignment
     DataLocation = NULL,       # address of the folder for the test
     HasTopics = NULL,          # logical that indicates whether the test has topic alignments
@@ -70,17 +78,17 @@ REPORT = R6Class(
     initialize = function(TMS = "LinkIt"){private$TMS = TMS}, #default the Testing Management System to LinkIt
     
     # Methods to set members
-    setComparison =         function(report = self){ setComparison.REPORT(report) }, 
+    setComparison =         function(report = self, messageLevel = 0){ setComparison.REPORT(report, messageLevel) }, 
     setComparisonFileName = function(x){private$ComparisonFileName = x},
     setComparisonLocation = function(x){private$ComparisonLocation = x},
     setDataLocation =       function(x){private$DataLocation = x},
     setItemInfo =           function(report = self){ setItemInfo.REPORT(report) }, 
     setItemSummary =        function(report = self){ setItemSummary.REPORT(report) }, 
     setHandouts =           function(report = self){ setHandouts.REPORT(report) }, 
-    setNarrative =          function(report = self){ setNarrative.REPORT(report) },
+    setNarrative =          function(report = self, messageLevel = 0){ setNarrative.REPORT(report, messageLevel) },
     setPassingScore =       function(x){private$PassingScore = x},
     setResults =            function(report = self){ setResults.REPORT(report) }, 
-    setSources =            function(report = self){ setSources.REPORT(report) }, 
+    setSources =            function(report = self, messageLevel = 0){ setSources.REPORT(report, messageLevel) }, 
     setSummary =            function(report = self){ setSummary.REPORT(report) }, 
     setTestName =           function(report = self){ setTestName.REPORT(report) }, 
     setTopicAlignments =    function(d2, report = self){ setTopicAlignments.REPORT(d2, report) }, 
@@ -92,6 +100,7 @@ REPORT = R6Class(
     # Methods to return members
     getChaffRules =                 function(){return(private$ChaffRules)},
     getComparison =                 function(){return(private$Comparison)},
+    getComparisonCutoffs =          function(){return(private$ComparisonCutoffs)},
     getComparisonLocation =         function(){return(private$ComparisonLocation)},
     getCorrelations =               function(){return(private$Correlations)},
     getDataLocation =               function(){return(private$DataLocation)},
@@ -112,6 +121,7 @@ REPORT = R6Class(
     getResponses =                  function(report = self){ return(getResponses.REPORT(report)) }, 
     getResponseSet =                function(){return(private$ResponseSet)},
     getResults =                    function(){return(private$Results)},
+    getSignificanceCutoffs =        function(){return(private$SignificanceCutoffs)},
     getSourceFileNames =            function(){return(private$SourceFileNames)},
     getSources =                    function(){return(private$Sources)},
     getSpecialScoring =             function(){return(private$SpecialScoring)},
