@@ -4,7 +4,8 @@
 \alias{VectorSentence}
 \title{Vector Sentence}
 \usage{
-VectorSentence(x, y = NA, OxfordComma = T, End = "and ", hyphenate = 3)
+VectorSentence(x, y = NA, OxfordComma = T, End = "and ", hyphenate = 3,
+  messageLevel = 0)
 }
 \arguments{
 \item{x}{a vector of values, some subset of which are to be listed in the ouput string}
