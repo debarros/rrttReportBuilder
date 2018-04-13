@@ -5,7 +5,7 @@
 \title{Curve a Score}
 \usage{
 curveScore(itemScores, itemVals, itemWts, specScor, lookup = NULL,
-  subsetnames = NULL)
+  subsetnames = NULL, messageLevel = 0)
 }
 \arguments{
 \item{itemScores}{a vector or a 1 row data frame containing whole number scores for a set of items}
@@ -18,7 +18,7 @@ curveScore(itemScores, itemVals, itemWts, specScor, lookup = NULL,
 
 \item{lookup}{a named list of data.frames, each with a score lookup table in it}
 
-\item{subsetnames}{a vector of names of the subsets in the same order as the item parameters}
+\item{subsetnames}{a vector of names of the subsets in the same order as the item parameters (to be used in lookup tables)}
 }
 \value{
 numeric of length 1 representing the curved score (generally on a scale of 0 to 1)

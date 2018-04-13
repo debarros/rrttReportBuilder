@@ -5,7 +5,7 @@
 #' @param itemWts a vector or a 1 row data frame containing whole number weights for a set of items
 #' @param specScor a 1 row data frame containing a scoring rule
 #' @param lookup a named list of data.frames, each with a score lookup table in it
-#' @param subsetnames a vector of names of the subsets in the same order as the item parameters
+#' @param subsetnames a vector of names of the subsets in the same order as the item parameters (to be used in lookup tables)
 #' @return numeric of length 1 representing the curved score (generally on a scale of 0 to 1)
 #' @examples
 #' # Sample Data 1
@@ -24,10 +24,13 @@
 #' 
 #' # Test Run 2
 #' curveScore(itemScores, itemVals, itemWts, specScor2)
-curveScore = function(itemScores, itemVals, itemWts, specScor, lookup = NULL, subsetnames = NULL){
+curveScore = function(itemScores, itemVals, itemWts, specScor, lookup = NULL, subsetnames = NULL, messageLevel = 0){
   
   # TYPE is a character of length 1 indicating the function to use on the score
   TYPE  = specScor[1,grep(pattern = "function", x = colnames(specScor), ignore.case = T, value = T)]
+  if(is.na(TYPE)){
+    stop("Error!  There is a special scoring rule with no scoring function defined.")
+  }
   
   # p1 through p5 are the parameters for the function
   p1 = specScor[1,grep(pattern = "parameter 1", x = colnames(specScor), ignore.case = T, value = T)]
