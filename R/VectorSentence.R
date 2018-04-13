@@ -59,7 +59,7 @@
 #' VectorSentence(x,y, OxfordComma = F, End = "and lastly ", hyphenate = 1)
 #' VectorSentence(x,y, OxfordComma = F, End = "and lastly ", hyphenate = 2)
 #' VectorSentence(x,y, OxfordComma = T, End = "and lastly ", hyphenate = 2)
-VectorSentence = function(x, y = NA, OxfordComma = T, End = "and ", hyphenate = 3){
+VectorSentence = function(x, y = NA, OxfordComma = T, End = "and ", hyphenate = 3, messageLevel = 0){
   
   #If y is not supplied, set it to be all true
   if(length(y) == 1){
