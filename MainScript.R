@@ -11,17 +11,18 @@ library(R6)
 dBtools::UpdateDescription()
 
 
+tests = read.csv()
 
-DataLocation = "//stuthin2/Data/tests/2017-2018/Humanities/H2/week18 (2018-01-10) Combined Midterm"
+DataLocation = "//stuthin2/Data/tests/2017-2018/ELA/Lit 12/week18 (2018-01-11) Midterm"
 ComparisonFileName = "comparison and topic alignment.xlsx"
 ReportFileName = "scores.xlsx"
 TMS = "ScantronAS"
 SMS = "PowerSchool"
 UploadFilenames = c("upload_percentages.csv", "upload_totalpoints.csv")
 template = NULL
+messageLevel = 2
 
-
-generateReport(DataLocation = DataLocation, TMS = TMS)
+generateReport(DataLocation = DataLocation, TMS = TMS, messageLevel = messageLevel)
 generateReport(DataLocation = DataLocation, TMS = TMS, template = template)
 
 devtools::install_github()
@@ -37,35 +38,7 @@ ItemInfo = report$getItemInfo()
 report$getItemSummary()
 report$getTopicSummary()
 
-nchar(x$ItemName)
-
-str(report$getItemInfo())
-str(ItemInfo)
-report$getNarrative()
-
-report$getTopicAlignments()
-
-result1 = report$getResults()[[1]]
-ItemResp = result1$getItemResponses()
-
-i = 1
-
-DescriptionLookup = read.csv("YearDescriptions.csv")
-devtools::use_data(DescriptionLookup, overwrite = T)
-
-thisSource = "C:/week04 (2017-09-26) U1 Numbers Variables Operations\\exports/Burgess_p8_itemresponses.csv"
+report$getUpLoadFiles()
 report$getDataLocation()
-thisSource = "Burgess_p8_itemresponses.csv"
-
-sourceLocation = "C:/week04 (2017-09-26) U1 Numbers Variables Operations\\exports/Burgess_p8_itemresponses.csv"
-
-itemNames = ItemInfo$ItemName
-
-x = report$getResults()
-str(x, max.level = 1)
-
-
-result$getSectionName()
-result$getSummary()
-result$getItemResponses()
-result$getItemResponseScores()
+report$getSources()
+report$getSourceFileNames()
