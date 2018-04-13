@@ -1,6 +1,6 @@
 # exportReport_REPORT
 
-exportReport.REPORT = function(filename, template, report) {
+exportReport.REPORT = function(filename, template, report, messageLevel = 0) {
   
   # put badmessage call here ####
 
@@ -67,7 +67,7 @@ exportReport.REPORT = function(filename, template, report) {
   } # /for
   
   
-  # Write the ItemInfo, Summary, and Upload tabs ####
+  # Write the ItemInfo and Summary tabs ####
   openxlsx::writeData(wb = wb1, 
                       sheet = "ItemInfo", 
                       x = ItemInfo)
@@ -79,10 +79,6 @@ exportReport.REPORT = function(filename, template, report) {
                       sheet = "Summary", 
                       x = names(Results), 
                       startRow = 3)
-  openxlsx::writeData(wb = wb1, 
-                      sheet = "Upload", 
-                      x = UploadTab, 
-                      startRow = 1)
   
   
   # If there are topics, write data to the relevant tabs ####
