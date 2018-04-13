@@ -20,7 +20,7 @@ generateReport = function(DataLocation = choose.dir(default = "J:/tests/2016-201
   currentReport = REPORT$new(TMS = TMS)         # initiate a new report
   currentReport$setUpLoadFiles(UploadFilenames) # set the names of the upload files
   currentReport$setDataLocation(DataLocation)   # set the folder for the test
-  currentReport$setSources()                    # identify all the csv's in the exports subfolder
+  currentReport$setSources(messageLevel = messageLevel - 1) # identify all the csv's in the exports subfolder
   currentReport$setTestName()
   currentReport$setComparisonFileName(ComparisonFileName)
   currentReport$setComparisonLocation(paste0(DataLocation, "\\", ComparisonFileName))
@@ -35,8 +35,8 @@ generateReport = function(DataLocation = choose.dir(default = "J:/tests/2016-201
   currentReport$setSummary()
   currentReport$setTopicSummary()
   currentReport$setItemSummary()         # easy, difficult, powerful distractors, wheat from chaff, check key, overthinking, highly related
-  currentReport$setComparison()
-  currentReport$setNarrative()
+  currentReport$setComparison(messageLevel = messageLevel - 1)
+  currentReport$setNarrative(messageLevel = messageLevel - 1)
   currentReport$setTopicScores()
   currentReport$setHandouts()
   currentReport$exportNarrative()                                            # save the html file with the narrative
