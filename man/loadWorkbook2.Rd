@@ -4,7 +4,7 @@
 \alias{loadWorkbook2}
 \title{Load Workbook 2}
 \usage{
-loadWorkbook2(file, xlsxFile = NULL, isUnzipped = FALSE)
+loadWorkbook2(file, xlsxFile = NULL, isUnzipped = FALSE, messageLevel = 0)
 }
 \arguments{
 \item{file}{filename of an xlsx file or path to an unzipped xlsx file}

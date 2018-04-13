@@ -4,7 +4,7 @@
 #' @param xlsxFile duplicate of \code{file}
 #' @param isUnzipped logical, is \code{file} an xlsx file or a folder containing an unzipped xlsx file?
 #' @return Workbook object
-loadWorkbook2 <- function(file, xlsxFile = NULL, isUnzipped = FALSE){
+loadWorkbook2 <- function(file, xlsxFile = NULL, isUnzipped = FALSE, messageLevel = 0){
   
   if(!is.null(xlsxFile))
     file <- xlsxFile
