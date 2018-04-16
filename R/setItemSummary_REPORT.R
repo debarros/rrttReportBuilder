@@ -15,13 +15,16 @@ setItemSummary.REPORT = function(report, messageLevel = 0) {
   OverThinkCutoff =            report$getOverThinkCutoff()
   EasyCutoff =                 report$getEasyCutoff()
   ChaffRules =                 report$getChaffRules()
+  nStudents =                  report$getSummary()$N
   
   # set the parameters
   DifficultCutoff = min(DCP$Lower, max(DCP$Upper, quantile(ItemInfo$AverageScore, DCP$Proportion, na.rm = T), na.rm = T), na.rm = T)
   
   # find the 1-RelatedCutoffProportion quantile of the item correlations
   RelatedCutoff = quantile(ItemInfo$Correlation, 1 - RelatedCutoffProportion, na.rm = T)   
-  DistractorCutoffCount = nrow(ItemInfo) * DistractorCutoffProportion
+  
+  # Determine how many times a distractor must be selected before it is considered powerful
+  DistractorCutoffCount = nStudents * DistractorCutoffProportion
   
   #set up the ItemSummary data.frame
   ItemSummary = data.frame(ItemName = ItemInfo$ItemName, stringsAsFactors = F) 
