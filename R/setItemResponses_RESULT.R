@@ -1,9 +1,17 @@
 # setItemResponses_RESULT.R
 
-setItemResponses.RESULT = function(sourceLocation, itemNames, itemValues, TMS, result, messageLevel = 0){
+setItemResponses.RESULT = function(sourceLocation, ItemInfo, TMS, result, messageLevel = 0){
+
+  SectionName  = result$getSectionName() # grab the name of the section associated with the current result object
+  
+  if(messageLevel > 0){message(paste0("setting item responses for ", SectionName))}
+  
+  itemNames = ItemInfo$ItemName          # grab item names
+  itemValues = ItemInfo$Value            # grab item values
   
   ret = TRUE           # initialize the return value
   ItemResponses = NULL # initialize the item responses object
+  
   
   if(TMS == "LinkIt"){
     ItemResponses = read.csv(sourceLocation, skip = 13, header = F, stringsAsFactors = F)               # read the item response info
@@ -34,6 +42,22 @@ setItemResponses.RESULT = function(sourceLocation, itemNames, itemValues, TMS, r
       
       # Reorder the columns
       ItemResponses = ItemResponses[,c("score","StudentID", "LastName", "FirstName", "TestDate","TotalPoints",itemNames)]
+      
+      # Convert gridded responses to numeric values so equivalent responses are manageable
+      for(i in 1:nrow(ItemInfo)){
+        itName = ItemInfo$ItemName[i]
+        itType = ItemInfo$Type[i]
+        itResp = ItemResponses[,itName]
+        if(itType %in% c("WH", "FL", "FI")){
+          itRespNum = suppressWarnings(as.numeric(itResp))
+          if(any(itResp[is.na(itRespNum)] != "--")){
+            stop(paste0("Error! ", SectionName, " has gridded responses that are not numbers or '--'."))
+          } else {
+            itRespNum[is.na(itRespNum)] = itResp[is.na(itRespNum)]
+            ItemResponses[,itName] = as.character(itRespNum)
+          }
+        }
+      }
     }
     
   } else if (TMS == "ASAP") {

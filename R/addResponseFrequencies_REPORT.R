@@ -29,6 +29,9 @@ addResponseFrequencies.REPORT = function(report, messageLevel = 0) {
       }
     } else if(ItemInfo$Type[i] == "WH"){
       currentOptions = sort(unlist(unique(ItemResponses[,colnames(ItemResponses) == ItemInfo$ItemName[i], with = F])))
+      currentOptions.numeric = suppressWarnings(as.numeric(currentOptions))                                             # Convert to numeric
+      currentOptions.numeric[is.na(currentOptions.numeric)] = currentOptions[is.na(currentOptions.numeric)]             # Anything not numeric, put it back in
+      currentOptions = sort(unique(currentOptions.numeric))                                                             # Remove duplicates from equivalent answers
     } else if(ItemInfo$Type[i] == "FL"){
       currentOptions = sort(unlist(unique(ItemResponses[,colnames(ItemResponses) == ItemInfo$ItemName[i], with = F])))
     } else if(ItemInfo$Type[i] == "FI"){

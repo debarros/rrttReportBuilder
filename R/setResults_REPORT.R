@@ -29,7 +29,7 @@ setResults.REPORT = function(report, messageLevel = 0) {
       sourceLocation = Sources[i]
       itemNames = ItemInfo$ItemName
       itemValues = ItemInfo$Value
-      hasData[i] = thisResult$setItemResponses(sourceLocation, itemNames, itemValues, TMS)
+      hasData[i] = thisResult$setItemResponses(sourceLocation, ItemInfo, TMS, messageLevel = messageLevel - 1)
       if(hasData[i]){
         results[[i]] = thisResult                         # put the response info in the list
       }
@@ -54,7 +54,7 @@ setResults.REPORT = function(report, messageLevel = 0) {
       sourceLocation = Sources[i]
       itemNames = ItemInfo$ItemName
       itemValues = ItemInfo$Value
-      thisResult$setItemResponses(sourceLocation, itemNames, itemValues, TMS)
+      thisResult$setItemResponses(sourceLocation, ItemInfo, TMS, messageLevel = messageLevel - 1)
       results[[i]] = thisResult                           # put the response info in the list
       names(results)[i] = SectionName                     # set the element name in the list to be the name of the section
     } # /for each source/section
@@ -72,7 +72,7 @@ setResults.REPORT = function(report, messageLevel = 0) {
       sourceLocation = Sources[i]
       itemNames = ItemInfo$ItemName
       itemValues = ItemInfo$Value
-      thisResult$setItemResponses(sourceLocation, itemNames, itemValues, TMS)
+      thisResult$setItemResponses(sourceLocation, ItemInfo, TMS, messageLevel = messageLevel - 1)
       results[[i]] = thisResult            # put the response info in the list
       names(results)[i] = SectionName      # set the element name in the list to be the name of the section
     } # /for each source/section

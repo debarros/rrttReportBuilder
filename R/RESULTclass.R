@@ -26,8 +26,8 @@ RESULT = R6Class(
     initialize = function(SectionName){private$SectionName = SectionName},
     
     # Methods to set members
-    setItemResponses =      function(sourceLocation, itemNames, itemValues, TMS, result = self){
-      setItemResponses.RESULT(sourceLocation, itemNames, itemValues, TMS, result)},
+    setItemResponses =      function(sourceLocation, ItemInfo, TMS, result = self, messageLevel = 0){
+      setItemResponses.RESULT(sourceLocation, ItemInfo, TMS, result, messageLevel)},
     setSectionName =        function(x){private$SectionName= x},
     setItemResponseScores = function(ItemInfo, TMS, result = self, messageLevel = 0){
       setItemResponseScores.RESULT(ItemInfo, TMS, result, messageLevel)},
