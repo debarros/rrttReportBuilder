@@ -26,12 +26,15 @@
 #' curveScore(itemScores, itemVals, itemWts, specScor2)
 curveScore = function(itemScores, itemVals, itemWts, specScor, lookup = NULL, subsetnames = NULL, messageLevel = 0){
   
+  if(messageLevel > 0){message("Running curveScore")}
+  
   # TYPE is a character of length 1 indicating the function to use on the score
   TYPE  = specScor[1,grep(pattern = "function", x = colnames(specScor), ignore.case = T, value = T)]
   if(is.na(TYPE)){
     stop("Error!  There is a special scoring rule with no scoring function defined.")
   }
   
+  if(messageLevel > 1){message("setting special scoring parameters")}
   # p1 through p5 are the parameters for the function
   p1 = specScor[1,grep(pattern = "parameter 1", x = colnames(specScor), ignore.case = T, value = T)]
   p2 = specScor[1,grep(pattern = "parameter 2", x = colnames(specScor), ignore.case = T, value = T)]
@@ -40,6 +43,7 @@ curveScore = function(itemScores, itemVals, itemWts, specScor, lookup = NULL, su
   p5 = specScor[1,grep(pattern = "parameter 5", x = colnames(specScor), ignore.case = T, value = T)]
   itemPercents = itemScores / itemVals
   
+  if(messageLevel > 1){message("selecting the special scoring function")}
   
   # Identity
   if(TYPE == "Identity"){
@@ -73,6 +77,9 @@ curveScore = function(itemScores, itemVals, itemWts, specScor, lookup = NULL, su
       stop(paste0("Special scoring requires a lookup table on a tab named ", p1, "."))
     }
     thisScore = currentLookup[currentLookup[,1] == sum(itemScores),2]
+    if(length(thisScore) == 0){
+      stop(paste0("The lookup table on the tab named ", p1, " is missing a row for the raw score ", sum(itemScores), "."))
+    }
     if(is.na(thisScore)){
       stop(paste0("The lookup table on the tab named ", p1, " is missing a row for the raw score ", sum(itemScores), "."))
     }
