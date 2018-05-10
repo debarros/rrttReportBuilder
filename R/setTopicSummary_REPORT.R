@@ -4,6 +4,9 @@ setTopicSummary.REPORT = function(report, messageLevel = 0) {
   
   #put badmessage call here
   
+  if(messageLevel > 0){
+    message("Running setTopicSummary.RESULT")
+  }
   
   # pull needed stuff from the report
   ItemInfo =        report$getItemInfo()

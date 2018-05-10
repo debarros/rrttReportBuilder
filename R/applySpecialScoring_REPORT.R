@@ -4,6 +4,10 @@ applySpecialScoring.REPORT = function(report, messageLevel = 0){
   
   # put badmessage call here
   
+  if(messageLevel > 0){
+    message("Running applySpecialScoring.REPORT")
+  }
+  
   # pull necessary info from the report
   HasSpecScor =    report$checkSpecScor()
   HasStuScor =     report$checkStudScor()
@@ -16,14 +20,18 @@ applySpecialScoring.REPORT = function(report, messageLevel = 0){
   colnames(itemValues) = ItemInfo$ItemName
   
   if(HasSpecScor){          # only proceed if there is special scoring
+    if(messageLevel > 1){message("Applying Special Scoring")}
+    
     updateIRandIRS = FALSE  # Should the ItemResponses and ItemResponseScores be updated?  Default to FALSE.
     
     for(res in 1:nResults){ # for each section
+      if(messageLevel > 1){message(paste0("Applying Special Scoring to result ", res))}
       CurrentResult = Results[[res]]
       ItRespSco = CurrentResult$getItemResponseScores()
       ItResp = CurrentResult$getItemResponses()
       
       for(stu in 1:nrow(ItRespSco)){      # for each student
+        if(messageLevel > 2){message(paste0("Applying Special Scoring to student ", stu))}
         curSpecScor = SpecialScoring[[1]] # start with the default special scoring
         
         if(HasStuScor){                   # if there is student specific scoring
@@ -52,7 +60,7 @@ applySpecialScoring.REPORT = function(report, messageLevel = 0){
             itemWts = itemWeights[,itemNames]
             specScor = SubsetScores[subst,]
             lookup = curSpecScor$getLookups()
-            SubsetScores$SubsetScore[subst] = curveScore(itemScores, itemVals, itemWts, specScor, lookup)
+            SubsetScores$SubsetScore[subst] = curveScore(itemScores, itemVals, itemWts, specScor, lookup, messageLevel = messageLevel -1)
             
             if(curFunction %in% c("Drop", "Full credit")){             # If this special scoring is Drop or Full Credit
               updateIRandIRS = TRUE                                    # set the update Item Respsonses flag

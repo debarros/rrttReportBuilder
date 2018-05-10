@@ -2,6 +2,10 @@
 
 setResults.REPORT = function(report, messageLevel = 0) {
   
+  if(messageLevel > 0){
+    message("Running setResults.REPORT")
+  }
+  
   # Get the relevant parts of the report object
   Sources = report$getSources()             # file paths to csvs with item response data
   ItemInfo = report$getItemInfo()           # data.frame with info about items

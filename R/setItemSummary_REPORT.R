@@ -6,6 +6,10 @@ setItemSummary.REPORT = function(report, messageLevel = 0) {
   
   # put badmessage call here
   
+  if(messageLevel > 0){
+    message("Running setItemSummary.RESULT")
+  }
+  
   # Grab the item info and whatnot from the report
   ItemInfo =                   report$getItemInfo()
   RelatedCutoffProportion =    report$getRelatedCutoffProportion()

@@ -6,6 +6,10 @@
 
 setTestName.REPORT = function(report, messageLevel = 0) {
 
+  if(messageLevel > 0){
+    message("Running setTestName.REPORT")
+  }
+  
   # pull the needed info from the report
   TMS = report$getTMS()         # name of the testing management system
   Sources = report$getSources() # file paths to source data

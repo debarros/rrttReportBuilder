@@ -2,6 +2,10 @@
 
 setSummary.REPORT = function(report, messageLevel = 0) {
   
+  if(messageLevel > 0){
+    message("Running setSummary.RESULT")
+  }
+  
   # pull the relevant parts of the report
   UploadTab = report$getUploadTab()
   nResults = length(report$getResults())

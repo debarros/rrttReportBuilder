@@ -2,6 +2,10 @@
 
 addCorrelations.REPORT = function(report, messageLevel = 0) {
   
+  if(messageLevel > 0){
+    message("Running addCorrelations.REPORT")
+  }
+  
   # pull the needed stuff from the report
   Results =            report$getResults()
   ItemInfo =           report$getItemInfo()

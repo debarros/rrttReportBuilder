@@ -21,20 +21,20 @@ generateReport = function(DataLocation = choose.dir(default = "J:/tests/2016-201
   currentReport$setUpLoadFiles(UploadFilenames) # set the names of the upload files
   currentReport$setDataLocation(DataLocation)   # set the folder for the test
   currentReport$setSources(messageLevel = messageLevel - 1) # identify all the csv's in the exports subfolder
-  currentReport$setTestName()
+  currentReport$setTestName(messageLevel = messageLevel - 1)
   currentReport$setComparisonFileName(ComparisonFileName)
   currentReport$setComparisonLocation(paste0(DataLocation, "\\", ComparisonFileName))
-  currentReport$setItemInfo()
-  currentReport$setResults()             # Get the actual results
+  currentReport$setItemInfo(messageLevel = messageLevel - 1)
+  currentReport$setResults(messageLevel = messageLevel - 1)             # Get the actual results
   currentReport$addItemScores(messageLevel = messageLevel - 1)
-  currentReport$loadSpecialScoring()     # Load special scoring rules
-  currentReport$applySpecialScoring()    # Apply special scoring rules
-  currentReport$addCorrelations()        # add item correlations to ItemInfo and to Correlations
-  currentReport$addResponseFrequencies() # add ReponseSet and add response frequencies to ItemInfo
-  currentReport$setUploadTab()
-  currentReport$setSummary()
-  currentReport$setTopicSummary()
-  currentReport$setItemSummary()         # easy, difficult, powerful distractors, wheat from chaff, check key, overthinking, highly related
+  currentReport$loadSpecialScoring(messageLevel = messageLevel - 1)     # Load special scoring rules
+  currentReport$applySpecialScoring(messageLevel = messageLevel - 1)    # Apply special scoring rules
+  currentReport$addCorrelations(messageLevel = messageLevel - 1)        # add item correlations to ItemInfo and to Correlations
+  currentReport$addResponseFrequencies(messageLevel = messageLevel - 1) # add ReponseSet and add response frequencies to ItemInfo
+  currentReport$setUploadTab(messageLevel = messageLevel - 1)
+  currentReport$setSummary(messageLevel = messageLevel - 1)
+  currentReport$setTopicSummary(messageLevel = messageLevel - 1)
+  currentReport$setItemSummary(messageLevel = messageLevel - 1) # easy, hard, distractors, wheat from chaff, check key, overthinking, highly related
   currentReport$setComparison(messageLevel = messageLevel - 1)
   currentReport$setNarrative(messageLevel = messageLevel - 1)
   currentReport$setTopicScores()

@@ -3,6 +3,10 @@
 addResponseFrequencies.REPORT = function(report, messageLevel = 0) {
   # put badmessage call here
   
+  if(messageLevel > 0){
+    message("Running addResponseFrequencies.REPORT")
+  }
+  
   # Grab the data that will be needed for this part
   ItemResponses = report$getResponses()
   ItemInfo =      report$getItemInfo()

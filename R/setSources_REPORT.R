@@ -2,6 +2,10 @@
 
 setSources.REPORT = function(report, messageLevel = 0) {
   
+  if(messageLevel > 0){
+    message("Running setSources.REPORT")
+  }
+  
   # pull the necessary stuff from the report
   DataLocation = report$getDataLocation()
   

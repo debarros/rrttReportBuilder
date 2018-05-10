@@ -2,6 +2,10 @@
 
 loadSpecialScoring.REPORT = function(report, messageLevel = 0){
   
+  if(messageLevel > 0){
+    message("Running loadSpecialScoring.REPORT")
+  }
+  
   # pull the needed info from the report
   ComparisonLocation = report$getComparisonLocation()
   

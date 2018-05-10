@@ -2,6 +2,10 @@
 
 setUploadTab.REPORT = function(report, messageLevel = 0) {
   
+  if(messageLevel > 0){
+    message("Running setUploadTab.REPORT")
+  }
+  
   # Pull the necessary components from the report
   ItemResponses = as.data.frame(report$getResponses())
   
