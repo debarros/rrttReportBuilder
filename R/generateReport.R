@@ -34,14 +34,14 @@ generateReport = function(DataLocation = choose.dir(default = "J:/tests/2016-201
   currentReport$setUploadTab(messageLevel = messageLevel - 1)
   currentReport$setSummary(messageLevel = messageLevel - 1)
   currentReport$setTopicSummary(messageLevel = messageLevel - 1)
-  currentReport$setItemSummary(messageLevel = messageLevel - 1) # easy, hard, distractors, wheat from chaff, check key, overthinking, highly related
+  currentReport$setItemSummary(messageLevel = messageLevel - 1) # easy hard distractors wheat/chaff check/key overthinking highly/related
   currentReport$setComparison(messageLevel = messageLevel - 1)
   currentReport$setNarrative(messageLevel = messageLevel - 1)
-  currentReport$setTopicScores()
-  currentReport$setHandouts()
-  currentReport$exportNarrative()                                            # save the html file with the narrative
-  currentReport$exportReport(filename = ReportFileName, template = template) # save the xlsx score report file
-  currentReport$exportUploads()                                              # save the CSV's for uploading grades
+  currentReport$setTopicScores(messageLevel = messageLevel - 1)
+  currentReport$setHandouts(messageLevel = messageLevel - 1)
+  currentReport$exportNarrative(messageLevel = messageLevel - 1)  # save the html file with the narrative
+  currentReport$exportReport(filename = ReportFileName, template = template, messageLevel = messageLevel - 1) # save the xlsx report file
+  currentReport$exportUploads(messageLevel = messageLevel - 1)  # save the CSV's for uploading grades
   
   return(currentReport)
   

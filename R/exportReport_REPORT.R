@@ -2,6 +2,10 @@
 
 exportReport.REPORT = function(filename, template, report, messageLevel = 0) {
   
+  if(messageLevel > 0){
+    message("Running exportReport.REPORT")
+  }
+  
   # put badmessage call here ####
 
   # pull the needed stuff from the report ####
@@ -28,6 +32,9 @@ exportReport.REPORT = function(filename, template, report, messageLevel = 0) {
   
   # Load the template ####
   # This next part creates a slight delay
+  
+  if(messageLevel > 1){message("Load the template")}
+  
   if(is.null(template)){
     wb1 = loadWorkbook2(file = system.file("extdata", "template", package = "rrttReportBuilder"), isUnzipped = T)  
   } else {
@@ -36,6 +43,7 @@ exportReport.REPORT = function(filename, template, report, messageLevel = 0) {
   
   
   # For each class section, write the student responses to the Responses tab ####
+  if(messageLevel > 1){message("Write the Responses tab")}
   for(res in 1:nResults){
     currentResult = Results[res]
     openxlsx::writeData(wb = wb1, 
@@ -52,6 +60,7 @@ exportReport.REPORT = function(filename, template, report, messageLevel = 0) {
   
   
   # For each class section, write the student item response scores to the ItemScores tab ####
+  if(messageLevel > 1){message("Write the ItemScores tab")}
   for(i in 1:nResults){
     currentResult = Results[i]
     openxlsx::writeData(wb = wb1, 
@@ -68,6 +77,7 @@ exportReport.REPORT = function(filename, template, report, messageLevel = 0) {
   
   
   # Write the ItemInfo and Summary tabs ####
+  if(messageLevel > 1){message("Write the ItemInfo and Summary tabs")}
   openxlsx::writeData(wb = wb1, 
                       sheet = "ItemInfo", 
                       x = ItemInfo)
@@ -83,6 +93,7 @@ exportReport.REPORT = function(filename, template, report, messageLevel = 0) {
   
   # If there are topics, write data to the relevant tabs ####
   if(HasTopics){
+    if(messageLevel > 1){message("Write the TopicAlignments and TopicSummary tabs")}
     openxlsx::writeData(wb = wb1, 
                         sheet = "TopicAlignments", 
                         x = TopicAlignments, 
@@ -94,6 +105,7 @@ exportReport.REPORT = function(filename, template, report, messageLevel = 0) {
                         rowNames = T)
     
     # Write the student topic scores one section at a time
+    if(messageLevel > 1){message("Write the TopicScores tab")}
     for(i in 1:nResults){
       currentResult = Results[i]
       openxlsx::writeData(wb = wb1, 
@@ -111,6 +123,7 @@ exportReport.REPORT = function(filename, template, report, messageLevel = 0) {
   
   
   # Write the Item_Summary tab and raw handouts tab ####
+  if(messageLevel > 1){message("Write the Item_Summary and Raw Handout Data tabs")}
   ItemSummary = data.frame(Narrative)
   ItemSummary = ItemSummary[4:(nrow(ItemSummary)-2), , drop = F]
   ItemSummary = ItemSummary[!(ItemSummary[,1] %in% c("* Boxplots", "* Topics")), , drop = F]
@@ -128,6 +141,7 @@ exportReport.REPORT = function(filename, template, report, messageLevel = 0) {
   # If there are comparisons, write data to the comparison tab ####
   numberOfComparisons = length(Comparisons)
   if(numberOfComparisons > 0){
+    if(messageLevel > 1){message("Write the Comparison tab")}
     
     for(i in numberOfComparisons:1){
       colShift = 14*(numberOfComparisons - i)
@@ -171,6 +185,7 @@ exportReport.REPORT = function(filename, template, report, messageLevel = 0) {
   
   
   # Write the responseSet to the Breakdown tab and do some formatting ####
+  if(messageLevel > 1){message("Write the Breakdown tab")}
   openxlsx::writeData(wb = wb1, sheet = "Breakdown", x = t(ResponseSet), 
                       startCol = 7, startRow = 3, colNames = F)
   openxlsx::removeColWidths(wb = wb1, sheet = "Breakdown", cols = 7:47)
@@ -179,6 +194,7 @@ exportReport.REPORT = function(filename, template, report, messageLevel = 0) {
   
   # Output the scores workbook ####
   # This next line creates a long delay
+  if(messageLevel > 1){message("Output the report file")}
   openxlsx::saveWorkbook(wb1, paste0(DataLocation, "\\", filename), overwrite = TRUE)
   
   

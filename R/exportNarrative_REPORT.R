@@ -2,6 +2,10 @@
 
 exportNarrative.REPORT = function(report, messageLevel = 0) {
   
+  if(messageLevel > 0){
+    message("Running exportNarrative.REPORT")
+  }
+  
   # pull the necessary stuff from the report
   DataLocation = report$getDataLocation()
   Narrative = report$getNarrative()

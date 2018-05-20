@@ -2,6 +2,10 @@
 
 setTopicScores.REPORT = function(report, messageLevel = 0) {
   
+  if(messageLevel > 0){
+    message("Running setTopicScores.REPORT")
+  }
+  
   # pull the necessary stuff from the report
   HasTopics = report$checkTopics()
   Results = report$getResults()

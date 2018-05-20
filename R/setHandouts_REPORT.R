@@ -2,6 +2,10 @@
 
 setHandouts.REPORT = function(report, messageLevel = 0) {
   
+  if(messageLevel > 0){
+    message("Running setHandouts.REPORT")
+  }
+  
   # pull the needed info from the report
   ItemInfo =           report$getItemInfo()
   ItemResponseScores = report$getItemResponseScores()

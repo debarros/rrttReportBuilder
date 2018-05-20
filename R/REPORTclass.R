@@ -84,7 +84,7 @@ REPORT = R6Class(
     setDataLocation =       function(x){private$DataLocation = x},
     setItemInfo =           function(report = self, messageLevel = 0){ setItemInfo.REPORT(report, messageLevel) }, 
     setItemSummary =        function(report = self, messageLevel = 0){ setItemSummary.REPORT(report, messageLevel) }, 
-    setHandouts =           function(report = self){ setHandouts.REPORT(report) }, 
+    setHandouts =           function(report = self, messageLevel = 0){ setHandouts.REPORT(report, messageLevel) }, 
     setNarrative =          function(report = self, messageLevel = 0){ setNarrative.REPORT(report, messageLevel) },
     setPassingScore =       function(x){private$PassingScore = x},
     setResults =            function(report = self, messageLevel = 0){ setResults.REPORT(report, messageLevel) }, 
@@ -94,7 +94,7 @@ REPORT = R6Class(
     setTopicAlignments =    function(d2, report = self){ setTopicAlignments.REPORT(d2, report) }, 
     setUploadTab =          function(report = self, messageLevel = 0){ setUploadTab.REPORT(report, messageLevel) },
     setTopicSummary =       function(report = self, messageLevel = 0){ setTopicSummary.REPORT(report, messageLevel) }, 
-    setTopicScores =        function(report = self){ setTopicScores.REPORT(report) }, 
+    setTopicScores =        function(report = self, messageLevel = 0){ setTopicScores.REPORT(report, messageLevel) }, 
     setUpLoadFiles =        function(x){private$UpLdFileNames = x},
     
     # Methods to return members
@@ -167,12 +167,12 @@ REPORT = R6Class(
     setUploadTotalPointsQuick =   function(x){private$UploadTotalPoints = x},
     
     # Export Methods
-    exportNarrative = function(report = self){ exportNarrative.REPORT(report) }, 
-    exportReport =    function(filename = "scores.xlsx", template = NULL, report = self){ 
-      exportReport.REPORT(filename, template, report) }, 
+    exportNarrative = function(report = self, messageLevel = 0){ exportNarrative.REPORT(report, messageLevel) }, 
+    exportReport =    function(filename = "scores.xlsx", template = NULL, report = self, messageLevel = 0){ 
+      exportReport.REPORT(filename, template, report, messageLevel) }, 
     exportUpdate =    function(uploadFilePath, report = self){ # called from exportReport
       exportUpdate.REPORT(uploadFilePath, report) },
-    exportUploads =   function(report = self){ exportUploads.REPORT(report) }, 
+    exportUploads =   function(report = self, messageLevel = 0){ exportUploads.REPORT(report, messageLevel) }, 
     
     # Other methods
     addCorrelations =        function(report = self, messageLevel = 0){ addCorrelations.REPORT(report) }, 

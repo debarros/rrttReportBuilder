@@ -60,7 +60,7 @@ applySpecialScoring.REPORT = function(report, messageLevel = 0){
             itemWts = itemWeights[,itemNames]
             specScor = SubsetScores[subst,]
             lookup = curSpecScor$getLookups()
-            SubsetScores$SubsetScore[subst] = curveScore(itemScores, itemVals, itemWts, specScor, lookup, messageLevel = messageLevel -1)
+            SubsetScores$SubsetScore[subst] = curveScore(itemScores, itemVals, itemWts, specScor, lookup, messageLevel = messageLevel - 2)
             
             if(curFunction %in% c("Drop", "Full credit")){             # If this special scoring is Drop or Full Credit
               updateIRandIRS = TRUE                                    # set the update Item Respsonses flag
@@ -89,7 +89,7 @@ applySpecialScoring.REPORT = function(report, messageLevel = 0){
           specScor = curSpecScor$getOverallSetup()
           lookup = curSpecScor$getLookups()
           subsetnames = SubsetScores$Subset
-          ItRespSco$score[stu] = 100 * curveScore(itemScores, itemVals, itemWts, specScor, lookup, subsetnames)
+          ItRespSco$score[stu] = 100 * curveScore(itemScores, itemVals, itemWts, specScor, lookup, subsetnames, messageLevel = messageLevel - 2)
           
         } else { # If there are no subsets to use, 
           
@@ -101,7 +101,7 @@ applySpecialScoring.REPORT = function(report, messageLevel = 0){
           itemWts = itemValues[,itemNames]                    # since this is an overall score, items are weighted by their values
           specScor = curSpecScor$getOverallSetup()
           lookup = curSpecScor$getLookups()
-          ItRespSco$score[stu] = 100 * curveScore(itemScores, itemVals, itemWts, specScor, lookup)
+          ItRespSco$score[stu] = 100 * curveScore(itemScores, itemVals, itemWts, specScor, lookup, messageLevel = messageLevel - 2)
           
           if(curFunction == c("Drop by response")){                  # If this special scoring is Drop by response
             updateIRandIRS = TRUE                                    # set the update Item Respsonses flag
