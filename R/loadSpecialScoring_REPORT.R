@@ -55,11 +55,14 @@ loadSpecialScoring.REPORT = function(report, messageLevel = 0){
         rowNames = T, colNames = F, rows = 3:4, cols = 2:3))
       
       # Second element: which items are in which subsets, and what are their weights
-      CurrentSpecial$setSubsetAlign(as.data.frame(
-        t(openxlsx::read.xlsx(
-          xlsxFile = ComparisonLocation, sheet = names(SpecialScoring)[i], 
-          rowNames = T, colNames = F, rows = 8:10)), 
-        stringsAsFactors = F))
+      subsetAlignment = t(openxlsx::read.xlsx(xlsxFile = ComparisonLocation,         # grab that section of the special scoring tab
+                                              sheet    = names(SpecialScoring)[i], 
+                                              rowNames = T, 
+                                              colNames = F, 
+                                              rows     = 8:10))
+      subsetAlignment[,1] = gsub(pattern = "&amp;", replacement = "&", x = subsetAlignment[,1, drop = F]) # fix any ampersands
+      subsetAlignment = as.data.frame(subsetAlignment, stringsAsFactors = F) # convert to data frame
+      CurrentSpecial$setSubsetAlign(subsetAlignment) # add subset alignment to the special scoring object
       
       # Third element: for each subset, what function should be applied, and what is its weight?
       CurrentSpecial$setSubsetSetup(as.data.frame(
