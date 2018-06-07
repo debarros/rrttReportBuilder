@@ -36,9 +36,9 @@ exportReport.REPORT = function(filename, template, report, messageLevel = 0) {
   if(messageLevel > 1){message("Load the template")}
   
   if(is.null(template)){
-    wb1 = loadWorkbook2(file = system.file("extdata", "template", package = "rrttReportBuilder"), isUnzipped = T)  
+    wb1 = openxlsx::loadWorkbook(file = system.file("extdata", "template", package = "rrttReportBuilder"), isUnzipped = T)  
   } else {
-    wb1 = loadWorkbook2(file = template, isUnzipped = F)
+    wb1 = openxlsx::loadWorkbook(file = template, isUnzipped = F)
   } # /if-else
   
   
