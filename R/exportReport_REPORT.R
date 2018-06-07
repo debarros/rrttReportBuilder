@@ -27,7 +27,7 @@ exportReport.REPORT = function(filename, template, report, messageLevel = 0) {
   # check to see if the report has been run before ####
   uploadFilePath = paste0(DataLocation, "\\", UploadFiles[1])
   if(file.exists(uploadFilePath)){
-    report$exportUpdate(uploadFilePath)
+    report$exportUpdate(uploadFilePath, messageLevel = messageLevel - 1)
   }
   
   # Load the template ####
