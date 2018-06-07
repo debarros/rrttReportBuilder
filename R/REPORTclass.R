@@ -91,7 +91,7 @@ REPORT = R6Class(
     setSources =            function(report = self, messageLevel = 0){ setSources.REPORT(report, messageLevel) }, 
     setSummary =            function(report = self, messageLevel = 0){ setSummary.REPORT(report, messageLevel) }, 
     setTestName =           function(report = self, messageLevel = 0){ setTestName.REPORT(report, messageLevel) }, 
-    setTopicAlignments =    function(d2, report = self){ setTopicAlignments.REPORT(d2, report) }, 
+    setTopicAlignments =    function(d2, report = self, messageLevel = 0){ setTopicAlignments.REPORT(d2, report, messageLevel) }, 
     setUploadTab =          function(report = self, messageLevel = 0){ setUploadTab.REPORT(report, messageLevel) },
     setTopicSummary =       function(report = self, messageLevel = 0){ setTopicSummary.REPORT(report, messageLevel) }, 
     setTopicScores =        function(report = self, messageLevel = 0){ setTopicScores.REPORT(report, messageLevel) }, 
@@ -118,7 +118,7 @@ REPORT = R6Class(
     getOverThinkCutoff =            function(){return(private$OverThinkCutoff)},
     getPassingScore =               function(){return(private$PassingScore)},
     getRelatedCutoffProportion =    function(){return(private$RelatedCutoffProportion)},
-    getResponses =                  function(report = self){ return(getResponses.REPORT(report)) }, 
+    getResponses =                  function(report = self, messageLevel = 0){ return(getResponses.REPORT(report, messageLevel)) }, 
     getResponseSet =                function(){return(private$ResponseSet)},
     getResults =                    function(){return(private$Results)},
     getSignificanceCutoffs =        function(){return(private$SignificanceCutoffs)},
@@ -129,7 +129,7 @@ REPORT = R6Class(
     getSummary =                    function(){return(private$Summary)},
     getTestName =                   function(){return(private$TestName)},
     getTMS =                        function(){return(private$TMS)},
-    getTopicAlignments =            function(report = self){ return(getTopicAlignments.REPORT(report)) }, 
+    getTopicAlignments =            function(report = self, messageLevel = 0){ return(getTopicAlignments.REPORT(report, messageLevel)) }, 
     getTopicAlignmentsQuick =       function(){return(private$TopicAlignments)},
     getTopicScores =                function(){return(private$TopicScores)},
     getTopicSummary =               function(){return(private$TopicSummary)},
@@ -170,8 +170,8 @@ REPORT = R6Class(
     exportNarrative = function(report = self, messageLevel = 0){ exportNarrative.REPORT(report, messageLevel) }, 
     exportReport =    function(filename = "scores.xlsx", template = NULL, report = self, messageLevel = 0){ 
       exportReport.REPORT(filename, template, report, messageLevel) }, 
-    exportUpdate =    function(uploadFilePath, report = self){ # called from exportReport
-      exportUpdate.REPORT(uploadFilePath, report) },
+    exportUpdate =    function(uploadFilePath, report = self, messageLevel = 0){ # called from exportReport
+      exportUpdate.REPORT(uploadFilePath, report, messageLevel) },
     exportUploads =   function(report = self, messageLevel = 0){ exportUploads.REPORT(report, messageLevel) }, 
     
     # Other methods
@@ -179,14 +179,12 @@ REPORT = R6Class(
     addItemScores =          function(report = self, messageLevel = 0){ addItemScores.REPORT(report, messageLevel) },
     addResponseFrequencies = function(report = self, messageLevel = 0){ addResponseFrequencies.REPORT(report, messageLevel) },
     applySpecialScoring =    function(report = self, messageLevel = 0){ applySpecialScoring.REPORT(report, messageLevel) },
-    badMessage =             function(method, report = self){ return(badMessage.REPORT(method, report)) },
+    badMessage =             function(method, report = self, messageLevel = 0){ return(badMessage.REPORT(method, report, messageLevel)) },
     checkSpecScor =          function(){return(private$HasSpecialScoring)},
     checkStudScor =          function(){return(private$HasStudentScoring)},
     checkTopics =            function(){return(private$HasTopics)},
-    enhanceItemInfo =        function(report = self, useLocalNames = F, useLocalValues = F){
-      enhanceItemInfo.REPORT(report, useLocalNames, useLocalValues)}, 
     loadSpecialScoring =     function(report = self, messageLevel = 0){ loadSpecialScoring.REPORT(report, messageLevel) }, 
-    updateIRandIRS =         function(report = self){updateIRandIRS.REPORT(self)},
+    updateIRandIRS =         function(report = self, messageLevel = 0){updateIRandIRS.REPORT(self, messageLevel)},
     updateItemInfo =         function(x){private$ItemInfo = x}
     
   ) # /public
