@@ -191,7 +191,7 @@ curveScore = function(itemScores, itemVals, itemWts, specScor, lookup = NULL, su
   if(TYPE == "Polynomial"){
     coeffs = as.numeric(c(p2, p3, p4, p5))                        # get the coefficients
     degree = sum(!is.na(coeffs))                                  # determine the highest degree term
-    rawScore = sum(itemPercents * itemWts) / sum(itemWts) # get the raw score as a percentage
+    rawScore = sum(itemPercents * itemWts) / sum(itemWts)         # get the raw score as a percentage
     thisScore = as.numeric(p1)                                    # initialize the score as the constant coefficient
     for(i in 1:degree){                                           # add the other terms
       thisScore = thisScore + (rawScore^i)*coeffs[i]
@@ -222,6 +222,9 @@ curveScore = function(itemScores, itemVals, itemWts, specScor, lookup = NULL, su
     }
     if(p2 == "percent"){
       thisScore = thisScore / (sum(itemVals * itemWts))
+    } else if(p2 != "points"){
+      stop(paste0("In Sum and Round special scoring, ", p2, " is not an implemented type of output.",  
+                  "The options are percent and points."))
     }
     return(thisScore)
   } # /Sum and Round
