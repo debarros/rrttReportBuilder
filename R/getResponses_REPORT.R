@@ -2,6 +2,8 @@
 
 getResponses.REPORT = function(report, messageLevel = 0) {
   
+  if(messageLevel > 0){ message("Running getResponses.REPORT") }
+  
   # pull the needed info from the report
   Results = report$getResults()
   

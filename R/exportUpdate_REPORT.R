@@ -2,6 +2,8 @@
 
 exportUpdate.REPORT = function(uploadFilePath, report, messageLevel = 0) {
   
+  if(messageLevel > 0){ message("Running exportUpdate.REPORT") }
+  
   # pull necessary stuff from the report
   AllScores = report$getUploadTab()
   testName = report$getTestName()

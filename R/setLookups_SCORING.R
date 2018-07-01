@@ -2,6 +2,8 @@
 
 setLookups.SCORING = function(ComparisonLocation, scoring, messageLevel = 0){
  
+  if(messageLevel > 0){message("running setLookups.SCORING")}
+  
   OvFuncs = scoring$getOverallSetup()       # Get all the scoring functions used in the overall setup on this test
   SubFuncs = scoring$getSubsetSetup()       # Get all the scoring functions used in the subset setup on this test
   LookFuncs = scoring$getLookupFunctions()  # Get the names of all the functions that require lookup tables

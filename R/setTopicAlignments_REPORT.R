@@ -2,6 +2,8 @@
 
 setTopicAlignments.REPORT = function(d2, report, messageLevel = 0) {
   
+  if(messageLevel > 0){message("running setTopicAlignments.REPORT")}
+  
   # Initialize HasTopics and Topic Alignments
   HasTopics = F
   TopicAlignments = NULL

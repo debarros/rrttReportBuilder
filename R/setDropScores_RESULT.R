@@ -2,6 +2,8 @@
 
 setDropScores.RESULT = function(ItemInfo, result, messageLevel = 0){
   
+  if(messageLevel > 0){message("running setDropScores.RESULT")}
+  
   # Get item response scores
   ItemResponseScores = result$getItemResponseScores()
   
