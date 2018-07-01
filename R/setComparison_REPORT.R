@@ -2,8 +2,8 @@
 
 setComparison.REPORT = function(report, messageLevel = 0) {
   
-  if(messageLevel > 0){message("starting setComparison.REPORT")}
-  if(messageLevel > 0){message("pulling info from the report")}
+  if(messageLevel > 0){message("running setComparison.REPORT")}
+  if(messageLevel > 1){message("pulling info from the report")}
   # pull the necessary stuff from the report
   HasTopics =          report$checkTopics()
   ItemScores =         report$getItemScores()
@@ -13,7 +13,7 @@ setComparison.REPORT = function(report, messageLevel = 0) {
   CompCuts =           report$getComparisonCutoffs()
   SigCuts =            report$getSignificanceCutoffs()
   
-  if(messageLevel > 0){message("create the comparison header")}
+  if(messageLevel > 1){message("create the comparison header")}
   
   # Create the comparison header
   d2 = openxlsx::read.xlsx(xlsxFile = ComparisonLocation, sheet = "Overall Comparison", startRow = 2, colNames = F)
@@ -24,7 +24,7 @@ setComparison.REPORT = function(report, messageLevel = 0) {
                           apply(X = !is.na(CompHeader), MARGIN = 2, FUN = any), 
                           drop = FALSE]
   
-  if(messageLevel > 0){message("if there are any comparisons")}
+  if(messageLevel > 1){message("if there are any comparisons")}
   
   if(ncol(CompHeader) > 0){                                         # If there are any comparisons
     Comparisons = vector(mode = "list", length = ncol(CompHeader))  # Create a list to hold them
@@ -32,9 +32,9 @@ setComparison.REPORT = function(report, messageLevel = 0) {
                              sheet = "Topic Comparison", 
                              startRow = 4, colNames = T)
     
-    if(messageLevel > 1){message("loop through comparisons")}
+    if(messageLevel > 2){message("loop through comparisons")}
     for(i in 1:ncol(CompHeader)){ # For each comparison,
-      if(messageLevel > 2){message(paste0("Comparison ", i))}
+      if(messageLevel > 3){message(paste0("Comparison ", i))}
       Comparisons[[i]] = COMPARISON$new()                                         # Set up the comparison object
       Comparisons[[i]]$setDescription(                                            # Last year, 2 yrs ago, etc
         DescriptionLookup$Description[DescriptionLookup$Year == CompHeader[5,i]])  
@@ -62,7 +62,7 @@ setComparison.REPORT = function(report, messageLevel = 0) {
       
       # Topic Comparisons
       if(HasTopics){                                                                   # If there are topics
-        if(messageLevel > 2){message(paste0("looking at topics for comparison ", i))}
+        if(messageLevel > 3){message(paste0("looking at topics for comparison ", i))}
         if(nrow(d3) != 0){                                                             # If there is a topic comparison
           TopComp = d3[,c(1,i+1)]                                                      # Get the topic comparison info
           TopComp$Higher = TopicSummary$`All Classes` > TopComp[,2] + CompCuts$Topic.H # Identify noticeably higher topics
@@ -74,12 +74,12 @@ setComparison.REPORT = function(report, messageLevel = 0) {
       
       # Overall Comparison
       if(!is.na(CompHeader[1,i])){          # If there is an overall comparison
-        if(messageLevel > 2){message(paste0("looking at overall comparison ", i))}
+        if(messageLevel > 3){message(paste0("looking at overall comparison ", i))}
         tTestSummary = t.test2(             # Do a t test to see if the mean difference is significant
           m1 = Summary$Average, m2 = as.numeric(CompHeader[1,i]), 
           s1 = Summary$SD,      s2 = as.numeric(CompHeader[2,i]), 
-          n1 = Summary$N,       n2 = as.numeric(CompHeader[3,i])
-        ) # /t.test2
+          n1 = Summary$N,       n2 = as.numeric(CompHeader[3,i]),
+          messageLevel = messageLevel - 1) # /t.test2
         Comparisons[[i]]$setGrowth(tTestSummary$`Difference of means`)  # Load the growth score into the comparison object
         Comparisons[[i]]$setTtest(tTestSummary$t)                       # Load the t score into the comparison object 
         Comparisons[[i]]$setPvalue(tTestSummary$`p-value`)              # Load the p-value into the comparison object
