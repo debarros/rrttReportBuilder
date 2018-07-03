@@ -95,6 +95,9 @@ applySpecialScoring.REPORT = function(report, messageLevel = 0){
           
           #get the total test score from the items
           curFunction = curSpecScor$getOverallSetup()$`Score function`
+          if(curFunction == "Lookup table"){
+            stop("The 'Lookup table' special scoring function requires the 'Use Subsets' field to be set to 'Yes'.")
+          }
           itemNames = colnames(itemValues)
           itemScores = ItRespSco[stu,itemNames]
           itemVals = itemValues[,itemNames]
