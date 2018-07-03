@@ -147,7 +147,7 @@ setNarrative.REPORT = function(report, messageLevel = 0) {
       for(i in length(allComps):1){                                                                   # for each comparison
         
         thisComp = allComps[[i]]                                                                      # get the comparison
-        CompNar = character(0)                                                                                  # initialize the current comparison narrative
+        CompNar = character(0)                                                                        # initialize the current comparison narrative
         ItemComparisons = thisComp$getItemComparisons()                                               # get the item comparisons
         if(HasTopics){ TopicComparisons = thisComp$getTopicComparisons() }                            # if there are topics, get the topic comparisons
         desc = thisComp$getDescription()                                                              # get the description
