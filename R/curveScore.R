@@ -63,6 +63,7 @@ curveScore = function(itemScores, itemVals, itemWts, specScor, lookup = NULL, su
   if(TYPE %in% c("Extra Credit items", "Out of x points")){
     thisScore = sum(itemPercents * itemWts) / sum(itemWts)
     thisScore = thisScore * sum(itemVals) / as.numeric(p1)
+    thisScore = signif(thisScore)                           # This is necessary to correct for tiny calculation errors like 3e-15
     return(thisScore)
   }
   
