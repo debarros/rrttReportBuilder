@@ -73,9 +73,9 @@ setComparison.REPORT = function(report, messageLevel = 0) {
       
       
       # Overall Comparison
-      if(!is.na(CompHeader[1,i])){          # If there is an overall comparison
+      if(!is.na(CompHeader[1,i]) & Summary$N > 1){                                 # If there's an overall comparison & enough students to make one
         if(messageLevel > 3){message(paste0("looking at overall comparison ", i))}
-        tTestSummary = t.test2(             # Do a t test to see if the mean difference is significant
+        tTestSummary = t.test2(                                                    # Do a t test to see if the mean difference is significant
           m1 = Summary$Average, m2 = as.numeric(CompHeader[1,i]), 
           s1 = Summary$SD,      s2 = as.numeric(CompHeader[2,i]), 
           n1 = Summary$N,       n2 = as.numeric(CompHeader[3,i]),
