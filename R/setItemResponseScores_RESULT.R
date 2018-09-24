@@ -7,7 +7,7 @@ setItemResponseScores.RESULT = function(ItemInfo, TMS, result, messageLevel = 0)
   }
   
   # Get the relevant data from the result
-  ItemResp = result$getItemResponses()
+  ItemResp = result$getItemResponses()  # all responses to all items
   sectionName = result$getSectionName()  
   
   # Create a data.frame to hold the item scores
@@ -23,12 +23,16 @@ setItemResponseScores.RESULT = function(ItemInfo, TMS, result, messageLevel = 0)
     message("Calculating item scores")
   }
   
-  for(i in 1:nrow(ItemInfo)){
+  for(i in 1:nrow(ItemInfo)){ # for each item on the assessment
     if(messageLevel > 1){
       message(paste0("Calculating scores for item ", i , " of ", nrow(ItemInfo)))
     }
     if(ItemInfo$Type[i] == "MC"){
       AnswerSet = strsplit(ItemInfo$Answer[i], split = ",")[[1]]
+      uniqueResponses = ItemResp[,ItemInfo$ItemName[i]]
+      if(any(grepl(pattern = ",", x = uniqueResponses, fixed = T))){
+        stop(paste0("Error!  The data for ", sectionName, " has MC responses that contain commas."))
+      }
       ItemResponseScores[,ItemInfo$ItemName[i]] = ItemInfo$Value[i]*(ItemResp[,ItemInfo$ItemName[i]] %in% AnswerSet)
       
     } else if(ItemInfo$Type[i] == "ER"){
