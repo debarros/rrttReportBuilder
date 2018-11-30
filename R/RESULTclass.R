@@ -29,8 +29,8 @@ RESULT = R6Class(
     setItemResponses =      function(sourceLocation, ItemInfo, TMS, result = self, messageLevel = 0){
       setItemResponses.RESULT(sourceLocation, ItemInfo, TMS, result, messageLevel)},
     setSectionName =        function(x){private$SectionName= x},
-    setItemResponseScores = function(ItemInfo, TMS, result = self, messageLevel = 0){
-      setItemResponseScores.RESULT(ItemInfo, TMS, result, messageLevel)},
+    setItemResponseScores = function(ItemInfo, TMS, HaltOnMultiResponse = F, result = self,  messageLevel = 0){
+      setItemResponseScores.RESULT(ItemInfo, TMS, HaltOnMultiResponse, result, messageLevel)},
     setDropScores =         function(ItemInfo, result = self){ # This is part of calculating the item correlations
       setDropScores.RESULT(ItemInfo, result)},
     setSummary =            function(x){private$Summary= x},

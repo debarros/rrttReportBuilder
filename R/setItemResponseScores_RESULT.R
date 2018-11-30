@@ -1,9 +1,13 @@
 # setItemResponseScores_RESULT.R
-
-setItemResponseScores.RESULT = function(ItemInfo, TMS, result, messageLevel = 0){
+           
+setItemResponseScores.RESULT = function(ItemInfo, TMS, HaltOnMultiResponse, result, messageLevel = 0){
 
   if(messageLevel > 0){
     message("Running setItemResponseScores.RESULT")
+  }
+  
+  if(messageLevel > 1){
+    message(paste0("str(result) = ", str(result)))
   }
   
   # Get the relevant data from the result
@@ -30,9 +34,12 @@ setItemResponseScores.RESULT = function(ItemInfo, TMS, result, messageLevel = 0)
     if(ItemInfo$Type[i] == "MC"){
       AnswerSet = strsplit(ItemInfo$Answer[i], split = ",")[[1]]
       uniqueResponses = ItemResp[,ItemInfo$ItemName[i]]
+      if(HaltOnMultiResponse){
       if(any(grepl(pattern = ",", x = uniqueResponses, fixed = T))){
         stop(paste0("Error!  The data for ", sectionName, " has MC responses that contain commas."))
       }
+        }
+      
       ItemResponseScores[,ItemInfo$ItemName[i]] = ItemInfo$Value[i]*(ItemResp[,ItemInfo$ItemName[i]] %in% AnswerSet)
       
     } else if(ItemInfo$Type[i] == "ER"){

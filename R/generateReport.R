@@ -14,7 +14,8 @@ generateReport = function(DataLocation = choose.dir(default = "J:/tests/2016-201
                           ReportFileName = "scores.xlsx",
                           TMS = "LinkIt", SMS = "PowerSchool",
                           UploadFilenames = c("upload_percentages.csv", "upload_totalpoints.csv"),
-                          template = NULL, 
+                          template = NULL,
+                          HaltOnMultiResponse = F,
                           messageLevel = 0){
   
   currentReport = REPORT$new(TMS = TMS)         # initiate a new report
@@ -26,7 +27,7 @@ generateReport = function(DataLocation = choose.dir(default = "J:/tests/2016-201
   currentReport$setComparisonLocation(paste0(DataLocation, "\\", ComparisonFileName))
   currentReport$setItemInfo(messageLevel = messageLevel - 1)
   currentReport$setResults(messageLevel = messageLevel - 1)             # Get the actual results
-  currentReport$addItemScores(messageLevel = messageLevel - 1)
+  currentReport$addItemScores(HaltOnMultiResponse = HaltOnMultiResponse, messageLevel = messageLevel - 1)
   currentReport$loadSpecialScoring(messageLevel = messageLevel - 1)     # Load special scoring rules
   currentReport$applySpecialScoring(messageLevel = messageLevel - 1)    # Apply special scoring rules
   currentReport$addCorrelations(messageLevel = messageLevel - 1)        # add item correlations to ItemInfo and to Correlations

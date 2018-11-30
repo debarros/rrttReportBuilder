@@ -176,7 +176,8 @@ REPORT = R6Class(
     
     # Other methods
     addCorrelations =        function(report = self, messageLevel = 0){ addCorrelations.REPORT(report) }, 
-    addItemScores =          function(report = self, messageLevel = 0){ addItemScores.REPORT(report, messageLevel) },
+    addItemScores =          function(report = self, HaltOnMultiResponse = F, messageLevel = 0){ 
+      addItemScores.REPORT(report, HaltOnMultiResponse, messageLevel) },
     addResponseFrequencies = function(report = self, messageLevel = 0){ addResponseFrequencies.REPORT(report, messageLevel) },
     applySpecialScoring =    function(report = self, messageLevel = 0){ applySpecialScoring.REPORT(report, messageLevel) },
     badMessage =             function(method, report = self, messageLevel = 0){ return(badMessage.REPORT(method, report, messageLevel)) },

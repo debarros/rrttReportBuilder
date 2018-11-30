@@ -1,6 +1,6 @@
 # addItemScores_REPORT
 
-addItemScores.REPORT = function(report, messageLevel = 0) {
+addItemScores.REPORT = function(report, HaltOnMultiResponse, messageLevel = 0) {
   # put badmessage call here
   
   if(messageLevel > 0){message("Running addItemScores.REPORT")}
@@ -17,7 +17,7 @@ addItemScores.REPORT = function(report, messageLevel = 0) {
   for(i in 1:length(results)){
     if(messageLevel > 1){message(paste0("Calculating item response scores for result", i))} 
     currentResult = results[[i]]
-    currentResult$setItemResponseScores(ItemInfo = ItemInfo, TMS = TMS, messageLevel = messageLevel - 1)
+    currentResult$setItemResponseScores(ItemInfo = ItemInfo, TMS = TMS, HaltOnMultiResponse = HaltOnMultiResponse, messageLevel = messageLevel - 1)
     ItReScores[[i]] = currentResult$getItemResponseScores()
   } # /for each result
   
