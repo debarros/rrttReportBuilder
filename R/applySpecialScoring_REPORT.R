@@ -54,6 +54,10 @@ applySpecialScoring.REPORT = function(report, messageLevel = 0){
             subsetName = SubsetScores$Subset[subst]                        # get the name of the subset
             itemNames = SubsetAlign$Item[SubsetAlign$Subset == subsetName] # get the names of the items to use in this subset
             
+            if(length(itemNames) == 0){
+              stop(paste0("There are no items in the ", subsetName, " subset"))
+            }
+            
             # calculate the current subset score
             itemScores = ItRespSco[stu,itemNames]
             itemVals = itemValues[,itemNames]
