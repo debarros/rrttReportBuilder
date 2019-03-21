@@ -7,11 +7,14 @@ setItemInfo.REPORT = function(report, messageLevel = 0) {
     message("Running setItemInfo.REPORT")
   }
   
+  # Pull the necessary info from the report
   CompLoc = report$getComparisonLocation()
   ItemInfo = openxlsx::read.xlsx(
     xlsxFile = CompLoc, sheet = "Topic Alignment", 
     startRow = 2, colNames = F)
   ItemInfo = ItemInfo[1:(which(is.na(ItemInfo[,3]))[1] - 1),3:ncol(ItemInfo)] # remove unnecessary columns and rows
+  ItemTypeCategories = report$getItemTypeCategories()
+  ITC.NeedsAnswer = ItemTypeCategories$Name[ItemTypeCategories$NeedsAnswer]
   
   # Check for missing info.  If there is any, halt and throw an error.
   errorMessage = character(0)
@@ -63,9 +66,29 @@ setItemInfo.REPORT = function(report, messageLevel = 0) {
   ItemInfo$options = ItemInfo$`Value:` + 1                    # default the number of options to what it should be for ER questions
   ItemInfo$`Answer:` = toupper(ItemInfo$`Answer:`)            # convert alpha answers to upper case
   
-  badTypes = ItemInfo$Type[!(ItemInfo$Type %in% report$getItemTypeCategories())]
+  # Check for errors in item types
+  badTypes = ItemInfo$Type[!(ItemInfo$Type %in% ItemTypeCategories$Name)]
   if(length(badTypes) > 0){
-    stop(paste0("The following item types are not acceptable: ", VectorSentence(badTypes, hyphenate = 0), "."))
+    if(length(badTypes) == 1){
+      errorMessage = c(errorMessage,paste0("The following item type is not acceptable: ", badTypes, "."))
+    } else {
+      erroritems = VectorSentence(badTypes, hyphenate = 0)
+      errorMessage = c(errorMessage,paste0("The following item types are not acceptable: ", erroritems, "."))
+    } # /if-else
+  } # /if
+  
+  missingAnswers = ItemInfo$`Question #:`[is.na(ItemInfo$`Answer:`) & ItemInfo$Type %in% ITC.NeedsAnswer]
+  if(length(missingAnswers) > 0){
+    if(length(missingAnswers) == 1){
+      errorMessage = c(errorMessage,paste0("Item number ",missingAnswers," needs an answer."))
+    } else {
+      erroritems = VectorSentence(missingAnswers, hyphenate = 0)
+      errorMessage = c(errorMessage,paste0("Item numbers ", erroritems," need answers."))  
+    }
+  }
+  
+  if(length(errorMessage) > 0){ # if there is an error message, halt and report it
+    stop(errorMessage)
   }
   
   # set the number of options for MC questions
