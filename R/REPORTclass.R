@@ -13,7 +13,11 @@ REPORT = R6Class(
     # General parameters
     DistractorCutoffProportion = 0.25,                # cutoff percentage for determining whether an item is a distrator
     EasyCutoff = 0.9,                                 # cutoff score for determining whether an item is easy
-    ItemTypeCategories = c("MC","ER","WH","FI","FL"), # all the different item types that are acceptable
+    ItemTypeCategories = data.frame(                  # all the different item types that are acceptable and their properties
+      Name = c("MC","ER","WH","FI","FL"),
+      LongName = c("Multiple Choice", "Extended Response", "Whole Number", "Fixed Point", "Floating Point"),
+      NeedsAnswer = c(T,F,T,T,T),
+      stringsAsFactors = F), 
     OverThinkCutoff = 0.1,                            # cutoff correlation for determining whether an item is an overthinker
     RelatedCutoffProportion = 0.2,                    # target proportion of items to count as highly related
     PassingScore = 0.7,                               # passing score for the test
