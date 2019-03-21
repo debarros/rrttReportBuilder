@@ -56,8 +56,9 @@ However, the template will be stored in unzipped form so that git can track it.
 * Need to create a program that converts ASAP export files to item response CSVs
 #### Item Types
 * To make the item frequency counts robust to changes and new types, there should be a different kind of setup
-* The ItemTypeCategories member of the REPORT class should be a data frame.  
-	* The first column holds the name of the item type.  
+* The ItemTypeCategories member of the REPORT class is now a data frame, but it needs more info.
+	* The first column holds the name of the item type.  The second holds a longer version of the name.
+	* There is also a column that indicates whether that item type requires an item to have an answer.
 	* Other columns should include info on how to handle that item type, such as whether to treat responses as scores.
 	* One factor to consider is how to generate the response set for a particular item.  Right now, MC is a vector of sequential uppercase letters, ER is a sequence from 0 to the value, and all of the gridded are grouped together and a unique set of actual responses are collected.  There should be a column that holds a code that specifies which method to use for a particular item type.
 	* There should be a Grouping column.  For item types whose response sets are determined empirically, sometimes we want them to be grouped and sometimes we don’t.  The Grouping column could contain a number that indicates a sort of superordinate item type category.  The response set for all items with the same Grouping value would be generated together.
