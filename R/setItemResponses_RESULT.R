@@ -50,7 +50,7 @@ setItemResponses.RESULT = function(sourceLocation, ItemInfo, TMS, result, messag
         itResp = ItemResponses[,itName]
         if(itType %in% c("WH", "FL", "FI")){
           itRespNum = suppressWarnings(as.numeric(itResp))
-          if(any(itResp[is.na(itRespNum)] != "--")){
+          if(any(itResp[is.na(itRespNum)] != "--")){ # if any values cannot be converted to numbers and are not "--", throw an error
             stop(paste0("Error! ", SectionName, " has gridded responses that are not numbers or '--'."))
           } else {
             itRespNum[is.na(itRespNum)] = itResp[is.na(itRespNum)]
