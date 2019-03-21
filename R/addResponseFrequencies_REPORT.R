@@ -66,14 +66,16 @@ addResponseFrequencies.REPORT = function(report, messageLevel = 0) {
   # Initialize the responseSet vector 
   responseSet = rep("", times = max(lengths(responseSetByType)))
   
-   
-  for(i in 1:length(responseSetByType)){                                 # For each element in responseSetByType,
-    for(j in 1:length(responseSetByType[[i]])){                          # For each entry in that vector, 
-      if(nchar(responseSet[j]) > 0){                                     # if there is aleady something there
-        responseSet[j] = paste0(responseSet[j], "/")                     # append a slash
-      }
-      responseSet[j] = paste0(responseSet[j], responseSetByType[[i]][j]) # append the response option
-    } # /for each response option for this type
+  
+  for(i in 1:length(responseSetByType)){                                   # For each element in responseSetByType,
+    if(length(responseSetByType[[i]]) > 0){                                # If there are any responses for that type,
+      for(j in 1:length(responseSetByType[[i]])){                          # For each entry in that vector, 
+        if(nchar(responseSet[j]) > 0){                                     # if there is aleady something there
+          responseSet[j] = paste0(responseSet[j], "/")                     # append a slash
+        }
+        responseSet[j] = paste0(responseSet[j], responseSetByType[[i]][j]) # append the response option
+      } # /for each response option for this type
+    }
   } # /for each type of response
   
   
