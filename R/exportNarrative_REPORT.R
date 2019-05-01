@@ -26,11 +26,9 @@ exportNarrative.REPORT = function(report, messageLevel = 0) {
   # Close the file connection
   close(fileConn)
   
-  # Convert the RMarxkdown file to an html file
-  rmarkdown::render(input =         paste0(DataLocation,"\\narrative.Rmd"),
-                    output_format = "html_document", 
-                    output_file =   "narrative.html", 
-                    output_dir =    DataLocation,
-                    quiet =         T)
+  knit(paste0(DataLocation,"\\narrative.Rmd"), paste0(DataLocation,"\\narrative.md")) # creates md file
+  markdownToHTML(paste0(DataLocation,"\\narrative.Rmd"), paste0(DataLocation,"\\narrative.html")) # creates html file
+  file.remove(paste0(DataLocation,"\\narrative.Rmd"))
+  file.remove(paste0(DataLocation,"\\narrative.md"))
   
 } # /function
