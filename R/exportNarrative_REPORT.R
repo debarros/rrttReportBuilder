@@ -26,8 +26,8 @@ exportNarrative.REPORT = function(report, messageLevel = 0) {
   # Close the file connection
   close(fileConn)
   
-  knit(paste0(DataLocation,"\\narrative.Rmd"), paste0(DataLocation,"\\narrative.md")) # creates md file
-  markdownToHTML(paste0(DataLocation,"\\narrative.Rmd"), paste0(DataLocation,"\\narrative.html")) # creates html file
+  knitr::knit(paste0(DataLocation,"\\narrative.Rmd"), paste0(DataLocation,"\\narrative.md"), quiet = T) # creates md file
+  markdown::markdownToHTML(paste0(DataLocation,"\\narrative.Rmd"), paste0(DataLocation,"\\narrative.html")) # creates html file
   file.remove(paste0(DataLocation,"\\narrative.Rmd"))
   file.remove(paste0(DataLocation,"\\narrative.md"))
   
