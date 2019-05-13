@@ -17,11 +17,12 @@ setComparison.REPORT = function(report, messageLevel = 0) {
   
   # Create the comparison header
   d2 = openxlsx::read.xlsx(xlsxFile = ComparisonLocation, sheet = "Overall Comparison", startRow = 2, colNames = F)
-  CompHeader = d2[1:8,-1]
-  row.names(CompHeader) = CompHeader[,1]
-  CompHeader = CompHeader[,2*(1:(ncol(CompHeader)/2))]
-  CompHeader = CompHeader[1:nrow(CompHeader), 
-                          apply(X = !is.na(CompHeader), MARGIN = 2, FUN = any), 
+  CompHeader = d2[1:8,-1]                                  # Get the header, but drop the first column
+  row.names(CompHeader) = CompHeader[,1]                   # Use the new first column as the row names
+  CompHeader = CompHeader[,2*(1:(ncol(CompHeader)/2))]     # Select only the even numbered columns, since those are the ones with data
+  CompHeader = CompHeader[1:nrow(CompHeader),              # Drop columns that have no data at all
+                          apply(X = !is.na(CompHeader), 
+                                MARGIN = 2, FUN = any), 
                           drop = FALSE]
   
   if(messageLevel > 1){message("if there are any comparisons")}
@@ -75,6 +76,11 @@ setComparison.REPORT = function(report, messageLevel = 0) {
       # Overall Comparison
       if(!is.na(CompHeader[1,i]) & Summary$N > 1){                                 # If there's an overall comparison & enough students to make one
         if(messageLevel > 3){message(paste0("looking at overall comparison ", i))}
+        
+        if(identical(rownames(CompHeader),CompHeader[,i])){
+          stop(paste0("There is an issue with comparison ", i, ".  "))
+        }
+        
         tTestSummary = t.test2(                                                    # Do a t test to see if the mean difference is significant
           m1 = Summary$Average, m2 = as.numeric(CompHeader[1,i]), 
           s1 = Summary$SD,      s2 = as.numeric(CompHeader[2,i]), 
