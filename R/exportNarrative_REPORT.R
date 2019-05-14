@@ -9,6 +9,7 @@ exportNarrative.REPORT = function(report, messageLevel = 0) {
   # pull the necessary stuff from the report
   DataLocation = report$getDataLocation()
   Narrative = report$getNarrative()
+  NarrativeStyleSheet = system.file("extdata", "narrative.css", package = "rrttReportBuilder")  # This should probable be a part of the REPORT class
   
   # establish a connection to the narrative file
   fileConn <- file(paste0(DataLocation,"\\narrative.Rmd"))
@@ -27,7 +28,9 @@ exportNarrative.REPORT = function(report, messageLevel = 0) {
   close(fileConn)
   
   knitr::knit(paste0(DataLocation,"\\narrative.Rmd"), paste0(DataLocation,"\\narrative.md"), quiet = T) # creates md file
-  markdown::markdownToHTML(paste0(DataLocation,"\\narrative.Rmd"), paste0(DataLocation,"\\narrative.html")) # creates html file
+  markdown::markdownToHTML(file = paste0(DataLocation,"\\narrative.Rmd"),                               # creates html file
+                           output = paste0(DataLocation,"\\narrative.html"),
+                           stylesheet = NarrativeStyleSheet) 
   file.remove(paste0(DataLocation,"\\narrative.Rmd"))
   file.remove(paste0(DataLocation,"\\narrative.md"))
   
