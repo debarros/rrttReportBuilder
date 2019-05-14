@@ -1,7 +1,7 @@
 Package: rrttReportBuilder
 Type: Package
 Title: Report Builder for Rapid Return To Teacher
-Version: 0.0.0.9021
+Version: 0.0.0.9022
 Date: 2019-05-13
 Authors@R: c(
     person("Paul", "de Barros", email = "pj.debarros@gmail.com", role = c("aut", "cre")),
