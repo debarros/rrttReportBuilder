@@ -46,7 +46,7 @@ exportUpdate.REPORT = function(uploadFilePath, report, messageLevel = 0) {
     } # /for loop
     
     # Close the table and the html document
-    out = paste0(out, '</table> \n </body> \n </html>')
+    out = paste0(out, '</table> \n <br> </body> \n </html>')
     
     write(out, scoreupdatefilepath)  # write the score update emails to a text file
     
