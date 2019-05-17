@@ -5,15 +5,16 @@ body, td {
 }
 
 body {
+  font-family: Arial,Helvetica Neue,Helvetica,sans-serif; 
   max-width: 800px;
+  font-size: 10pt;
   margin: 0px;
   padding: 0em;
   line-height: 20px;
 }
 
 p {
-	margin: 0px;
-	padding: 0em;
+	margin-top: 0px;
 }
 
 tt, code, pre {
@@ -55,7 +56,7 @@ pre {
   overflow-x: auto;
 }
 pre code {
-   display: block; padding: 0.5em;
+   display: block; padding: 0em;
 }
 
 code {
@@ -109,7 +110,7 @@ hr {
    }
 
    pre, blockquote {
-      padding-right: 1em;
+      padding-right: 0em;
       page-break-inside: avoid;
    }
 
