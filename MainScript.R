@@ -16,7 +16,8 @@ dBtools::UpdateDescription()
 tests = read.csv()
 
 
-DataLocation = "//stuthin2/Data/tests/2018-2019/Social Studies/Global 1/week31 (2019-04-18) Age of Exploration"
+# DataLocation = "//stuthin2/Data/tests/2018-2019/Social Studies/Multi/week30 (2019-04-09) Civil Engagement (US and AP US)/modified data"
+DataLocation = CopyClipboard()
 ComparisonFileName = "comparison and topic alignment.xlsx"
 ReportFileName = "scores.xlsx"
 TMS = "ScantronAS"
