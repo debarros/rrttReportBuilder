@@ -24,7 +24,7 @@ TMS = "ScantronAS"
 SMS = "PowerSchool"
 UploadFilenames = c("upload_percentages.csv", "upload_totalpoints.csv")
 template = NULL
-messageLevel = 3
+messageLevel = 4
 HaltOnMultiResponse = T
 
 generateReport(DataLocation = DataLocation, ComparisonFileName = ComparisonFileName, TMS = TMS, 
@@ -36,6 +36,7 @@ devtools::install_github()
 
 report = currentReport
 scoring = CurrentSpecial
+i = 1
 res = 1
 stu = 1
 subst = 1
