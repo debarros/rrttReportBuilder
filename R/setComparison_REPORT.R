@@ -66,6 +66,10 @@ setComparison.REPORT = function(report, messageLevel = 0) {
         if(messageLevel > 3){message(paste0("looking at topics for comparison ", i))}
         if(nrow(d3) != 0){                                                             # If there is a topic comparison
           TopComp = d3[,c(1,i+1)]                                                      # Get the topic comparison info
+          if(nrow(TopComp) != nrow(TopicSummary)){                                     # Check size of table of topic comparisons
+            stop(paste0("There's a problem with the number of topic comparison ",
+                        "values in comparison ", i))
+          }
           TopComp$Higher = TopicSummary$`All Classes` > TopComp[,2] + CompCuts$Topic.H # Identify noticeably higher topics
           TopComp$Lower = TopicSummary$`All Classes` < TopComp[,2] - CompCuts$Topic.L  # Identify noticeably lower topics
           Comparisons[[i]]$setTopicComparisons(TopComp)                                # Load topic comparison into comparison object
