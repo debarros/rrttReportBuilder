@@ -8,3 +8,5 @@
 ^README\.md$
 ^CleanAndRebuild\.R$
 ^UpdateDescription\.R$
+^YearDescriptions\.xlsx$
+^Maintenance\.R$
