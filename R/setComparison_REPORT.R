@@ -34,23 +34,35 @@ setComparison.REPORT = function(report, messageLevel = 0) {
                              startRow = 4, colNames = T)
     
     if(messageLevel > 2){message("loop through comparisons")}
-    for(i in 1:ncol(CompHeader)){ # For each comparison,
-      if(messageLevel > 3){message(paste0("Comparison ", i))}
-      Comparisons[[i]] = COMPARISON$new()                                         # Set up the comparison object
-      Comparisons[[i]]$setDescription(                                            # Last year, 2 yrs ago, etc
-        DescriptionLookup$Description[DescriptionLookup$Year == CompHeader[5,i]])  
-      Comparisons[[i]]$setSummary(CompHeader[,i], row.names(CompHeader))          # Set the comparison summary
+    
+    for(thisComp in 1:ncol(CompHeader)){ # For each comparison,
+      if(messageLevel > 3){message(paste0("Comparison ", thisComp))}
+      Comparisons[[thisComp]] = COMPARISON$new()                                  # Set up the comparison object
+      
+      # Set the year (Last year, 2 yrs ago, etc).  Also, make sure it exists.
+      thisYear = CompHeader[5,thisComp]
+      if(is.na(thisYear)){
+        stop(paste0("The year of comparison #",thisComp,
+                    " is missing.  Check the test setup file."))
+      }
+      Comparisons[[thisComp]]$setDescription(
+        DescriptionLookup$Description[DescriptionLookup$Year == thisYear])  
+      
+      Comparisons[[thisComp]]$setSummary(                                         # Set the comparison summary
+        CompHeader[,thisComp], row.names(CompHeader)) 
       
       # Item Comparisons
       ItemComparisons = magrittr::set_colnames(                                   # Set up the item comparisons                        
-        d2[-c(1:9), c(1,(2*i), (1+2*i))],
+        d2[-c(1:9), c(1,(2*thisComp), (1+2*thisComp))],
         c("This test item", "Prior test item", "Prior test score"))
       
-      # Check whether the entries in the Prior test score column can be converted to numeric
+      # Check if entries in Prior test score column can be converted to numeric
       PriorTestScores.original = ItemComparisons$`Prior test score`
-      PriorTestScores.numeric = suppressWarnings(as.numeric(PriorTestScores.original))
-      if(any(!is.na(PriorTestScores.original[is.na(PriorTestScores.numeric)]))){             # If any values get converted to NA's, stop.
-        stop(paste0("Error!  Comparison ", i ," has prior test item scores that are not numbers."))
+      PriorTestScores.numeric = suppressWarnings(
+        as.numeric(PriorTestScores.original))
+      if(any(!is.na(PriorTestScores.original[is.na(PriorTestScores.numeric)]))){  # If any values get converted to NA's, stop.
+        stop(paste0("Error!  Comparison ", thisComp ,
+                    " has prior test item scores that are not numbers."))
       }
       
       ItemComparisons$`Prior test score` = PriorTestScores.numeric                # Convert the prior test item scores to numeric
@@ -58,41 +70,45 @@ setComparison.REPORT = function(report, messageLevel = 0) {
       ItemComparisons$Higher[is.na(ItemComparisons$Higher)] = F                   # If there is no comparison for that item, mark as FALSE
       ItemComparisons$Lower = ItemScores < ItemComparisons[,3] - CompCuts$Item.L  # Determine which items are noticeably lower this time
       ItemComparisons$Lower[is.na(ItemComparisons$Lower)] = F                     # If there is no comparison for that item, mark as FALSE
-      Comparisons[[i]]$setItemComparisons(ItemComparisons)                        # Load the item comparisons into the comparison object
+      Comparisons[[thisComp]]$setItemComparisons(ItemComparisons)                 # Load the item comparisons into the comparison object
       
       
       # Topic Comparisons
       if(HasTopics){                                                                   # If there are topics
-        if(messageLevel > 3){message(paste0("looking at topics for comparison ", i))}
+        if(messageLevel > 3){
+          message(paste0("looking at topics for comparison ", thisComp))
+        }
         if(nrow(d3) != 0){                                                             # If there is a topic comparison
-          TopComp = d3[,c(1,i+1)]                                                      # Get the topic comparison info
+          TopComp = d3[,c(1,thisComp+1)]                                               # Get the topic comparison info
           if(nrow(TopComp) != nrow(TopicSummary)){                                     # Check size of table of topic comparisons
             stop(paste0("There's a problem with the number of topic comparison ",
-                        "values in comparison ", i))
+                        "values in comparison ", thisComp))
           }
           TopComp$Higher = TopicSummary$`All Classes` > TopComp[,2] + CompCuts$Topic.H # Identify noticeably higher topics
           TopComp$Lower = TopicSummary$`All Classes` < TopComp[,2] - CompCuts$Topic.L  # Identify noticeably lower topics
-          Comparisons[[i]]$setTopicComparisons(TopComp)                                # Load topic comparison into comparison object
+          Comparisons[[thisComp]]$setTopicComparisons(TopComp)                         # Load topic comparison into comparison object
         } # /if there is topic comparison data
       } # /if there are topics
       
       
       # Overall Comparison
-      if(!is.na(CompHeader[1,i]) & Summary$N > 1){                                 # If there's an overall comparison & enough students to make one
-        if(messageLevel > 3){message(paste0("looking at overall comparison ", i))}
-        
-        if(identical(rownames(CompHeader),CompHeader[,i])){
-          stop(paste0("There is an issue with comparison ", i, ".  "))
+      if(!is.na(CompHeader[1,thisComp]) & Summary$N > 1){                          # If there's an overall comparison & enough students to make one
+        if(messageLevel > 3){
+          message(paste0("looking at overall comparison ", thisComp))
         }
         
-        tTestSummary = t.test2(                                                    # Do a t test to see if the mean difference is significant
-          m1 = Summary$Average, m2 = as.numeric(CompHeader[1,i]), 
-          s1 = Summary$SD,      s2 = as.numeric(CompHeader[2,i]), 
-          n1 = Summary$N,       n2 = as.numeric(CompHeader[3,i]),
+        if(identical(rownames(CompHeader),CompHeader[,thisComp])){
+          stop(paste0("There is an issue with comparison ", thisComp, ".  "))
+        }
+        
+        tTestSummary = t.test2(                                                # Do a t test to see if the mean difference is significant
+          m1 = Summary$Average, m2 = as.numeric(CompHeader[1,thisComp]), 
+          s1 = Summary$SD,      s2 = as.numeric(CompHeader[2,thisComp]), 
+          n1 = Summary$N,       n2 = as.numeric(CompHeader[3,thisComp]),
           messageLevel = messageLevel - 1) # /t.test2
-        Comparisons[[i]]$setGrowth(tTestSummary$`Difference of means`)  # Load the growth score into the comparison object
-        Comparisons[[i]]$setTtest(tTestSummary$t)                       # Load the t score into the comparison object 
-        Comparisons[[i]]$setPvalue(tTestSummary$`p-value`)              # Load the p-value into the comparison object
+        Comparisons[[thisComp]]$setGrowth(tTestSummary$`Difference of means`)  # Load the growth score into the comparison object
+        Comparisons[[thisComp]]$setTtest(tTestSummary$t)                       # Load the t score into the comparison object 
+        Comparisons[[thisComp]]$setPvalue(tTestSummary$`p-value`)              # Load the p-value into the comparison object
         
         # Significance
         significance = "not a significant difference, and is probably due to chance."        # Default the significance to the lowest level
@@ -105,11 +121,14 @@ setComparison.REPORT = function(report, messageLevel = 0) {
         if(tTestSummary$`p-value` < SigCuts$extremely){
           significance = "an extremely significant difference, and could not be due to chance."
         }
-        Comparisons[[i]]$setSignificance(significance)   # Load the significance description into the comparison object
+        Comparisons[[thisComp]]$setSignificance(significance)   # Load the significance description into the comparison object
       } # /if there is an overall comparison
     } # /for each comparison
     
     report$setComparisonQuick(Comparisons) # Load the list of comparisons into the report object
+    
     if(messageLevel > 0){message("done with setComparison_REPORT")}
+    
   } # /if there are comparisons
+  
 } # /function
