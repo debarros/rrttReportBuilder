@@ -18,8 +18,17 @@ setTopicSummary.REPORT = function(report, messageLevel = 0) {
   TopicSummary = NULL 
   
   if(HasTopics){
-    TopicNames = colnames(TopicAlignments)[-1]
-    TopicScores = vector(mode = "list", length = length(Results))        # initialize a list to hold the data.frames of topics scores
+    
+    TopicNames = colnames(TopicAlignments)[-1]                            # Get the topic names
+    
+    for(thisTopic in TopicNames){
+      if(any(is.na(TopicAlignments[,thisTopic]))){
+        stop(paste0("There are missing values in the alignment for the ", # Check for problems with the topic alignments
+                    thisTopic, " topic."))
+      }
+    }
+
+    TopicScores = vector(mode = "list", length = length(Results))         # initialize a list to hold the data.frames of topics scores
     sectionNames = c("All Classes", names(Results))
     TopicSummary = magrittr::set_rownames(
       magrittr::set_colnames(
@@ -30,19 +39,19 @@ setTopicSummary.REPORT = function(report, messageLevel = 0) {
         sectionNames),
       TopicNames)
     
-    for(i in 1:length(Results)){
-      currentResult = Results[[i]]
+    for(thisResult in 1:length(Results)){
+      currentResult = Results[[thisResult]]
       currentResult$setTopicScores(TopicAlignments, ItemInfo)
-      TopicScores[[i]] = currentResult$getTopicScores()
-      TopicSummary[,names(Results)[i]] = currentResult$getTopicSummary()
+      TopicScores[[thisResult]] = currentResult$getTopicScores()
+      TopicSummary[,names(Results)[thisResult]] = currentResult$getTopicSummary()
     } # /for
     
     TopicScores = data.table::rbindlist(TopicScores)                     # Combine the topics scores data.frames
     
-    for(i in TopicNames){
-      itemset = TopicAlignments[,i]
+    for(thisTopic in TopicNames){
+      itemset = TopicAlignments[,thisTopic]
       totalpoints = sum(TopicAlignments$Value[itemset], na.rm = T)
-      TopicSummary$`All Classes`[rownames(TopicSummary) == i] = mean(unlist(TopicScores[,i, with = F]), na.rm = T)
+      TopicSummary$`All Classes`[rownames(TopicSummary) == thisTopic] = mean(unlist(TopicScores[,thisTopic, with = F]), na.rm = T)
     } # /for
   } # /if has topics 
   
