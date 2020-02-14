@@ -30,7 +30,11 @@ setItemResponses.RESULT = function(sourceLocation, ItemInfo, TMS, result, messag
       ret = FALSE 
     } else {
       ItemResponses = ItemResponses[-nrow(ItemResponses),1:(ncol(ItemResponses)-3)]
-      colnames(ItemResponses) = c("Student", "StudentID", "Test.Name", itemNames)
+      newColumnNames = c("Student", "StudentID", "Test.Name", itemNames)
+      if(length(newColumnNames) != length(colnames(ItemResponses))){
+        stop("The number of items in the test setup file does not match the number of items in the item score export file.")
+      }
+      colnames(ItemResponses) = newColumnNames
       
       # Split the full names into first and last names
       commaSpot = regexpr(pattern = ",",text = ItemResponses$Student)
