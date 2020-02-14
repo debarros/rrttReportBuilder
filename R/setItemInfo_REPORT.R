@@ -8,6 +8,9 @@ setItemInfo.REPORT = function(report, messageLevel = 0) {
   }
   
   # Pull the necessary info from the report
+  if(messageLevel > 1){
+    message("pulling necessary info from the report object")
+  }
   CompLoc = report$getComparisonLocation()
   ItemInfo = openxlsx::read.xlsx(
     xlsxFile = CompLoc, sheet = "Topic Alignment", 
@@ -15,6 +18,12 @@ setItemInfo.REPORT = function(report, messageLevel = 0) {
   ItemInfo = ItemInfo[1:(which(is.na(ItemInfo[,3]))[1] - 1),3:ncol(ItemInfo)] # remove unnecessary columns and rows
   ItemTypeCategories = report$getItemTypeCategories()
   ITC.NeedsAnswer = ItemTypeCategories$Name[ItemTypeCategories$NeedsAnswer]
+  
+  
+  
+  if(messageLevel > 1){
+    message("Checking for missing info and duplicate names")
+  }
   
   # Check for missing info.  If there is any, halt and throw an error.
   errorMessage = character(0)
@@ -46,7 +55,30 @@ setItemInfo.REPORT = function(report, messageLevel = 0) {
     stop(errorMessage)
   }
   
+    # Check for duplicate topic names, or topic names that match item info variable names
+  duplicateNames = ItemInfo[,1][duplicated(ItemInfo[,1])]
+  if(length(duplicateNames) > 0){
+    if(length(duplicateNames) == 1){
+      errorMessage = paste0(c("A name occurs twice when it really shouldn't.  ",
+                       "This means that two topics have the same name, ", 
+                       "or one of the topic names is the same as one of the item characteristics.",
+                       "The problematic name is:     ", duplicateNames), collapse = "")
+    } else {
+      errorMessage = paste0(c("Some names occur twice when they really shouldn't.  ",
+                       "This happens whenever two topics have the same name, ", 
+                       "or a topic names is the same as one of the item characteristics.",
+                       "The problematic names are ", 
+                       VectorSentence(duplicateNames, hyphenate = 1)), collapse = "")  
+    } # /if-else exactly 1 duplicate name
+    stop(errorMessage)
+  } # /if there are duplicate names
+  
+  
+  
   # Begin to organize the ItemInfo
+  if(messageLevel > 1){
+    message("Organizing ItemInfo")
+  }
   ItemInfo = t(ItemInfo)                                   # transpose it
   colnames(ItemInfo) = ItemInfo[1,]                        # use the first row as the column names
   ItemInfo = ItemInfo[-1,]                                 # remove the first row
@@ -57,10 +89,16 @@ setItemInfo.REPORT = function(report, messageLevel = 0) {
     pattern = stringr::fixed(" "), replacement = "") 
   
   # Topic Alignments
+  if(messageLevel > 1){
+    message("Organizing topic alignments")
+  }
   report$setTopicAlignments(ItemInfo)    # set the topic alignments
   ItemInfo = ItemInfo[,!(colnames(ItemInfo) %in% colnames(report$getTopicAlignments()))] # remove the topic alignments from the ItemInfo
   
   # Type, Value, Options, and Answers
+  if(messageLevel > 1){
+    message("Organizing Item parameters")
+  }
   ItemInfo$Type = toupper(substr(x = ItemInfo$`Type:`, 1, 2)) # determine the item type category
   ItemInfo$`Value:` = as.integer(ItemInfo$`Value:`)           # convert the Value column to integer
   ItemInfo$options = ItemInfo$`Value:` + 1                    # default the number of options to what it should be for ER questions
