@@ -38,14 +38,17 @@ report = currentReport
 scoring = CurrentSpecial
 i = 1
 res = 1
+thisResult = 1
 stu = 1
 subst = 1
 subst = 1 + subst
 curSpecScor
 result = report$getResults()[[1]]
 result = currentResult
+result = thisResult
 report$getResults()
 ItemInfo = report$getItemInfo()
+str(ItemInfo)
 
 report$getSummary()
 report$getItemSummary()
@@ -74,3 +77,5 @@ result$.__enclos_env__$private$ItemResponses
 
 
 
+
+UpdateDescription()
