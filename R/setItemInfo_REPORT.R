@@ -12,10 +12,10 @@ setItemInfo.REPORT = function(report, messageLevel = 0) {
     message("pulling necessary info from the report object")
   }
   CompLoc = report$getComparisonLocation()
-  ItemInfo = openxlsx::read.xlsx(
+  ItemInfo.raw = openxlsx::read.xlsx(
     xlsxFile = CompLoc, sheet = "Topic Alignment", 
     startRow = 2, colNames = F)
-  ItemInfo = ItemInfo[1:(which(is.na(ItemInfo[,3]))[1] - 1),3:ncol(ItemInfo)] # remove unnecessary columns and rows
+  ItemInfo = ItemInfo.raw[1:(which(is.na(ItemInfo.raw[,3]))[1] - 1),3:ncol(ItemInfo.raw)] # remove unnecessary columns and rows
   ItemTypeCategories = report$getItemTypeCategories()
   ITC.NeedsAnswer = ItemTypeCategories$Name[ItemTypeCategories$NeedsAnswer]
   
@@ -23,6 +23,13 @@ setItemInfo.REPORT = function(report, messageLevel = 0) {
   
   if(messageLevel > 1){
     message("Checking for missing info and duplicate names")
+  }
+  if(!is.data.frame(ItemInfo)){
+    print("str(ItemInfo.raw) = ")
+    print(capture.output(str(ItemInfo.raw)))
+    print("str(ItemInfo) = ")
+    print(capture.output(str(ItemInfo)))
+    stop("There's something wrong with the item info.  It looks like there might not be any items in the topic alignment tab.")
   }
   
   # Check for missing info.  If there is any, halt and throw an error.
